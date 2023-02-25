@@ -8,9 +8,11 @@ processes = []
   builder = "paketobuildpacks/builder:base"
 
 [build.args]
-  BPL_JVM_THREAD_COUNT=50
   BP_JVM_VERSION=17
-  JAVA_TOOL_OPTIONS="-Xss256K -XX:ReservedCodeCacheSize=64M -XX:MaxMetaspaceSize=64M"
+
+[env]
+  BPL_JVM_THREAD_COUNT=50
+  JAVA_TOOL_OPTIONS="-Xss256K -XX:ReservedCodeCacheSize=64M -XX:MaxMetaspaceSize=256M"
 
 [deploy]
   strategy = "canary"
