@@ -12,7 +12,7 @@ processes = []
 
 [env]
   BPL_JVM_THREAD_COUNT=50
-  JAVA_TOOL_OPTIONS="-Xss256K -XX:ReservedCodeCacheSize=64M -XX:MaxMetaspaceSize=256M"
+  JAVA_TOOL_OPTIONS="-Xss256K -XX:ReservedCodeCacheSize=64M -XX:MaxMetaspaceSize=512"
 
 [deploy]
   strategy = "canary"
