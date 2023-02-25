@@ -1,4 +1,4 @@
-app = "cs5500-s22-starterbot"
+app = "cs5500-s22-team-koala"
 
 kill_signal = "SIGINT"
 kill_timeout = 5
