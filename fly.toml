@@ -1,4 +1,4 @@
-app = "cs5500-s22-starterbot"
+app = "cs5500-s22-team-koala"
 
 kill_signal = "SIGINT"
 kill_timeout = 5
@@ -9,6 +9,7 @@ processes = []
 
 [env]
   BPL_JVM_THREAD_COUNT=50
+  BP_JVM_VERSION=17
   JAVA_TOOL_OPTIONS="-Xss256K -XX:ReservedCodeCacheSize=64M -XX:MaxMetaspaceSize=64M"
 
 [deploy]
