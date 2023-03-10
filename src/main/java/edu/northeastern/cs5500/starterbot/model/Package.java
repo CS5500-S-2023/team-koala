@@ -6,7 +6,7 @@ public class Package {
 
     String name;
     String trackingNumber;
-    
+
     public Package(String name, String trackingNumber) {
         this.name = name;
         this.trackingNumber = trackingNumber;
@@ -14,6 +14,7 @@ public class Package {
 
     /**
      * This constructor is for users who don't like to create a name
+     *
      * @param name
      * @param trackingNumber
      */

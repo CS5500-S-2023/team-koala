@@ -9,8 +9,20 @@ public class CommandModule {
 
     @Provides
     @IntoSet
-    public SlashCommandHandler provideSayCommand(ButtonCommand sayCommand) {
+    public SlashCommandHandler provideSayCommand(SayCommand sayCommand) {
         return sayCommand;
+    }
+
+    @Provides
+    @IntoSet
+    public SlashCommandHandler provideAddPackageCommand(AddPackageCommand addPackageCommand) {
+        return addPackageCommand;
+    }
+
+    @Provides
+    @IntoSet
+    public ModalListener provideAddPackageCommandHListener(AddPackageCommand addPackageCommand) {
+        return addPackageCommand;
     }
 
     @Provides

@@ -1,6 +1,7 @@
 package edu.northeastern.cs5500.starterbot.listener;
 
 import edu.northeastern.cs5500.starterbot.command.ButtonHandler;
+import edu.northeastern.cs5500.starterbot.command.ModalListener;
 import edu.northeastern.cs5500.starterbot.command.SlashCommandHandler;
 import edu.northeastern.cs5500.starterbot.command.StringSelectHandler;
 import java.util.ArrayList;
@@ -11,11 +12,13 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.modals.*;
 
 @Slf4j
 public class MessageListener extends ListenerAdapter {
@@ -23,6 +26,7 @@ public class MessageListener extends ListenerAdapter {
     @Inject Set<SlashCommandHandler> commands;
     @Inject Set<ButtonHandler> buttons;
     @Inject Set<StringSelectHandler> stringSelects;
+    @Inject Set<ModalListener> modals;
 
     @Inject
     public MessageListener() {
@@ -48,6 +52,22 @@ public class MessageListener extends ListenerAdapter {
             return new ArrayList<>();
         }
         return commandData;
+    }
+
+    @Override
+    public void onModalInteraction(@Nonnull ModalInteractionEvent event) {
+        log.info("onModalInteraction: {}", event.getModalId());
+        String id = event.getModalId();
+        Objects.requireNonNull(id);
+        // modal name format: mod_xx
+        String handlerName = id.split(":", 2)[0].substring(4);
+
+        for (ModalListener modalListener : modals) {
+            if (modalListener.getName().equals(handlerName)) {
+                modalListener.onModalInteraction(event);
+                return;
+            }
+        }
     }
 
     @Override
