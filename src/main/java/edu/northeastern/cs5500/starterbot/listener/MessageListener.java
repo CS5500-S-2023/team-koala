@@ -1,7 +1,6 @@
 package edu.northeastern.cs5500.starterbot.listener;
 
 import edu.northeastern.cs5500.starterbot.command.ButtonHandler;
-import edu.northeastern.cs5500.starterbot.command.ModalListener;
 import edu.northeastern.cs5500.starterbot.command.SlashCommandHandler;
 import edu.northeastern.cs5500.starterbot.command.StringSelectHandler;
 import java.util.ArrayList;
@@ -12,7 +11,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
@@ -26,7 +24,6 @@ public class MessageListener extends ListenerAdapter {
     @Inject Set<SlashCommandHandler> commands;
     @Inject Set<ButtonHandler> buttons;
     @Inject Set<StringSelectHandler> stringSelects;
-    @Inject Set<ModalListener> modals;
 
     @Inject
     public MessageListener() {
@@ -55,22 +52,6 @@ public class MessageListener extends ListenerAdapter {
     }
 
     @Override
-    public void onModalInteraction(@Nonnull ModalInteractionEvent event) {
-        log.info("onModalInteraction: {}", event.getModalId());
-        String id = event.getModalId();
-        Objects.requireNonNull(id);
-        // modal name format: mod_xx
-        String handlerName = id.split(":", 2)[0].substring(4);
-
-        for (ModalListener modalListener : modals) {
-            if (modalListener.getName().equals(handlerName)) {
-                modalListener.onModalInteraction(event);
-                return;
-            }
-        }
-    }
-
-    @Override
     public void onButtonInteraction(@Nonnull ButtonInteractionEvent event) {
         log.info("onButtonInteraction: {}", event.getButton().getId());
         String id = event.getButton().getId();
@@ -91,6 +72,8 @@ public class MessageListener extends ListenerAdapter {
     public void onStringSelectInteraction(@Nonnull StringSelectInteractionEvent event) {
         log.info("onStringSelectInteraction: {}", event.getComponent().getId());
         String handlerName = event.getComponent().getId();
+        // string select name format: string_select_xxxx
+        handlerName = handlerName.split(":", 2)[0].substring(14);
 
         for (StringSelectHandler stringSelectHandler : stringSelects) {
             if (stringSelectHandler.getName().equals(handlerName)) {

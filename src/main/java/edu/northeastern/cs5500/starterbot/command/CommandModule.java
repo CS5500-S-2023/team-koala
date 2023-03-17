@@ -21,7 +21,8 @@ public class CommandModule {
 
     @Provides
     @IntoSet
-    public ModalListener provideAddPackageCommandHListener(AddPackageCommand addPackageCommand) {
+    public StringSelectHandler provideAddPackageCommandMenuHandler(
+            AddPackageCommand addPackageCommand) {
         return addPackageCommand;
     }
 
