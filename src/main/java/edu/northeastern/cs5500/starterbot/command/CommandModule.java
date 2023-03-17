@@ -22,6 +22,12 @@ public class CommandModule {
 
     @Provides
     @IntoSet
+    public SlashCommandHandler addReminderCommand(AddReminderCommand addReminderCommand) {
+        return addReminderCommand;
+    }
+
+    @Provides
+    @IntoSet
     public SlashCommandHandler provideButtonCommand(ButtonCommand buttonCommand) {
         return buttonCommand;
     }
