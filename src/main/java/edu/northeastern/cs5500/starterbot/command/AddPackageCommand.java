@@ -1,6 +1,7 @@
 package edu.northeastern.cs5500.starterbot.command;
 
 import edu.northeastern.cs5500.starterbot.model.Package;
+import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -20,6 +21,20 @@ import net.dv8tion.jda.api.interactions.modals.*;
 public class AddPackageCommand implements SlashCommandHandler, StringSelectHandler {
 
     private Package package1 = new Package();
+    // may have a better solution to read the data from csv file
+    // https://github.com/CS5500-S-2023/team-koala/issues/15
+    private final Map<String, String> carrieMap =
+            Map.of(
+                    "UPS", "ups",
+                    "DHL", "dhl",
+                    "FedEx", "fedex",
+                    "USPS", "usps",
+                    "LaserShip", "lasership",
+                    "China-post", "cpcbe",
+                    "China Ems International", "china_ems_international",
+                    "GLS", "gls",
+                    "Canada Post", "canada_post",
+                    "Purolator", "purolator");
 
     @Inject
     public AddPackageCommand() {
@@ -65,21 +80,18 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
         String trackingNumber = trackingNumberOption.getAsString();
         package1.setTrackingNumber(trackingNumber);
 
-        SelectMenu carrier =
-                StringSelectMenu.create("string_select_add_package")
-                        .addOption(
-                                "Pizza", "pizza",
-                                "Classic") // SelectOption with only the label, value, and
-                        // description
-                        .addOptions(
-                                SelectOption.of(
-                                                "Hamburger",
-                                                "hamburger") // another way to create a SelectOption
-                                        .withDescription("Tasty") // this time with a description
-                                        .withDefault(true)) // while also being the default option
-                        .build();
+        StringSelectMenu.Builder carrierBuilder =
+                StringSelectMenu.create("string_select_add_package");
+        for (String carrierKey : carrieMap.keySet()) {
+            carrierBuilder.addOption(
+                    carrierKey,
+                    carrieMap.get(carrierKey),
+                    "carrier name"); // label, value, description
+        }
 
-        event.reply("Select the carrier for your package").addActionRow(carrier).queue();
+        event.reply("Select the carrier for your package")
+                .addActionRow(carrierBuilder.build())
+                .queue();
     }
 
     @Override
