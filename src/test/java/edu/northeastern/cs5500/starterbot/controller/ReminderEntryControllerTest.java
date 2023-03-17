@@ -22,9 +22,6 @@ class ReminderEntryControllerTest {
     private ReminderEntryController getReminderEntryController() {
         ReminderEntryController reminderEntryController =
                 new ReminderEntryController(new InMemoryRepository<>());
-        // ReminderEntryController reminderEntryController =
-        //         new ReminderEntryController(new InMemoryRepository<>());
-        // System.out.println(reminderEntryController);
         return reminderEntryController;
     }
 
