@@ -1,4 +1,8 @@
 package edu.northeastern.cs5500.starterbot.api;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpClient;
+import java.io.IOException;
 
 public class fedexApi {
     public void authentication() {
