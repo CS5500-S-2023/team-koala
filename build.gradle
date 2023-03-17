@@ -52,6 +52,10 @@ dependencies {
     implementation ('net.dv8tion:JDA:_') {
         // Remove the next line if your bot needs voice support!
         exclude module: "opus-java"
+
+    //OkHttp
+    implementation 'com.squareup.okhttp3:okhttp:3.14.6'
+
     }
 
     // Dagger for dependency injection
