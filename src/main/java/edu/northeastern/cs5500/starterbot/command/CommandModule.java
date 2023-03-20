@@ -53,6 +53,12 @@ public class CommandModule {
 
     @Provides
     @IntoSet
+    public ButtonHandler provideAddReminderCommandConfirmHandler(AddReminderCommand addReminderCommand) {
+        return addReminderCommand;
+    }
+
+    @Provides
+    @IntoSet
     public SlashCommandHandler provideDropdownCommand(DropdownCommand dropdownCommand) {
         return dropdownCommand;
     }
