@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.modals.*;
 
 @Slf4j
 public class MessageListener extends ListenerAdapter {
@@ -71,6 +72,8 @@ public class MessageListener extends ListenerAdapter {
     public void onStringSelectInteraction(@Nonnull StringSelectInteractionEvent event) {
         log.info("onStringSelectInteraction: {}", event.getComponent().getId());
         String handlerName = event.getComponent().getId();
+        // string select name format: string_select_xxxx
+        handlerName = handlerName.split(":", 2)[0].substring(14);
 
         for (StringSelectHandler stringSelectHandler : stringSelects) {
             if (stringSelectHandler.getName().equals(handlerName)) {
