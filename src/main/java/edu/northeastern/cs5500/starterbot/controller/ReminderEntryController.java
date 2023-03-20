@@ -32,7 +32,7 @@ public class ReminderEntryController {
         LocalTime reminderTime = LocalTime.of(hour, min);
 
         TimeUnit unit = null;
-        if (unitString != null) {
+        if (interval != null) {
             switch (unitString) {
                 case "m":
                     unit = TimeUnit.MINUTES;
