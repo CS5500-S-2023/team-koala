@@ -63,11 +63,11 @@ public class AddReminderCommand implements SlashCommandHandler {
         String discordUserId = event.getUser().getId();
         String title = Objects.requireNonNull(event.getOption("title")).getAsString();
         String reminderTimeString =
-                Objects.requireNonNull(event.getOption("reminder-time(hh:mm)")).getAsString();
+                Objects.requireNonNull(event.getOption("reminder-time")).getAsString();
 
         OptionMapping offsetOption = event.getOption("reminder-offset");
         OptionMapping intervalOption = event.getOption("repeat-interval");
-        OptionMapping unitOption = event.getOption("interval-unit(m/h/d)");
+        OptionMapping unitOption = event.getOption("interval-unit");
 
         Integer offset = offsetOption == null ? 10 : offsetOption.getAsInt();
         Integer interval = intervalOption == null ? null : intervalOption.getAsInt();
