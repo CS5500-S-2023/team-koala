@@ -2,6 +2,7 @@ package edu.northeastern.cs5500.starterbot.repository;
 
 import dagger.Module;
 import dagger.Provides;
+import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
 import edu.northeastern.cs5500.starterbot.model.UserPreference;
 
@@ -35,5 +36,11 @@ public class RepositoryModule {
     @Provides
     public Class<ReminderEntry> provideReminderEntry() {
         return ReminderEntry.class;
+    }
+
+    @Provides
+    public GenericRepository<Package> providePackageRepository(
+            MongoDBRepository<Package> repository) {
+        return repository;
     }
 }
