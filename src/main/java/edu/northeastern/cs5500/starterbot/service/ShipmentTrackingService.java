@@ -2,6 +2,7 @@ package edu.northeastern.cs5500.starterbot.service;
 
 import edu.northeastern.cs5500.starterbot.exception.NotFoundException;
 import edu.northeastern.cs5500.starterbot.model.TrackingInformation;
+import java.io.IOException;
 import javax.annotation.Nonnull;
 
 public interface ShipmentTrackingService extends Service {
@@ -22,5 +23,5 @@ public interface ShipmentTrackingService extends Service {
      */
     @Nonnull
     TrackingInformation getTrackingInformation(@Nonnull String trackingNumber)
-            throws NotFoundException;
+            throws NotFoundException, IOException;
 }

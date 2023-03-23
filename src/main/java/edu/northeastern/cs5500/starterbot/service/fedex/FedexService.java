@@ -10,7 +10,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -96,10 +95,8 @@ public class FedexService implements ShipmentTrackingService {
 
     @Override
     @Nonnull
-    // TODO: You must remove this SneakyThrows before you can merge this code
-    @SneakyThrows({IOException.class})
     public TrackingInformation getTrackingInformation(@Nonnull String trackingNumber)
-            throws NotFoundException {
+            throws NotFoundException, IOException {
         OkHttpClient client = new OkHttpClient();
 
         MediaType mediaType = MediaType.parse("application/json");
@@ -107,6 +104,7 @@ public class FedexService implements ShipmentTrackingService {
         FedexTrackingNumbersRequest fedexTrackingNumbersRequest =
                 new FedexTrackingNumbersRequest(trackingNumber);
         RequestBody body = RequestBody.create(fedexTrackingNumbersRequest.toJson(), mediaType);
+
         Request request =
                 new Request.Builder()
                         .url("https://apis-sandbox.fedex.com/track/v1/trackingnumbers")
@@ -116,19 +114,27 @@ public class FedexService implements ShipmentTrackingService {
                         .addHeader("Authorization", refreshAccessToken().toHeader())
                         .build();
 
-        Response response = client.newCall(request).execute();
+        Response response = null;
+        try {
+            response = client.newCall(request).execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw e;
+        }
 
         if (!response.isSuccessful()) {
             log.error("Failed to get tracking information from Fedex: {}", response);
             throw new NotFoundException();
         }
 
+        String responseString = response.body().string();
         FedexTrackingNumbersResponse fedexTrackingNumbersResponse =
-                FedexTrackingNumbersResponse.fromJson(response.body().string());
+                FedexTrackingNumbersResponse.fromJson(responseString);
 
-        // TODO: Handle error codes from the response since Fedex always returns code 200 even if
-        // the package is not found
-        // You should throw a NotFoundException when this happens.
+        if (responseString.contains("Tracking number cannot be found.")) {
+            log.error("No such tracking number exists from Fedex: {}", response);
+            throw new NotFoundException();
+        }
 
         String description =
                 fedexTrackingNumbersResponse
