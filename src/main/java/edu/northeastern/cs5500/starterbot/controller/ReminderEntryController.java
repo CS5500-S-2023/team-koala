@@ -2,9 +2,7 @@ package edu.northeastern.cs5500.starterbot.controller;
 
 import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
-import java.time.LocalTime;
 import java.util.Collection;
-import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 public class ReminderEntryController {
@@ -16,9 +14,7 @@ public class ReminderEntryController {
         this.reminderEntryRepository = reminderEntryRepository;
     }
 
-    public void addReminder(
-            ReminderEntry reminderEntry) {
-
+    public void addReminder(ReminderEntry reminderEntry) {
         reminderEntryRepository.add(reminderEntry);
     }
 

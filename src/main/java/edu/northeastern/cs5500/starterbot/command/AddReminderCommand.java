@@ -3,16 +3,18 @@ package edu.northeastern.cs5500.starterbot.command;
 import edu.northeastern.cs5500.starterbot.controller.ReminderEntryController;
 import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
 import java.time.LocalTime;
-import java.util.Objects;
-import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -22,9 +24,6 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.MessageEmbed.Field;
-import net.dv8tion.jda.api.EmbedBuilder;
 
 @Singleton
 @Slf4j
@@ -89,8 +88,27 @@ public class AddReminderCommand implements SlashCommandHandler, ButtonHandler {
         String unitString = unitOption == null ? null : unitOption.getAsString();
 
         String[] reminderHourMin = reminderTimeString.split(":");
-        Integer hour = Integer.parseInt(reminderHourMin[0]);
-        Integer min = Integer.parseInt(reminderHourMin[1]);
+        if (reminderHourMin.length != 2) {
+            event.reply("Please specify reminder time like 'hh:mm' (24-hour clock format)").queue();
+            return;
+        }
+
+        Integer hour = null;
+        Integer min = null;
+        try {
+            hour = Integer.parseInt(reminderHourMin[0]);
+            min = Integer.parseInt(reminderHourMin[1]);
+
+            if (hour < 0 || hour >= 24) {
+                throw new NumberFormatException("Hour must be an integer from 0 to 23");
+            }
+            if (min < 0 || min >= 60) {
+                throw new NumberFormatException("Minute must be an integer from 0 to 59");
+            }
+        } catch (NumberFormatException e) {
+            event.reply("Please specify reminder time hour and minute with valid numbers").queue();
+            return;
+        }
 
         LocalTime reminderTime = LocalTime.of(hour, min);
 
@@ -110,8 +128,9 @@ public class AddReminderCommand implements SlashCommandHandler, ButtonHandler {
                     break;
 
                 default:
-                    unit = TimeUnit.MINUTES;
-                    break;
+                    event.reply("Please specify repeat interval with m(minute) / h(hour) / d(day)")
+                            .queue();
+                    return;
             }
         }
         ReminderEntry reminderEntry =
@@ -120,8 +139,8 @@ public class AddReminderCommand implements SlashCommandHandler, ButtonHandler {
                         .title(title)
                         .reminderTime(reminderTime)
                         .reminderOffset(offset)
-                        .recurrenceInterval(interval)
-                        .recurrencTimeUnit(unit)
+                        .repeatInterval(interval)
+                        .repeatTimeUnit(unit)
                         .build();
         tempStore.put(discordUserId, reminderEntry);
 
@@ -132,8 +151,8 @@ public class AddReminderCommand implements SlashCommandHandler, ButtonHandler {
         embedBuilder.addField("Reminder Offset", String.valueOf(offset), false);
 
         if (interval != null) {
-                embedBuilder.addField("Repeat Interval", String.valueOf(interval), false);
-                embedBuilder.addField("Repeat Interval Time Unit", unitString, false);
+            embedBuilder.addField("Repeat Interval", String.valueOf(interval), false);
+            embedBuilder.addField("Repeat Interval Time Unit", unitString, false);
         }
 
         MessageEmbed embed = embedBuilder.build();
@@ -142,26 +161,34 @@ public class AddReminderCommand implements SlashCommandHandler, ButtonHandler {
         MessageCreateBuilder messageCreateBuilder = new MessageCreateBuilder();
         messageCreateBuilder =
                 messageCreateBuilder
-                .addEmbeds(
-                        embeds
-                )
-                .addActionRow(
-                        Button.primary(this.getName() + ":comfirm@" + discordUserId, "Confirm"),
-                        Button.secondary(this.getName() + ":cancel@" + discordUserId, "Cancel"));
-        messageCreateBuilder = messageCreateBuilder.setContent("Are you sure you would like to add the following event?");
+                        .addEmbeds(embeds)
+                        .addActionRow(
+                                Button.primary(
+                                        this.getName() + ":comfirm@" + discordUserId, "Confirm"),
+                                Button.secondary(
+                                        this.getName() + ":cancel@" + discordUserId, "Cancel"));
+        messageCreateBuilder =
+                messageCreateBuilder.setContent(
+                        "Are you sure you would like to add the following event?");
         event.reply(messageCreateBuilder.build()).queue();
     }
 
     @Override
     public void onButtonInteraction(@Nonnull ButtonInteractionEvent event) {
+
+        String label = event.getButton().getLabel();
+
         String id = event.getButton().getId();
         Objects.requireNonNull(id);
         String userId = id.split("@", 2)[1];
-        
+
         ReminderEntry entry = tempStore.get(userId);
         tempStore.remove(userId);
-        reminderEntryController.addReminder(
-                entry);
-        event.reply("Event Added!").queue();
+        if (label.equals("Cancel")) {
+            event.reply("Request canceled!").queue();
+            return;
+        }
+        reminderEntryController.addReminder(entry);
+        event.reply("Reminder Added!").queue();
     }
 }

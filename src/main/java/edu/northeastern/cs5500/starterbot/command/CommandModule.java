@@ -53,7 +53,8 @@ public class CommandModule {
 
     @Provides
     @IntoSet
-    public ButtonHandler provideAddReminderCommandConfirmHandler(AddReminderCommand addReminderCommand) {
+    public ButtonHandler provideAddReminderCommandConfirmHandler(
+            AddReminderCommand addReminderCommand) {
         return addReminderCommand;
     }
 
