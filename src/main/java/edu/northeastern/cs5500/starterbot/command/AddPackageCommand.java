@@ -2,12 +2,14 @@ package edu.northeastern.cs5500.starterbot.command;
 
 import edu.northeastern.cs5500.starterbot.model.Package;
 import java.util.Map;
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -57,7 +59,10 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
                         "The bot will record the number",
                         true)
                 .addOption(
-                        OptionType.STRING, "package_alias", "The bot will record the name", false);
+                        OptionType.STRING,
+                        "package_alias",
+                        "The bot will record the alias for the package",
+                        false);
     }
 
     @Override
@@ -65,12 +70,11 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
         log.info("event: /add_package");
 
         // retrieve option data
-        var aliasOption = event.getOption("package_alias");
-        var trackingNumberOption = event.getOption("tracking_number");
-        if (trackingNumberOption == null) {
-            log.error("Received null value for mandatory parameter 'tracking_number'");
-            return;
-        }
+        OptionMapping aliasOption = event.getOption("package_alias");
+        OptionMapping trackingNumberOption =
+                Objects.requireNonNull(
+                        event.getOption("tracking_number"),
+                        "Received null value for mandatory parameter 'tracking_number'");
 
         // set package data
         package1.reset(); // avoid newing several objects
@@ -80,6 +84,7 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
         String trackingNumber = trackingNumberOption.getAsString();
         package1.setTrackingNumber(trackingNumber);
 
+        // Reply with a select menu for users to choose a carrier
         StringSelectMenu.Builder carrierBuilder =
                 StringSelectMenu.create("string_select_add_package");
         for (String carrierKey : carrieMap.keySet()) {

@@ -1,24 +1,25 @@
 package edu.northeastern.cs5500.starterbot.model;
 
+import javax.annotation.Nonnull;
 import lombok.Data;
 import org.bson.types.ObjectId;
 
 @Data
 public class Package implements Model {
-    private final String UNDEFINED_NAME = "undefined";
 
     ObjectId id;
     String name;
-    String trackingNumber;
-    String carrierId;
+    @Nonnull String trackingNumber;
+    @Nonnull String carrierId;
 
     public Package() {
-        this.name = UNDEFINED_NAME;
+        this.name = null;
         this.trackingNumber = null;
         this.carrierId = null;
     }
 
-    public Package(String name, String trackingNumber, String carrierId) {
+    public Package(
+            @Nonnull String name, @Nonnull String trackingNumber, @Nonnull String carrierId) {
         this.name = name;
         this.trackingNumber = trackingNumber;
         this.carrierId = carrierId;
@@ -30,14 +31,14 @@ public class Package implements Model {
      * @param carrierId - passed from select list in frontend
      * @param trackingNumber
      */
-    public Package(String trackingNumber, String carrierId) {
-        this.name = UNDEFINED_NAME;
+    public Package(@Nonnull String trackingNumber, @Nonnull String carrierId) {
+        this.name = null;
         this.trackingNumber = trackingNumber;
         this.carrierId = carrierId;
     }
 
     public void reset() {
-        this.name = UNDEFINED_NAME;
+        this.name = null;
         this.trackingNumber = null;
         this.carrierId = null;
     }
