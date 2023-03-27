@@ -22,7 +22,7 @@ import net.dv8tion.jda.api.interactions.modals.*;
 @Slf4j
 public class AddPackageCommand implements SlashCommandHandler, StringSelectHandler {
 
-    private Package package1 = new Package();
+    private final Package package1 = new Package();
     // may have a better solution to read the data from csv file
     // https://github.com/CS5500-S-2023/team-koala/issues/15
     private final Map<String, String> carrieMap =
@@ -87,11 +87,9 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
         // Reply with a select menu for users to choose a carrier
         StringSelectMenu.Builder carrierBuilder =
                 StringSelectMenu.create("string_select_add_package");
-        for (String carrierKey : carrieMap.keySet()) {
+        for (Map.Entry<String, String> entry : carrieMap.entrySet()) {
             carrierBuilder.addOption(
-                    carrierKey,
-                    carrieMap.get(carrierKey),
-                    "carrier name"); // label, value, description
+                    entry.getKey(), entry.getValue(), "carrier name"); // label, value, description
         }
 
         event.reply("Select the carrier for your package")
