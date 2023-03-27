@@ -1,6 +1,7 @@
 package edu.northeastern.cs5500.starterbot.command;
 
 import edu.northeastern.cs5500.starterbot.model.Package;
+import edu.northeastern.cs5500.starterbot.controller.PackageController;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nonnull;
@@ -22,6 +23,8 @@ import net.dv8tion.jda.api.interactions.modals.*;
 @Singleton
 @Slf4j
 public class AddPackageCommand implements SlashCommandHandler, StringSelectHandler {
+
+    @Inject PackageController packageController;
 
     private Package package1;
     // may have a better solution to read the data from csv file
@@ -110,8 +113,13 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
         package1.setCarrierId(carrier);
         log.info(package1.toString());
 
-        // create a package
+        // create a package and receives success or error messages
+        String created = packageController.createPackage(package1);
 
-        event.reply("Your package has been created successfully!").setEphemeral(true).queue();
+        if (created.equals(packageController.SUCCESS_STATUS)) {
+            event.reply("Your package has been created successfully!").setEphemeral(true).queue();
+        } else {
+            event.reply("Your package was not created successfuly because of ", created).setEphemeral(true).queue();
+        }
     }
 }
