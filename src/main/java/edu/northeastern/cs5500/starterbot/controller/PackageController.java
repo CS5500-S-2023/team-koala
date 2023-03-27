@@ -18,9 +18,8 @@ public class PackageController {
     public String createPackage(Package package1) {
 
         // create tracking item
-        
 
-        // write to database 
+        // write to database
         // assumed success, otherwise will need to modify repository functions
         packageRepository.add(package1);
 

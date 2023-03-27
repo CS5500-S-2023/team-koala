@@ -43,4 +43,9 @@ public class RepositoryModule {
             MongoDBRepository<Package> repository) {
         return repository;
     }
+
+    @Provides
+    public Class<Package> providePackage() {
+        return Package.class;
+    }
 }
