@@ -55,7 +55,6 @@ public class FedexService implements ShipmentTrackingService {
 
         MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
 
-        // 'input' refers to JSON Payload
         RequestBody body =
                 RequestBody.create(
                         String.format(
@@ -100,7 +99,6 @@ public class FedexService implements ShipmentTrackingService {
         OkHttpClient client = new OkHttpClient();
 
         MediaType mediaType = MediaType.parse("application/json");
-        // 'input' refers to JSON Payload
         FedexTrackingNumbersRequest fedexTrackingNumbersRequest =
                 new FedexTrackingNumbersRequest(trackingNumber);
         RequestBody body = RequestBody.create(fedexTrackingNumbersRequest.toJson(), mediaType);
@@ -143,7 +141,7 @@ public class FedexService implements ShipmentTrackingService {
                         .getTrackResults()[0]
                         .getLatestStatusDetail()
                         .getDescription();
-
+        System.out.println("Hi");
         return new TrackingInformation(trackingNumber, description);
     }
 }

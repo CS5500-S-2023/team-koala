@@ -4,17 +4,4 @@
         "**/build": true,
         "**/bin": true
     },
-    "java.configuration.updateBuildConfiguration": "interactive",
-    "java.test.config": {
-        "name": "WithFedex",
-        "env": {
-            "FEDEX_CLIENT_ID":"l761ceae70781f4085b811a852d96251a1",
-            "FEDEX_CLIENT_SECRET":"c281c72592bf42d1b1f389e8e2e93269"
-        }
-    },
-    "terminal.integrated.env.linux": {
-        "FEDEX_CLIENT_ID":"l761ceae70781f4085b811a852d96251a1",
-        "FEDEX_CLIENT_SECRET":"c281c72592bf42d1b1f389e8e2e93269"
-    },
-    "java.debug.settings.onBuildFailureProceed": true
 }
