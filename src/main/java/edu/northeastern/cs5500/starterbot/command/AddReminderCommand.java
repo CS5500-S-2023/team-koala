@@ -41,12 +41,12 @@ public class AddReminderCommand implements SlashCommandHandler {
                                 "Start time of the event to be reminded of",
                                 true),
                         new OptionData(
-                                OptionType.NUMBER,
+                                OptionType.INTEGER,
                                 "reminder-offset",
                                 "how much earlier the user want to be reminded of some event",
                                 false),
                         new OptionData(
-                                OptionType.NUMBER,
+                                OptionType.INTEGER,
                                 "repeat-interval",
                                 "Interval between 2 reminders if user wants repeated reminders",
                                 false),
