@@ -61,11 +61,6 @@ dependencies {
     // MongoDB for data storage
     implementation 'org.mongodb:mongo-java-driver:_'
 
-    //OKHttpClient for Java API calls
-    implementation Square.okHttp3
-
-    //JSONObject
-    implementation 'com.google.code.gson:gson:_'
 }
 
 application {
