@@ -5,6 +5,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+
+import edu.northeastern.cs5500.starterbot.controller.PackageController;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import java.io.BufferedReader;
@@ -24,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TrackPackageService implements Service {
 
     private static final String REALTIME_URL = "https://www.kd100.com/api/v1/tracking/realtime";
+    private static final String CREATE_TRACKING_URL = "https://www.kd100.com/api/v1/tracking/create";
     private static final String API_KEY =
             new ProcessBuilder().environment().get("KEY_DELIVERY_API_KEY");
     private static final String SECRET =
@@ -40,6 +43,42 @@ public class TrackPackageService implements Service {
         this.packageRepository = packageRepository;
     }
 
+    /**
+     * Get updates along the way Delivery status is not instantly displayed
+     *
+     * @return if a package is successfully created
+     */
+    public String createPackageTracking(Package package1) {
+        // mock data
+        String carrier_id = "ups";
+        String tracking_number = "1Z9A170W0337231977";
+        String webhook_url = "https://www.kd100.com/webhook_url";
+
+        String result = getData(carrier_id, tracking_number, webhook_url, CREATE_TRACKING_URL);
+
+        // read the result and handle errors
+        return readResponse(result);
+    }
+
+    /** Updates about packages will be posted via webhook */
+    private void handlePackageUpdates() {}
+
+    /**
+     * When creating the tracking, if the response code is 407, message is "The tracking_number is
+     * invalid", return false
+     *
+     * @return
+     */
+    public String readResponse(String result) {
+        JsonObject json = new Gson().fromJson(result, JsonElement.class).getAsJsonObject();
+
+        int code = json.get("code").getAsInt();
+        String message = json.get("message").getAsString();
+
+        if (code != 200) return message;
+
+        return PackageController.SUCCESS;
+    }
     /**
      * Call real-time tracking api to get the latest status Invoked when displaying list of packages
      * Update package info in database
@@ -214,4 +253,8 @@ class MD5Utils {
             return null;
         }
     }
+
+    
+
+   
 }
