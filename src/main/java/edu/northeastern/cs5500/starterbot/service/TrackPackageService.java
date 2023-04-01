@@ -1,5 +1,6 @@
 package edu.northeastern.cs5500.starterbot.service;
 
+import edu.northeastern.cs5500.starterbot.model.Package;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,6 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
+import javax.inject.Inject;
 
 @Singleton
 @Slf4j
@@ -21,7 +23,12 @@ public class TrackPackageService implements Service {
     private final String SECRET = "1db9a0ce49d341f1b932b12e0fccdfd6";
     private final int CONNECT_TIMEOUT = 1000;
     private final int READ_TIMEOUT = 5000;
-    private final String SUCCESS = "success";
+    public final String SUCCESS = "success";
+
+    @Inject
+    public TrackPackageService() {
+
+    }
 
     /**
      * Get updates along the way Delivery status is not instantly displayed
@@ -29,9 +36,9 @@ public class TrackPackageService implements Service {
      * @return if a package is successfully created
      */
     public String createPackageTracking(Package package1) {
-        // mock data
-        String carrier_id = "ups";
-        String tracking_number = "1Z9A170W0337231977";
+        String carrier_id = package1.getCarrierId();
+        String tracking_number = package1.getTrackingNumber();
+        // use default for now
         String webhook_url = "https://www.kd100.com/webhook_url";
 
         String result = getData(carrier_id, tracking_number, webhook_url);
