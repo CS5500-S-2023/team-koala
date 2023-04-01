@@ -37,6 +37,10 @@ public class PackageController {
     public String createPackage(Package package1) {
 
         // create tracking item
+        String createTracking = trackPackageService.createPackageTracking(package1);
+        if (!createTracking.equals(PackageController.SUCCESS)) {
+            return createTracking;
+        }
 
         // write to database
         // assumed insertion success, otherwise will need to modify repository functions

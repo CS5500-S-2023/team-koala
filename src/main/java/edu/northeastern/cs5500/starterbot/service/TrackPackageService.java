@@ -49,9 +49,9 @@ public class TrackPackageService implements Service {
      * @return if a package is successfully created
      */
     public String createPackageTracking(Package package1) {
-        // mock data
-        String carrier_id = "ups";
-        String tracking_number = "1Z9A170W0337231977";
+        String carrier_id = package1.getCarrierId();
+        String tracking_number = package1.getTrackingNumber();
+        // use default for now
         String webhook_url = "https://www.kd100.com/webhook_url";
 
         String result = getData(carrier_id, tracking_number, webhook_url, CREATE_TRACKING_URL);

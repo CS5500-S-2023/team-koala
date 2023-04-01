@@ -2,6 +2,7 @@ package edu.northeastern.cs5500.starterbot.Service;
 
 import static org.junit.Assert.*;
 
+import edu.northeastern.cs5500.starterbot.controller.PackageController;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.InMemoryRepository;
 import edu.northeastern.cs5500.starterbot.service.TrackPackageService;
@@ -26,5 +27,15 @@ public class TrackPackageServiceTest {
 
         trackPackageService.getPackageLatestStatus(package1);
         assertEquals("[SEATTLE, WA, US]DELIVERED", package1.getStatus());
+    }
+
+    @Test
+    void testcreatePackageTracking() {
+        Package package1 = new Package();
+        package1.setCarrierId("ups");
+        package1.setTrackingNumber("1Z9A170W0337231977");
+        
+        assertEquals(PackageController.SUCCESS,
+            trackPackageService.createPackageTracking(package1));
     }
 }
