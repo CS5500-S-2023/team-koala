@@ -20,22 +20,20 @@ public class DeletePackageCommand implements SlashCommandHandler, StringSelectHa
     public CommandData getCommandData() {
         return Commands.slash(getName(), "Delete a package")
                 .addOption(
-                    OptionType.STRING,
-                    "package id",
-                    "The bot will delete the package associated with the package ID",
-                    true
-                );
+                        OptionType.STRING,
+                        "package id",
+                        "The bot will delete the package associated with the package ID",
+                        true);
     }
 
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
         log.info("event: /delete_package");
         OptionMapping packageIdOption =
-            Objects.requireNonNull(
-                event.getOption("package id"),
-                "Received null value for mandatory parameter 'tracking_number'"
-            );
-        
+                Objects.requireNonNull(
+                        event.getOption("package id"),
+                        "Received null value for mandatory parameter 'tracking_number'");
+
         String packageId = packageIdOption.getAsString();
 
         try {
@@ -58,5 +56,4 @@ public class DeletePackageCommand implements SlashCommandHandler, StringSelectHa
 
         event.reply("Your package has been deleted successfully!");
     }
-
 }
