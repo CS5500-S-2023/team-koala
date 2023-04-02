@@ -1,5 +1,6 @@
 package edu.northeastern.cs5500.starterbot.command;
 
+import edu.northeastern.cs5500.starterbot.controller.PackageController;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import java.util.Map;
 import java.util.Objects;
@@ -7,6 +8,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -22,7 +24,9 @@ import net.dv8tion.jda.api.interactions.modals.*;
 @Slf4j
 public class AddPackageCommand implements SlashCommandHandler, StringSelectHandler {
 
-    private final Package package1 = new Package();
+    @Inject PackageController packageController;
+
+    private Package package1;
     // may have a better solution to read the data from csv file
     // https://github.com/CS5500-S-2023/team-koala/issues/15
     private final Map<String, String> carrieMap =
@@ -76,13 +80,17 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
                         event.getOption("tracking_number"),
                         "Received null value for mandatory parameter 'tracking_number'");
 
+        // retrieve user info
+        User user = event.getUser();
+
         // set package data
-        package1.reset(); // avoid newing several objects
+        package1 = new Package(); // avoid newing several objects
         if (aliasOption != null) {
             package1.setName(aliasOption.getAsString());
         }
         String trackingNumber = trackingNumberOption.getAsString();
         package1.setTrackingNumber(trackingNumber);
+        package1.setUserId(user.getId());
 
         // Reply with a select menu for users to choose a carrier
         StringSelectMenu.Builder carrierBuilder =
@@ -105,8 +113,15 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
         package1.setCarrierId(carrier);
         log.info(package1.toString());
 
-        // create a package
+        // create a package and receives success or error messages
+        String created = packageController.createPackage(package1);
 
-        event.reply("Your package has been created successfully!").setEphemeral(true).queue();
+        if (created.equals(packageController.SUCCESS)) {
+            event.reply("Your package has been created successfully!").setEphemeral(true).queue();
+        } else {
+            event.reply("Your package was not created successfuly because of " + created)
+                    .setEphemeral(true)
+                    .queue();
+        }
     }
 }
