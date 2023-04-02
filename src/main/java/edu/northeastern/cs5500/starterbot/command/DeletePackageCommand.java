@@ -60,16 +60,4 @@ public class DeletePackageCommand implements SlashCommandHandler, StringSelectHa
 
         event.reply("Your package has been deleted successfully");
     }
-
-    @Override
-    public void onStringSelectInteraction(StringSelectInteractionEvent event) {
-        log.info("event: /string_select_delete_package");
-        String packageId = event.getValues().get(0);
-        ObjectId objectId = new ObjectId(packageId);
-
-        packages.delete(objectId);
-        log.info(packages.toString());
-
-        event.reply("Your package has been deleted successfully!");
-    }
 }
