@@ -1,5 +1,25 @@
-import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
+package edu.northeastern.cs5500.starterbot.command;
 
+import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
+import java.util.Objects;
+import javax.annotation.Nonnull;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.components.*;
+import net.dv8tion.jda.api.interactions.components.selections.*;
+import net.dv8tion.jda.api.interactions.components.text.*;
+import net.dv8tion.jda.api.interactions.modals.*;
+import org.bson.types.ObjectId;
+
+@Singleton
+@Slf4j
 public class DeletePackageCommand implements SlashCommandHandler, StringSelectHandler {
 
     private final GenericRepository<Package> packages;
@@ -35,13 +55,8 @@ public class DeletePackageCommand implements SlashCommandHandler, StringSelectHa
                         "Received null value for mandatory parameter 'tracking_number'");
 
         String packageId = packageIdOption.getAsString();
-
-        try {
-            packages.delete(packageId);
-        } catch (PackageDoesNotExistException e) {
-            e.printStackTrace();
-            throw e;
-        }
+        ObjectId objectId = new ObjectId(packageId);
+        packages.delete(objectId);
 
         event.reply("Your package has been deleted successfully");
     }
@@ -50,8 +65,9 @@ public class DeletePackageCommand implements SlashCommandHandler, StringSelectHa
     public void onStringSelectInteraction(StringSelectInteractionEvent event) {
         log.info("event: /string_select_delete_package");
         String packageId = event.getValues().get(0);
+        ObjectId objectId = new ObjectId(packageId);
 
-        packages.delete(packageId);
+        packages.delete(objectId);
         log.info(packages.toString());
 
         event.reply("Your package has been deleted successfully!");
