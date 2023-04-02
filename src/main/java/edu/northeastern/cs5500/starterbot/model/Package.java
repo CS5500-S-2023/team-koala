@@ -19,4 +19,20 @@ public class Package implements Model {
         this.trackingNumber = null;
         this.carrierId = null;
     }
+
+    public ObjectId getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getTrackingNumber() {
+        return trackingNumber;
+    }
+
+    public String getCarrierId() {
+        return carrierId;
+    }
 }
