@@ -30,4 +30,8 @@ public class PackageController {
     public Package getPackage(ObjectId id) {
         return this.packageRepository.get(id);
     }
+
+    public void deletePackage(ObjectId id) {
+        packageRepository.delete(id);
+    }
 }
