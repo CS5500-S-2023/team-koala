@@ -41,22 +41,20 @@ public class DisplayPackagesCommand {
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
         log.info("event: /display_packages");
 
-        // Why is there an erorr trying to use package
+        EmbedBuilder embedBuilder =
+                new EmbedBuilder().setColor(Color.LIGHT_GRAY).setTitle("Displaying Packages");
         for (Package p : packages) {
-            EmbedBuilder eb =
-                    new EmbedBuilder()
-                            .setColor(Color.LIGHT_GRAY)
-                            .addField("Id: ", displayPackageId(p.getId()), false)
-                            .addField("Name: ", displayPackageName(p.getName()), false)
-                            .addField(
-                                    "Tracking Number: ",
-                                    displayTrackingNumber(p.getTrackingNumber()),
-                                    true);
+            embedBuilder.addField("Id: ", displayPackageId(p.getId()), true);
+            embedBuilder.addField("Name: ", displayPackageName(p.getName()), true);
+            embedBuilder.addField(
+                    "Tracking Number: ", displayTrackingNumber(p.getTrackingNumber()), true);
             // .addField(
             //         "ETA: ",
             //         displayEstimatedDeliveryDate(p.getEstimatedDeliveryDate()),
             //         true);
         }
+
+        event.replyEmbeds(embedBuilder.build()).queue();
     }
 
     private String displayPackageId(ObjectId id) {
