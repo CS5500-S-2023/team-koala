@@ -1,12 +1,12 @@
 package edu.northeastern.cs5500.starterbot.command;
 
 import edu.northeastern.cs5500.starterbot.controller.ReminderEntryController;
-import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
+import edu.northeastern.cs5500.starterbot.exception.InvalidTimeUnitException;
+import edu.northeastern.cs5500.starterbot.exception.ReminderNotFoundException;
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
@@ -29,9 +29,17 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 @Slf4j
 public class AddReminderCommand implements SlashCommandHandler, ButtonHandler {
 
-    Map<String, ReminderEntry> tempStore = new HashMap<>();
-
     @Inject ReminderEntryController reminderEntryController;
+
+    public static MessageEmbed buildEmbed(List<String[]> fields) {
+        EmbedBuilder embedBuilder = new EmbedBuilder();
+
+        for (String[] field : fields) {
+            embedBuilder.addField(field[0], field[1], false);
+        }
+
+        return embedBuilder.build();
+    }
 
     @Inject
     public AddReminderCommand() {}
@@ -87,75 +95,38 @@ public class AddReminderCommand implements SlashCommandHandler, ButtonHandler {
         Integer interval = intervalOption == null ? null : intervalOption.getAsInt();
         String unitString = unitOption == null ? null : unitOption.getAsString();
 
-        String[] reminderHourMin = reminderTimeString.split(":");
-        if (reminderHourMin.length != 2) {
+        LocalTime reminderTime = null;
+        try {
+            reminderTime = ReminderEntryController.parseReminderTime(reminderTimeString);
+        } catch (DateTimeParseException e) {
             event.reply("Please specify reminder time like 'hh:mm' (24-hour clock format)").queue();
             return;
         }
 
-        Integer hour = null;
-        Integer min = null;
-        try {
-            hour = Integer.parseInt(reminderHourMin[0]);
-            min = Integer.parseInt(reminderHourMin[1]);
-
-            if (hour < 0 || hour >= 24) {
-                throw new NumberFormatException("Hour must be an integer from 0 to 23");
-            }
-            if (min < 0 || min >= 60) {
-                throw new NumberFormatException("Minute must be an integer from 0 to 59");
-            }
-        } catch (NumberFormatException e) {
-            event.reply("Please specify reminder time hour and minute with valid numbers").queue();
-            return;
-        }
-
-        LocalTime reminderTime = LocalTime.of(hour, min);
-
         TimeUnit unit = null;
         if (interval != null && unitString != null) {
-            switch (unitString) {
-                case "m":
-                    unit = TimeUnit.MINUTES;
-                    break;
-
-                case "h":
-                    unit = TimeUnit.HOURS;
-                    break;
-
-                case "d":
-                    unit = TimeUnit.DAYS;
-                    break;
-
-                default:
-                    event.reply("Please specify repeat interval with m(minute) / h(hour) / d(day)")
-                            .queue();
-                    return;
+            try {
+                unit = ReminderEntryController.parseTimeUnit(unitString);
+            } catch (InvalidTimeUnitException e) {
+                event.reply("Please specify time unit with either m (minute), h (hour) or d (day)")
+                        .queue();
+                return;
             }
         }
-        ReminderEntry reminderEntry =
-                ReminderEntry.builder()
-                        .discordUserId(discordUserId)
-                        .title(title)
-                        .reminderTime(reminderTime)
-                        .reminderOffset(offset)
-                        .repeatInterval(interval)
-                        .repeatTimeUnit(unit)
-                        .build();
-        tempStore.put(discordUserId, reminderEntry);
+        reminderEntryController.addReminder(
+                discordUserId, title, reminderTime, offset, interval, unit);
 
         List<MessageEmbed> embeds = new ArrayList<>();
-        EmbedBuilder embedBuilder = new EmbedBuilder();
-        embedBuilder.addField("Title", title, false);
-        embedBuilder.addField("Reminder Time", reminderTimeString, false);
-        embedBuilder.addField("Reminder Offset", String.valueOf(offset), false);
+        List<String[]> reminderInfo = new ArrayList<>();
+        reminderInfo.add(new String[] {"Title", title});
+        reminderInfo.add(new String[] {"Reminder Time", reminderTimeString});
+        reminderInfo.add(new String[] {"Reminder Offset", String.valueOf(offset)});
 
         if (interval != null) {
-            embedBuilder.addField("Repeat Interval", String.valueOf(interval), false);
-            embedBuilder.addField("Repeat Interval Time Unit", unitString, false);
+            reminderInfo.add(new String[] {"Repeat Interval", String.valueOf(interval)});
+            reminderInfo.add(new String[] {"Repeat Interval Time Unit", unitString});
         }
-
-        MessageEmbed embed = embedBuilder.build();
+        MessageEmbed embed = buildEmbed(reminderInfo);
         embeds.add(embed);
 
         MessageCreateBuilder messageCreateBuilder = new MessageCreateBuilder();
@@ -169,7 +140,7 @@ public class AddReminderCommand implements SlashCommandHandler, ButtonHandler {
                                         this.getName() + ":cancel@" + discordUserId, "Cancel"));
         messageCreateBuilder =
                 messageCreateBuilder.setContent(
-                        "Are you sure you would like to add the following event?");
+                        "Are you sure you would like to add the following reminder?");
         event.reply(messageCreateBuilder.build()).queue();
     }
 
@@ -181,14 +152,17 @@ public class AddReminderCommand implements SlashCommandHandler, ButtonHandler {
         String id = event.getButton().getId();
         Objects.requireNonNull(id);
         String userId = id.split("@", 2)[1];
-
-        ReminderEntry entry = tempStore.get(userId);
-        tempStore.remove(userId);
         if (label.equals("Cancel")) {
+            reminderEntryController.cancelReminder(userId);
             event.reply("Request canceled!").queue();
             return;
         }
-        reminderEntryController.addReminder(entry);
+        try {
+            reminderEntryController.confirmReminder(userId);
+        } catch (ReminderNotFoundException e) {
+            event.reply("Oops, looks like we lost your reminder! Please try adding it again")
+                    .queue();
+        }
         event.reply("Reminder Added!").queue();
     }
 }

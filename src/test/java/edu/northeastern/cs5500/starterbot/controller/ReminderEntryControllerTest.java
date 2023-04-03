@@ -1,11 +1,15 @@
 package edu.northeastern.cs5500.starterbot.controller;
 
 import static com.google.common.truth.Truth.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import edu.northeastern.cs5500.starterbot.exception.InvalidTimeUnitException;
+import edu.northeastern.cs5500.starterbot.exception.ReminderNotFoundException;
 import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
 import edu.northeastern.cs5500.starterbot.repository.InMemoryRepository;
 import java.time.LocalTime;
 import java.util.concurrent.TimeUnit;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class ReminderEntryControllerTest {
@@ -16,29 +20,58 @@ class ReminderEntryControllerTest {
 
     static final LocalTime REMINDER_TIME = LocalTime.of(14, 00);
     static final TimeUnit REPEAT_TIME_UNIT = TimeUnit.MINUTES;
+    private ReminderEntryController reminderEntryController;
 
     private ReminderEntryController getReminderEntryController() {
-        ReminderEntryController reminderEntryController =
-                new ReminderEntryController(new InMemoryRepository<>());
-        return reminderEntryController;
+        return new ReminderEntryController(new InMemoryRepository<>());
+    }
+
+    @BeforeEach
+    void beforeEach() {
+        // setup
+        reminderEntryController = getReminderEntryController();
+
+        // mutation
+        reminderEntryController.addReminder(
+                DISCORD_USER_ID,
+                TITLE,
+                REMINDER_TIME,
+                REMINDER_OFFSET,
+                REPEAT_INTERVAL,
+                REPEAT_TIME_UNIT);
+    }
+
+    @Test
+    void testParseTimeUnit() throws InvalidTimeUnitException {
+        assertThat(ReminderEntryController.parseTimeUnit("m")).isEqualTo(TimeUnit.MINUTES);
+        assertThat(ReminderEntryController.parseTimeUnit("h")).isEqualTo(TimeUnit.HOURS);
+        assertThat(ReminderEntryController.parseTimeUnit("d")).isEqualTo(TimeUnit.DAYS);
+        assertThrows(
+                InvalidTimeUnitException.class, () -> ReminderEntryController.parseTimeUnit("r"));
     }
 
     @Test
     void testAddReminder() {
-        // setup
-        ReminderEntryController reminderEntryController = getReminderEntryController();
-        ReminderEntry testEntry =
-                ReminderEntry.builder()
-                        .discordUserId(DISCORD_USER_ID)
-                        .title(TITLE)
-                        .reminderTime(REMINDER_TIME)
-                        .reminderOffset(REMINDER_OFFSET)
-                        .repeatInterval(REPEAT_INTERVAL)
-                        .repeatTimeUnit(REPEAT_TIME_UNIT)
-                        .build();
+        ReminderEntry pendingEntry =
+                reminderEntryController.getPendingReminderForUserId(DISCORD_USER_ID);
 
-        // mutation
-        reminderEntryController.addReminder(testEntry);
+        // postcondition
+        assertThat(pendingEntry.getDiscordUserId()).isEqualTo(DISCORD_USER_ID);
+        assertThat(pendingEntry.getTitle()).isEqualTo(TITLE);
+        assertThat(pendingEntry.getReminderTime()).isEqualTo(REMINDER_TIME);
+        assertThat(pendingEntry.getReminderOffset()).isEqualTo(REMINDER_OFFSET);
+        assertThat(pendingEntry.getRepeatInterval()).isEqualTo(REPEAT_INTERVAL);
+        assertThat(pendingEntry.getRepeatTimeUnit()).isEqualTo(REPEAT_TIME_UNIT);
+    }
+
+    @Test
+    void testConfirmReminder() {
+        try {
+            reminderEntryController.confirmReminder(DISCORD_USER_ID);
+        } catch (ReminderNotFoundException e) {
+            e.printStackTrace();
+        }
+
         ReminderEntry savedEntry =
                 reminderEntryController.getReminderEntryForUserId(DISCORD_USER_ID);
 
@@ -49,5 +82,13 @@ class ReminderEntryControllerTest {
         assertThat(savedEntry.getReminderOffset()).isEqualTo(REMINDER_OFFSET);
         assertThat(savedEntry.getRepeatInterval()).isEqualTo(REPEAT_INTERVAL);
         assertThat(savedEntry.getRepeatTimeUnit()).isEqualTo(REPEAT_TIME_UNIT);
+    }
+
+    @Test
+    void testCancelReminder() {
+        reminderEntryController.cancelReminder(DISCORD_USER_ID);
+
+        assertThat(reminderEntryController.getPendingReminderForUserId(DISCORD_USER_ID)).isNull();
+        assertThat(reminderEntryController.getReminderEntryForUserId(DISCORD_USER_ID)).isNull();
     }
 }
