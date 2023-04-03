@@ -1,65 +1,61 @@
 package edu.northeastern.cs5500.starterbot.command;
 
-import java.awt.Color;
-import edu.northeastern.cs5500.starterbot.controller.PackageController;
 import edu.northeastern.cs5500.starterbot.model.Package;
-import java.util.Map;
-import java.util.Objects;
+import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
+import java.awt.Color;
+import java.util.ArrayList;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.components.*;
 import net.dv8tion.jda.api.interactions.components.selections.*;
 import net.dv8tion.jda.api.interactions.components.text.*;
 import net.dv8tion.jda.api.interactions.modals.*;
-import java.util.Date;
-
+import org.bson.types.ObjectId;
 
 @Singleton
 @Slf4j
 public class DisplayPackagesCommand {
 
-    private final GenericRepository<Package> packages;
-    
+    private final ArrayList<Package> packages;
+
     @Inject
-    public DisplayPackagesCommand(GenericRepository<Package> packages) {
-        this.packages = packages;
+    public DisplayPackagesCommand(GenericRepository<Package> packageRepository) {
+        this.packages = new ArrayList<>(packageRepository.getAll());
     }
 
-    @Override
     @Nonnull
     public String getName() {
         return "display_packages";
     }
 
-    @Override
     public CommandData getCommandData() {
         return Commands.slash(getName(), "display all packages");
     }
 
-    //
-    @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
         log.info("event: /display_packages");
 
         // Why is there an erorr trying to use package
-        for (Package package : packages) {
-            EmbedBuilder eb = new EmbedBuilder()
-            .setColor(Color.LIGHT_GRAY)
-            .addField("Id: ", displayPackageId(package.getId()), false)
-            .addField("Name: ", displayPackageName(package.getName()), false)
-            .addField("Tracking Number: ", displayTrackingNumber(package.getTrackingNumber()), true)
-            .addField("ETA: ", displayEstimatedDeliveryDate(package.getEstimatedDeliveryDate()), true);
-
-            event.reply(eb.build());
+        for (Package p : packages) {
+            EmbedBuilder eb =
+                    new EmbedBuilder()
+                            .setColor(Color.LIGHT_GRAY)
+                            .addField("Id: ", displayPackageId(p.getId()), false)
+                            .addField("Name: ", displayPackageName(p.getName()), false)
+                            .addField(
+                                    "Tracking Number: ",
+                                    displayTrackingNumber(p.getTrackingNumber()),
+                                    true);
+            // .addField(
+            //         "ETA: ",
+            //         displayEstimatedDeliveryDate(p.getEstimatedDeliveryDate()),
+            //         true);
         }
     }
 
@@ -75,7 +71,9 @@ public class DisplayPackagesCommand {
         return trackingNumber;
     }
 
-    private Date displayEstimatedDeliveryDate(Date estimatedDeliveryDate) {
-        return estimatedDeliveryDate;
-    }
+    // private String displayEstimatedDeliveryDate(Date estimatedDeliveryDate) {
+    //     DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
+    //     String strEstimatedDeliveryDate = dateFormat.format(estimatedDeliveryDate);
+    //     return strEstimatedDeliveryDate;
+    // }
 }

@@ -34,4 +34,8 @@ public class PackageController {
     public void deletePackage(ObjectId id) {
         packageRepository.delete(id);
     }
+
+    public ArrayList<Package> getAllPackages() {
+        return new ArrayList<Package>(packageRepository.getAll());
+    }
 }
