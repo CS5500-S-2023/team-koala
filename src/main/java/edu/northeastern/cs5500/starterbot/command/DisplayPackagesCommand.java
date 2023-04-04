@@ -20,7 +20,7 @@ import org.bson.types.ObjectId;
 
 @Singleton
 @Slf4j
-public class DisplayPackagesCommand {
+public class DisplayPackagesCommand implements SlashCommandHandler {
 
     private final ArrayList<Package> packages;
 
@@ -34,10 +34,13 @@ public class DisplayPackagesCommand {
         return "display_packages";
     }
 
+    @Override
+    @Nonnull
     public CommandData getCommandData() {
         return Commands.slash(getName(), "display all packages");
     }
 
+    @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
         log.info("event: /display_packages");
 
@@ -57,15 +60,18 @@ public class DisplayPackagesCommand {
         event.replyEmbeds(embedBuilder.build()).queue();
     }
 
-    private String displayPackageId(ObjectId id) {
+    @Nonnull
+    private String displayPackageId(@Nonnull ObjectId id) {
         return id.toString();
     }
 
-    private String displayPackageName(String name) {
+    @Nonnull
+    private String displayPackageName(@Nonnull String name) {
         return name;
     }
 
-    private String displayTrackingNumber(String trackingNumber) {
+    @Nonnull
+    private String displayTrackingNumber(@Nonnull String trackingNumber) {
         return trackingNumber;
     }
 
