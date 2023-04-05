@@ -24,8 +24,8 @@ public class TrackPackageService implements Service {
 
     private final String REALTIME_URL = "https://www.kd100.com/api/v1/tracking/realtime";
     // will change to environmental variable later like BOT_TOKEN
-    private final String API_KEY = "PoceRRIqNjYd1883";
-    private final String SECRET = "1db9a0ce49d341f1b932b12e0fccdfd6";
+    private final String API_KEY = new ProcessBuilder().environment().get("API_KEY");
+    private final String SECRET = new ProcessBuilder().environment().get("SECRET");
     private final int CONNECT_TIMEOUT = 1000;
     private final int READ_TIMEOUT = 5000;
     public final String SUCCESS = "success";
