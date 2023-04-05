@@ -9,16 +9,17 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
-import javax.inject.Inject;
 
 @Singleton
 @Slf4j
 public class TrackPackageService implements Service {
 
     private final String URL = "https://www.kd100.com/api/v1/tracking/create";
+    // will change to environmental variable later like BOT_TOKEN
     private final String API_KEY = "PoceRRIqNjYd1883";
     private final String SECRET = "1db9a0ce49d341f1b932b12e0fccdfd6";
     private final int CONNECT_TIMEOUT = 1000;
@@ -26,9 +27,7 @@ public class TrackPackageService implements Service {
     public final String SUCCESS = "success";
 
     @Inject
-    public TrackPackageService() {
-
-    }
+    public TrackPackageService() {}
 
     /**
      * Get updates along the way Delivery status is not instantly displayed
