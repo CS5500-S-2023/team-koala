@@ -1,6 +1,7 @@
 package edu.northeastern.cs5500.starterbot.service;
 
 import edu.northeastern.cs5500.starterbot.model.Package;
+import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -29,23 +30,31 @@ public class TrackPackageService implements Service {
     private final int READ_TIMEOUT = 5000;
     public final String SUCCESS = "success";
 
+    GenericRepository<Package> packageRepository; // data access object
+
     @Inject
-    public TrackPackageService() {}
+    public TrackPackageService(GenericRepository<Package> packageRepository) {
+        this.packageRepository = packageRepository;
+    }
 
     /**
      * Call real-time tracking api to get the latest status Invoked when displaying list of packages
+     * Update package info in database
      *
      * @return package1 - If there no delivery updates, status and statusTime in Package will be
      *     null - Otherwise, they are not null
      */
-    public Package getPackageLatestStatus(Package package1) {
+    public void getPackageLatestStatus(Package package1) {
         String carrier_id = package1.getCarrierId();
         String tracking_number = package1.getTrackingNumber();
 
         String result = getData(REALTIME_URL, carrier_id, tracking_number, null);
 
         // read the delivery updates
-        return readDeliveryResponse(result, package1);
+        readDeliveryResponse(result, package1);
+
+        // Update package info in database
+        packageRepository.add(package1);
     }
 
     /**
@@ -55,7 +64,7 @@ public class TrackPackageService implements Service {
      * @param result
      * @return
      */
-    private Package readDeliveryResponse(String result, Package package1) {
+    private void readDeliveryResponse(String result, Package package1) {
         JSONObject json = new JSONObject(result);
         JSONObject data = json.getJSONObject("data");
         String carrier = data.getString("carrier_id");
@@ -73,8 +82,6 @@ public class TrackPackageService implements Service {
 
         package1.setStatus(status);
         package1.setStatusTime(time);
-
-        return package1;
     }
 
     /**
