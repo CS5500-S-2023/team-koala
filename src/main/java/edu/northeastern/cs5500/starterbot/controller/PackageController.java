@@ -3,6 +3,7 @@ package edu.northeastern.cs5500.starterbot.controller;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import java.util.ArrayList;
+import java.util.List;
 import javax.inject.Inject;
 import org.bson.types.ObjectId;
 
@@ -36,7 +37,7 @@ public class PackageController {
         packageRepository.delete(id);
     }
 
-    public ArrayList<Package> getAllPackages() {
-        return new ArrayList<Package>(packageRepository.getAll());
+    public List<Package> getAllPackages() {
+        return new ArrayList<>(packageRepository.getAll());
     }
 }

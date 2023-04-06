@@ -1,9 +1,9 @@
 package edu.northeastern.cs5500.starterbot.command;
 
+import edu.northeastern.cs5500.starterbot.controller.PackageController;
 import edu.northeastern.cs5500.starterbot.model.Package;
-import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import java.awt.Color;
-import java.util.ArrayList;
+import java.util.List;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -22,11 +22,11 @@ import org.bson.types.ObjectId;
 @Slf4j
 public class DisplayPackagesCommand implements SlashCommandHandler {
 
-    private final ArrayList<Package> packages;
+    @Inject PackageController packageController;
 
     @Inject
-    public DisplayPackagesCommand(GenericRepository<Package> packageRepository) {
-        this.packages = new ArrayList<>(packageRepository.getAll());
+    public DisplayPackagesCommand() {
+        // Defined empty and public for dagger injection
     }
 
     @Nonnull
@@ -43,6 +43,8 @@ public class DisplayPackagesCommand implements SlashCommandHandler {
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
         log.info("event: /display_packages");
+
+        List<Package> packages = packageController.getAllPackages();
 
         EmbedBuilder embedBuilder =
                 new EmbedBuilder().setColor(Color.LIGHT_GRAY).setTitle("Displaying Packages");

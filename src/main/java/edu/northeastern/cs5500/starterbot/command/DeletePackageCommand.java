@@ -1,6 +1,6 @@
 package edu.northeastern.cs5500.starterbot.command;
 
-import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
+import edu.northeastern.cs5500.starterbot.controller.PackageController;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -11,21 +11,17 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.components.*;
-import net.dv8tion.jda.api.interactions.components.selections.*;
-import net.dv8tion.jda.api.interactions.components.text.*;
-import net.dv8tion.jda.api.interactions.modals.*;
 import org.bson.types.ObjectId;
 
 @Singleton
 @Slf4j
 public class DeletePackageCommand implements SlashCommandHandler {
 
-    private final GenericRepository<Package> packages;
+    @Inject PackageController packageController;
 
     @Inject
-    public DeletePackageCommand(GenericRepository<Package> packages) {
-        this.packages = packages;
+    public DeletePackageCommand() {
+        // Defined empty and public for dagger injection
     }
 
     @Override
@@ -40,7 +36,7 @@ public class DeletePackageCommand implements SlashCommandHandler {
         return Commands.slash(getName(), "Delete a package")
                 .addOption(
                         OptionType.STRING,
-                        "package id",
+                        "package_id",
                         "The bot will delete the package associated with the package ID",
                         true);
     }
@@ -50,12 +46,13 @@ public class DeletePackageCommand implements SlashCommandHandler {
         log.info("event: /delete_package");
         OptionMapping packageIdOption =
                 Objects.requireNonNull(
-                        event.getOption("package id"),
-                        "Received null value for mandatory parameter 'tracking_number'");
+                        event.getOption("package_id"),
+                        "Received null value for mandatory parameter 'package_id'");
 
         String packageId = packageIdOption.getAsString();
         ObjectId objectId = new ObjectId(packageId);
-        packages.delete(objectId);
+
+        packageController.deletePackage(objectId);
 
         event.reply("Your package has been deleted successfully");
     }
