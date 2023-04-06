@@ -54,6 +54,6 @@ public class DeletePackageCommand implements SlashCommandHandler {
 
         packageController.deletePackage(objectId);
 
-        event.reply("Your package has been deleted successfully");
+        event.reply("Your package has been deleted successfully").queue();
     }
 }
