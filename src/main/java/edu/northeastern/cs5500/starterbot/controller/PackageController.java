@@ -20,8 +20,9 @@ public class PackageController {
     }
 
     /**
-     * The updated status will be written in the passed-in package object If the status and
-     * statusTime is null, then it means no status is available yet.
+     * The updated status will be written in the passed-in package object.
+     *
+     * <p>Expected: If the status and statusTime is null, then it means no status is available yet.
      *
      * @param package1
      */
