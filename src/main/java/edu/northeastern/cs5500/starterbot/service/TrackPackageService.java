@@ -22,13 +22,12 @@ import org.json.JSONObject;
 @Slf4j
 public class TrackPackageService implements Service {
 
-    private final String REALTIME_URL = "https://www.kd100.com/api/v1/tracking/realtime";
-    // will change to environmental variable later like BOT_TOKEN
-    private final String API_KEY = new ProcessBuilder().environment().get("API_KEY");
-    private final String SECRET = new ProcessBuilder().environment().get("SECRET");
-    private final int CONNECT_TIMEOUT = 1000;
-    private final int READ_TIMEOUT = 5000;
-    public final String SUCCESS = "success";
+    private static final String REALTIME_URL = "https://www.kd100.com/api/v1/tracking/realtime";
+    private static final String API_KEY = new ProcessBuilder().environment().get("API_KEY");
+    private static final String SECRET = new ProcessBuilder().environment().get("SECRET");
+    private static final int CONNECT_TIMEOUT = 1000;
+    private static final int READ_TIMEOUT = 5000;
+    public static final String SUCCESS = "success";
 
     GenericRepository<Package> packageRepository; // data access object
 
@@ -105,6 +104,9 @@ public class TrackPackageService implements Service {
         return this.post(param, signature, url);
     }
 
+    /**
+     * @see https://www.kd100.com/docs/create-tracking
+     */
     private String post(String param, String signature, String urlTarget) {
         StringBuffer response = new StringBuffer("");
 
@@ -161,6 +163,9 @@ public class TrackPackageService implements Service {
     }
 }
 
+/**
+ * @see https://www.kd100.com/docs/create-tracking
+ */
 class MD5Utils {
     private static MessageDigest mdigest = null;
     private static char digits[] = {
