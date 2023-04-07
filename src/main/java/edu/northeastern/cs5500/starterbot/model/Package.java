@@ -1,15 +1,12 @@
 package edu.northeastern.cs5500.starterbot.model;
 
-import java.time.LocalDateTime;
-
+import com.mongodb.lang.Nullable;
+import java.sql.Timestamp;
 import javax.annotation.Nonnull;
 import lombok.AllArgsConstructor; // only for test purpose
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import org.bson.types.ObjectId;
-
-import com.mongodb.lang.Nullable;
 
 @Data
 @AllArgsConstructor
@@ -22,6 +19,5 @@ public class Package implements Model {
     @Nonnull String carrierId;
     @Nonnull String userId;
     @Nullable String status;
-    @Nullable LocalDateTime statusTime;
-    
+    @Nullable Timestamp statusTime;
 }

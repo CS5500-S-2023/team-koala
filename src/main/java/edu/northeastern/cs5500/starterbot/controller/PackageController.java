@@ -9,7 +9,7 @@ import org.bson.types.ObjectId;
 public class PackageController {
 
     GenericRepository<Package> packageRepository; // data access object
-    public final String SUCCESS = "success";
+    public static final String SUCCESS = "success";
     TrackPackageService trackPackageService;
 
     @Inject
@@ -38,7 +38,7 @@ public class PackageController {
         // assumed insertion success, otherwise will need to modify repository functions
         packageRepository.add(package1);
 
-        return SUCCESS;
+        return TrackPackageService.SUCCESS;
     }
 
     public Package getPackage(ObjectId id) {

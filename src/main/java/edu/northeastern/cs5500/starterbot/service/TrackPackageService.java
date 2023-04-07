@@ -1,5 +1,10 @@
 package edu.northeastern.cs5500.starterbot.service;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import java.io.BufferedReader;
@@ -10,13 +15,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 @Singleton
 @Slf4j
@@ -27,7 +28,8 @@ public class TrackPackageService implements Service {
     private static final String SECRET = new ProcessBuilder().environment().get("SECRET");
     private static final int CONNECT_TIMEOUT = 1000;
     private static final int READ_TIMEOUT = 5000;
-    public static final String SUCCESS = "success";
+    public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+    private static final int API_KEY_NOT_SET = 102;
 
     GenericRepository<Package> packageRepository; // data access object
 
@@ -48,12 +50,13 @@ public class TrackPackageService implements Service {
         String tracking_number = package1.getTrackingNumber();
 
         String result = getData(REALTIME_URL, carrier_id, tracking_number, null);
+        log.info("getPackageLatestStatus: " + package1.getId() + " - " + result);
 
         // read the delivery updates
         readDeliveryResponse(result, package1);
 
         // Update package info in database
-        packageRepository.add(package1);
+        packageRepository.update(package1);
     }
 
     /**
@@ -64,27 +67,27 @@ public class TrackPackageService implements Service {
      * @return
      */
     private void readDeliveryResponse(String result, Package package1) {
-        JSONObject json = new JSONObject(result);
-        JSONObject data = json.getJSONObject("data");
-        String carrier = data.getString("carrier_id");
-        String trackingNumber = data.getString("tracking_number");
+        Gson gson = new GsonBuilder().setDateFormat(DATE_FORMAT).create();
+        JsonObject response = gson.fromJson(result, JsonElement.class).getAsJsonObject();
+        if (response.get("code").getAsInt() == API_KEY_NOT_SET) {
+            log.info(response.get("message").getAsString());
+            return;
+        }
+        JsonArray deliveryStatuses = response.getAsJsonObject("data").getAsJsonArray("items");
 
-        JSONArray deliveryStatuses = data.getJSONArray("items");
-        JSONObject latestStatus =
-                deliveryStatuses.length() == 0 ? null : (JSONObject) deliveryStatuses.get(0);
+        if (deliveryStatuses.size() != 0) {
+            log.info("readDeliveryResponse: got the delivery status of " + package1.getId());
+            JsonObject latestStatus = (JsonObject) deliveryStatuses.get(0);
 
-        String status = latestStatus.getString("context");
-
-        String statusTime = latestStatus.getString("time");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        LocalDateTime time = LocalDateTime.parse(statusTime, formatter);
-
-        package1.setStatus(status);
-        package1.setStatusTime(time);
+            KeyDeliveryStatus deliveryStatus = gson.fromJson(latestStatus, KeyDeliveryStatus.class);
+            package1.setStatus(deliveryStatus.getStatus());
+            package1.setStatusTime(deliveryStatus.getStatusTime());
+        }
     }
 
     /**
-     * Construct JSON strings and send post requests to a KeyDelivery API
+     * Construct JSON strings and send post requests to a KeyDelivery API Create tracking API and
+     * Realtime tracking API both use this function
      *
      * @param carrier_id
      * @param tracking_number
@@ -94,11 +97,14 @@ public class TrackPackageService implements Service {
     private String getData(
             String url, String carrier_id, String tracking_number, String webhook_url) {
 
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("carrier_id", carrier_id);
-        jsonObject.put("tracking_number", tracking_number);
-        jsonObject.put("webhook_url", webhook_url);
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("carrier_id", carrier_id);
+        jsonObject.addProperty("tracking_number", tracking_number);
+        if (webhook_url != null) {
+            jsonObject.addProperty("webhook_url", webhook_url);
+        }
         String param = jsonObject.toString();
+        log.info("getData: json is constructed - " + param);
 
         String signature = MD5Utils.encode(param + API_KEY + SECRET);
         return this.post(param, signature, url);
