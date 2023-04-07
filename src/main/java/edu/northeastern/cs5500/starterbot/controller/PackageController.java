@@ -38,7 +38,7 @@ public class PackageController {
         // assumed insertion success, otherwise will need to modify repository functions
         packageRepository.add(package1);
 
-        return TrackPackageService.SUCCESS;
+        return SUCCESS;
     }
 
     public Package getPackage(ObjectId id) {
