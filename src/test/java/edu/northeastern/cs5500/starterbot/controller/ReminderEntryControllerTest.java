@@ -4,7 +4,6 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import edu.northeastern.cs5500.starterbot.exception.InvalidTimeUnitException;
-import edu.northeastern.cs5500.starterbot.exception.ReminderNotFoundException;
 import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
 import edu.northeastern.cs5500.starterbot.repository.InMemoryRepository;
 import java.time.LocalTime;
@@ -52,25 +51,6 @@ class ReminderEntryControllerTest {
 
     @Test
     void testAddReminder() {
-        ReminderEntry pendingEntry =
-                reminderEntryController.getPendingReminderForUserId(DISCORD_USER_ID);
-
-        // postcondition
-        assertThat(pendingEntry.getDiscordUserId()).isEqualTo(DISCORD_USER_ID);
-        assertThat(pendingEntry.getTitle()).isEqualTo(TITLE);
-        assertThat(pendingEntry.getReminderTime()).isEqualTo(REMINDER_TIME);
-        assertThat(pendingEntry.getReminderOffset()).isEqualTo(REMINDER_OFFSET);
-        assertThat(pendingEntry.getRepeatInterval()).isEqualTo(REPEAT_INTERVAL);
-        assertThat(pendingEntry.getRepeatTimeUnit()).isEqualTo(REPEAT_TIME_UNIT);
-    }
-
-    @Test
-    void testConfirmReminder() {
-        try {
-            reminderEntryController.confirmReminder(DISCORD_USER_ID);
-        } catch (ReminderNotFoundException e) {
-            e.printStackTrace();
-        }
 
         ReminderEntry savedEntry =
                 reminderEntryController.getReminderEntryForUserId(DISCORD_USER_ID);
@@ -82,13 +62,5 @@ class ReminderEntryControllerTest {
         assertThat(savedEntry.getReminderOffset()).isEqualTo(REMINDER_OFFSET);
         assertThat(savedEntry.getRepeatInterval()).isEqualTo(REPEAT_INTERVAL);
         assertThat(savedEntry.getRepeatTimeUnit()).isEqualTo(REPEAT_TIME_UNIT);
-    }
-
-    @Test
-    void testCancelReminder() {
-        reminderEntryController.cancelReminder(DISCORD_USER_ID);
-
-        assertThat(reminderEntryController.getPendingReminderForUserId(DISCORD_USER_ID)).isNull();
-        assertThat(reminderEntryController.getReminderEntryForUserId(DISCORD_USER_ID)).isNull();
     }
 }

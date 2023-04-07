@@ -2,7 +2,6 @@ package edu.northeastern.cs5500.starterbot.command;
 
 import edu.northeastern.cs5500.starterbot.controller.ReminderEntryController;
 import edu.northeastern.cs5500.starterbot.exception.InvalidTimeUnitException;
-import edu.northeastern.cs5500.starterbot.exception.ReminderNotFoundException;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -16,18 +15,16 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
 @Singleton
 @Slf4j
-public class AddReminderCommand implements SlashCommandHandler, ButtonHandler {
+public class AddReminderCommand implements SlashCommandHandler {
 
     @Inject ReminderEntryController reminderEntryController;
 
@@ -117,52 +114,22 @@ public class AddReminderCommand implements SlashCommandHandler, ButtonHandler {
                 discordUserId, title, reminderTime, offset, interval, unit);
 
         List<MessageEmbed> embeds = new ArrayList<>();
-        List<String[]> reminderInfo = new ArrayList<>();
-        reminderInfo.add(new String[] {"Title", title});
-        reminderInfo.add(new String[] {"Reminder Time", reminderTimeString});
-        reminderInfo.add(new String[] {"Reminder Offset", String.valueOf(offset)});
-
+        EmbedBuilder embedBuilder = new EmbedBuilder();
+        embedBuilder.addField("Title", title, false);
+        embedBuilder.addField("Reminder Time", reminderTimeString, false);
+        embedBuilder.addField("Reminder Offset", String.valueOf(offset), false);
         if (interval != null) {
-            reminderInfo.add(new String[] {"Repeat Interval", String.valueOf(interval)});
-            reminderInfo.add(new String[] {"Repeat Interval Time Unit", unitString});
+            embedBuilder.addField("Repeat Interval", String.valueOf(interval), false);
+            embedBuilder.addField("Repeat Interval Time Unit", unitString, false);
         }
-        MessageEmbed embed = buildEmbed(reminderInfo);
+        MessageEmbed embed = embedBuilder.build();
         embeds.add(embed);
 
         MessageCreateBuilder messageCreateBuilder = new MessageCreateBuilder();
-        messageCreateBuilder =
-                messageCreateBuilder
-                        .addEmbeds(embeds)
-                        .addActionRow(
-                                Button.primary(
-                                        this.getName() + ":comfirm@" + discordUserId, "Confirm"),
-                                Button.secondary(
-                                        this.getName() + ":cancel@" + discordUserId, "Cancel"));
+        messageCreateBuilder = messageCreateBuilder.addEmbeds(embeds);
         messageCreateBuilder =
                 messageCreateBuilder.setContent(
-                        "Are you sure you would like to add the following reminder?");
+                        "The following reminder has been successfully added!");
         event.reply(messageCreateBuilder.build()).queue();
-    }
-
-    @Override
-    public void onButtonInteraction(@Nonnull ButtonInteractionEvent event) {
-
-        String label = event.getButton().getLabel();
-
-        String id = event.getButton().getId();
-        Objects.requireNonNull(id);
-        String userId = id.split("@", 2)[1];
-        if (label.equals("Cancel")) {
-            reminderEntryController.cancelReminder(userId);
-            event.reply("Request canceled!").queue();
-            return;
-        }
-        try {
-            reminderEntryController.confirmReminder(userId);
-        } catch (ReminderNotFoundException e) {
-            event.reply("Oops, looks like we lost your reminder! Please try adding it again")
-                    .queue();
-        }
-        event.reply("Reminder Added!").queue();
     }
 }
