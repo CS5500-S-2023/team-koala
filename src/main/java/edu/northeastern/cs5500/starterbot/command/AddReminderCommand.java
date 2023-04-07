@@ -28,16 +28,6 @@ public class AddReminderCommand implements SlashCommandHandler {
 
     @Inject ReminderEntryController reminderEntryController;
 
-    public static MessageEmbed buildEmbed(List<String[]> fields) {
-        EmbedBuilder embedBuilder = new EmbedBuilder();
-
-        for (String[] field : fields) {
-            embedBuilder.addField(field[0], field[1], false);
-        }
-
-        return embedBuilder.build();
-    }
-
     @Inject
     public AddReminderCommand() {}
 
