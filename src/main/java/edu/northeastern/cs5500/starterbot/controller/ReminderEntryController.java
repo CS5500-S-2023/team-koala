@@ -8,6 +8,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
+import org.bson.types.ObjectId;
 
 public class ReminderEntryController {
     GenericRepository<ReminderEntry> reminderEntryRepository;
@@ -71,5 +72,10 @@ public class ReminderEntryController {
         }
 
         return null;
+    }
+
+    public void deleteReminder(String reminderId) {
+        ObjectId id = new ObjectId(reminderId);
+        reminderEntryRepository.delete(id);
     }
 }

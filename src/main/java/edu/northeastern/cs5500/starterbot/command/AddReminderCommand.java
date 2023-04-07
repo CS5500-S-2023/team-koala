@@ -2,17 +2,27 @@ package edu.northeastern.cs5500.starterbot.command;
 
 import edu.northeastern.cs5500.starterbot.controller.ReminderEntryController;
 import edu.northeastern.cs5500.starterbot.exception.InvalidTimeUnitException;
+import edu.northeastern.cs5500.starterbot.exception.ReminderNotFoundException;
+import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -27,6 +37,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 public class AddReminderCommand implements SlashCommandHandler {
 
     @Inject ReminderEntryController reminderEntryController;
+    ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(20);
 
     @Inject
     public AddReminderCommand() {}
@@ -95,6 +106,13 @@ public class AddReminderCommand implements SlashCommandHandler {
         }
 
         // parse reminder repeat time unit
+        LocalTime actualReminderTime = reminderTime.minusMinutes(offset);
+        if (interval == null && LocalTime.now().compareTo(actualReminderTime) >= 0) {
+            event.reply(
+                            "Sorry we cannot schedule reminder for past events, please double check the time.")
+                    .queue();
+        }
+
         TimeUnit unit = null;
         if (interval != null && unitString != null) {
             try {
@@ -129,5 +147,61 @@ public class AddReminderCommand implements SlashCommandHandler {
                 messageCreateBuilder.setContent(
                         "The following reminder has been successfully added!");
         event.reply(messageCreateBuilder.build()).queue();
+    }
+
+    private void scheduleMessage(
+            ReminderEntry entry, ButtonInteractionEvent event, String reminderId) {
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("America/Los_Angeles"));
+        Integer offset = entry.getReminderOffset();
+        LocalTime reminderTimeActual = entry.getReminderTime().minusMinutes(offset);
+        Integer repeatInterval = entry.getRepeatInterval();
+        TimeUnit unit = entry.getRepeatTimeUnit();
+        ZonedDateTime nextReminder =
+                now.withHour(reminderTimeActual.getHour()).withMinute(reminderTimeActual.getMinute());
+
+        int today = now.getDayOfMonth();
+        while (now.compareTo(nextReminder) >= 0
+                && repeatInterval != null
+                && nextReminder.getDayOfMonth() == today) {
+            switch (unit) {
+                case MINUTES:
+                    nextReminder = nextReminder.plusMinutes(repeatInterval);
+                    break;
+                case HOURS:
+                    nextReminder = nextReminder.plusHours(repeatInterval);
+                    break;
+                case DAYS:
+                    nextReminder = nextReminder.plusDays(repeatInterval);
+                    break;
+            }
+        }
+
+        Duration durationTilNextReminder = Duration.between(now, nextReminder);
+
+        long initialDelay = durationTilNextReminder.getSeconds();
+        Runnable task =
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        ReminderEntry retrivedEntry = reminderEntryController.getReminder(reminderId);
+                        if (entry == null) {
+                            return;
+                        }
+                        String message =
+                                "Reminder: You have " + retrivedEntry.getTitle() + " coming up! Get ready!";
+                        JDA jda = event.getJDA();
+                        for (Guild guild : jda.getGuilds()) {
+                            guild.getDefaultChannel().asTextChannel().sendMessage(message).queue();
+                        }
+                        if (entry.getRepeatInterval() == null) {
+                            reminderEntryController.deleteReminder(reminderId);
+                        }
+                    }
+                };
+        if (repeatInterval == null) {
+            scheduler.schedule(task, initialDelay, TimeUnit.SECONDS);
+            return;
+        }
+        scheduler.scheduleAtFixedRate(task, initialDelay, unit.toSeconds(1) * entry.getRepeatInterval(), TimeUnit.SECONDS);
     }
 }
