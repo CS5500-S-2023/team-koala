@@ -24,8 +24,10 @@ import lombok.extern.slf4j.Slf4j;
 public class TrackPackageService implements Service {
 
     private static final String REALTIME_URL = "https://www.kd100.com/api/v1/tracking/realtime";
-    private static final String API_KEY = new ProcessBuilder().environment().get("API_KEY");
-    private static final String SECRET = new ProcessBuilder().environment().get("SECRET");
+    private static final String API_KEY =
+            new ProcessBuilder().environment().get("KEY_DELIVERY_API_KEY");
+    private static final String SECRET =
+            new ProcessBuilder().environment().get("KEY_DELIVERY_API_SECRET");
     private static final int CONNECT_TIMEOUT = 1000;
     private static final int READ_TIMEOUT = 5000;
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
