@@ -84,7 +84,8 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
         String trackingNumber = trackingNumberOption.getAsString();
         log.info(
                 "Collected data: packageName - {}, trackingNumber - {}",
-                packageName, trackingNumber);
+                packageName,
+                trackingNumber);
 
         // Reply with a select menu for users to choose a carrier
         StringSelectMenu.Builder carrierBuilder = StringSelectMenu.create("add_package");
