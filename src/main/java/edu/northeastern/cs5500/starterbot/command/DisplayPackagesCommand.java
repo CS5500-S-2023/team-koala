@@ -44,7 +44,8 @@ public class DisplayPackagesCommand implements SlashCommandHandler {
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
         log.info("event: /display_packages");
 
-        List<Package> packages = packageController.getAllPackages();
+        String userId = event.getUser().getId();
+        List<Package> packages = packageController.getUsersPackages(userId);
 
         EmbedBuilder embedBuilder =
                 new EmbedBuilder().setColor(Color.LIGHT_GRAY).setTitle("Displaying Packages");

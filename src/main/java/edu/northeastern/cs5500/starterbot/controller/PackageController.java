@@ -37,7 +37,14 @@ public class PackageController {
         packageRepository.delete(id);
     }
 
-    public List<Package> getAllPackages() {
-        return new ArrayList<>(packageRepository.getAll());
+    public List<Package> getUsersPackages(String userId) {
+        List<Package> allPackages = new ArrayList<>(packageRepository.getAll());
+        List<Package> usersPackages = new ArrayList<>();
+        for (Package p : allPackages) {
+            if (p.getUserId().equals(userId)) {
+                usersPackages.add(p);
+            }
+        }
+        return usersPackages;
     }
 }
