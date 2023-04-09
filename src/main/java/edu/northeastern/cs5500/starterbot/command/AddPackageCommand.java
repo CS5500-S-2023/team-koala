@@ -77,15 +77,17 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
                         "Received null value for mandatory parameter 'tracking_number'");
 
         // collect package data
-        String packageName = null;
+        String packageName = "";
         if (nameOption != null) {
             packageName = nameOption.getAsString();
         }
         String trackingNumber = trackingNumberOption.getAsString();
+        log.info(
+                "Collected data: packageName - {}, trackingNumber - {}",
+                packageName, trackingNumber);
 
         // Reply with a select menu for users to choose a carrier
-        StringSelectMenu.Builder carrierBuilder =
-                StringSelectMenu.create("string_select_add_package");
+        StringSelectMenu.Builder carrierBuilder = StringSelectMenu.create("add_package");
         for (Map.Entry<String, String> entry : carrieMap.entrySet()) {
             carrierBuilder.addOption(
                     entry.getKey(),
@@ -101,8 +103,7 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
 
     @Override
     public void onStringSelectInteraction(StringSelectInteractionEvent event) {
-        log.info("event: /add_package - StringSelectInteractionEvent");
-        log.info(event.getValues().get(0));
+        log.info("event: /add_package:StringSelectInteractionEvent - {}", event.getValues().get(0));
 
         // collect passed in data from previous step
         String[] paramArray = event.getValues().get(0).split("::");
@@ -112,7 +113,7 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
 
         // retrieve user info
         User user = event.getUser();
-        if (packageName.equals("null")) {
+        if (packageName.isBlank()) {
             log.info("The package name is null");
             packageName = null;
         }
