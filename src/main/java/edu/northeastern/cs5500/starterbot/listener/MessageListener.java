@@ -72,8 +72,7 @@ public class MessageListener extends ListenerAdapter {
     public void onStringSelectInteraction(@Nonnull StringSelectInteractionEvent event) {
         log.info("onStringSelectInteraction: {}", event.getComponent().getId());
         String handlerName = event.getComponent().getId();
-        // string select name format: string_select_xxxx
-        handlerName = handlerName.split(":", 2)[0].substring(14);
+        handlerName = handlerName.split(":", 2)[0];
 
         for (StringSelectHandler stringSelectHandler : stringSelects) {
             if (stringSelectHandler.getName().equals(handlerName)) {
