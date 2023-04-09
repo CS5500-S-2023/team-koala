@@ -5,7 +5,8 @@
 ### Code ###
 .vscode/*
 
-### eclipse ###
+### Eclipse Settings ###
+>>>>>>> 43dd809 (remove global package variable in AddPackageCommand and replaced the naming alias to name for package class)
 .settings/*
 
 ### Java ###

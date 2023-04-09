@@ -5,7 +5,6 @@ import java.sql.Timestamp;
 import javax.annotation.Nonnull;
 import lombok.AllArgsConstructor; // only for test purpose
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 
 @Data
