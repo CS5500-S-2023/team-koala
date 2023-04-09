@@ -3,6 +3,7 @@ package edu.northeastern.cs5500.starterbot.controller;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import javax.inject.Inject;
 import org.bson.types.ObjectId;
@@ -38,7 +39,7 @@ public class PackageController {
     }
 
     public List<Package> getUsersPackages(String userId) {
-        List<Package> allPackages = new ArrayList<>(packageRepository.getAll());
+        Collection<Package> allPackages = packageRepository.getAll();
         List<Package> usersPackages = new ArrayList<>();
         for (Package p : allPackages) {
             if (p.getUserId().equals(userId)) {
