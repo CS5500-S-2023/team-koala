@@ -119,7 +119,13 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
             packageName = null;
         }
 
-        Package pkg = new Package(null, packageName, trackingNumber, carrierId, user.getId());
+        Package pkg =
+                Package.builder()
+                        .trackingNumber(trackingNumber)
+                        .carrierId(carrierId)
+                        .userId(user.getId())
+                        .name(packageName)
+                        .build();
         log.info(pkg.toString());
 
         // create a package and receives success or error messages

@@ -17,9 +17,12 @@ public class TrackPackageServiceTest {
 
     @Test
     void testRealtimePackageTracking() {
-        Package package1 = new Package();
-        package1.setCarrierId("ups");
-        package1.setTrackingNumber("1Z9A170W0337231977");
+        Package package1 =
+                Package.builder()
+                        .carrierId("ups")
+                        .trackingNumber("1Z9A170W0337231977")
+                        .userId("user id")
+                        .build();
 
         trackPackageService.getPackageLatestStatus(package1);
         assertEquals("[SEATTLE, WA, US]DELIVERED", package1.getStatus());
