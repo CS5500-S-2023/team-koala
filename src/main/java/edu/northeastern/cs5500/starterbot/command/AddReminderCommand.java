@@ -2,14 +2,12 @@ package edu.northeastern.cs5500.starterbot.command;
 
 import edu.northeastern.cs5500.starterbot.controller.ReminderEntryController;
 import edu.northeastern.cs5500.starterbot.exception.InvalidTimeUnitException;
-import edu.northeastern.cs5500.starterbot.exception.ReminderNotFoundException;
 import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.format.DateTimeParseException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -123,10 +121,17 @@ public class AddReminderCommand implements SlashCommandHandler {
                 return;
             }
         }
+<<<<<<< HEAD
 
         // add reminder to database
         reminderEntryController.addReminder(
                 discordUserId, title, reminderTime, offset, interval, unit);
+=======
+        ReminderEntry savedEntry =
+                reminderEntryController.addReminder(
+                        discordUserId, title, reminderTime, offset, interval, unit);
+        scheduleMessage(savedEntry, event);
+>>>>>>> ab644b3 (merged changed from addReminderConfirm)
 
         // return reminder info in confirmation message to user
         List<MessageEmbed> embeds = new ArrayList<>();
@@ -149,15 +154,16 @@ public class AddReminderCommand implements SlashCommandHandler {
         event.reply(messageCreateBuilder.build()).queue();
     }
 
-    private void scheduleMessage(
-            ReminderEntry entry, ButtonInteractionEvent event, String reminderId) {
+    private void scheduleMessage(ReminderEntry entry, SlashCommandInteractionEvent event) {
+        String reminderId = entry.getId().toString();
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of("America/Los_Angeles"));
         Integer offset = entry.getReminderOffset();
         LocalTime reminderTimeActual = entry.getReminderTime().minusMinutes(offset);
         Integer repeatInterval = entry.getRepeatInterval();
         TimeUnit unit = entry.getRepeatTimeUnit();
         ZonedDateTime nextReminder =
-                now.withHour(reminderTimeActual.getHour()).withMinute(reminderTimeActual.getMinute());
+                now.withHour(reminderTimeActual.getHour())
+                        .withMinute(reminderTimeActual.getMinute());
 
         int today = now.getDayOfMonth();
         while (now.compareTo(nextReminder) >= 0
@@ -183,12 +189,15 @@ public class AddReminderCommand implements SlashCommandHandler {
                 new Runnable() {
                     @Override
                     public void run() {
-                        ReminderEntry retrivedEntry = reminderEntryController.getReminder(reminderId);
+                        ReminderEntry retrivedEntry =
+                                reminderEntryController.getReminder(reminderId);
                         if (entry == null) {
                             return;
                         }
                         String message =
-                                "Reminder: You have " + retrivedEntry.getTitle() + " coming up! Get ready!";
+                                "Reminder: You have "
+                                        + retrivedEntry.getTitle()
+                                        + " coming up! Get ready!";
                         JDA jda = event.getJDA();
                         for (Guild guild : jda.getGuilds()) {
                             guild.getDefaultChannel().asTextChannel().sendMessage(message).queue();
@@ -202,6 +211,10 @@ public class AddReminderCommand implements SlashCommandHandler {
             scheduler.schedule(task, initialDelay, TimeUnit.SECONDS);
             return;
         }
-        scheduler.scheduleAtFixedRate(task, initialDelay, unit.toSeconds(1) * entry.getRepeatInterval(), TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(
+                task,
+                initialDelay,
+                unit.toSeconds(1) * entry.getRepeatInterval(),
+                TimeUnit.SECONDS);
     }
 }

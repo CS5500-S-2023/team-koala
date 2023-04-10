@@ -44,7 +44,7 @@ public class ReminderEntryController {
         return unit;
     }
 
-    public void addReminder(
+    public ReminderEntry addReminder(
             String discordUserId,
             String title,
             LocalTime reminderTime,
@@ -60,7 +60,7 @@ public class ReminderEntryController {
                         .repeatInterval(interval)
                         .repeatTimeUnit(unit)
                         .build();
-        reminderEntryRepository.add(reminderEntry);
+        return reminderEntryRepository.add(reminderEntry);
     }
 
     public ReminderEntry getReminderEntryForUserId(String discordUserId) {
@@ -72,6 +72,10 @@ public class ReminderEntryController {
         }
 
         return null;
+    }
+
+    public ReminderEntry getReminder(String reminderId) {
+        return reminderEntryRepository.get(new ObjectId(reminderId));
     }
 
     public void deleteReminder(String reminderId) {
