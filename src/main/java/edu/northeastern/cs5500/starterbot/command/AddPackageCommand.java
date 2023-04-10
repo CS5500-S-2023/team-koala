@@ -126,7 +126,7 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
         String created = packageController.createPackage(pkg);
         log.info("package creation : " + created);
 
-        if (created.equals(packageController.SUCCESS)) {
+        if (created.equals(PackageController.SUCCESS)) {
             event.reply("Your package has been created successfully!").setEphemeral(true).queue();
         } else {
             event.reply("Your package was not created successfuly because of " + created)
