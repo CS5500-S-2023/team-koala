@@ -61,6 +61,10 @@ dependencies {
     // MongoDB for data storage
     implementation 'org.mongodb:mongo-java-driver:_'
 
+    // Detect lombok annotation in test
+    annotationProcessor 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok'
+
 }
 
 application {
