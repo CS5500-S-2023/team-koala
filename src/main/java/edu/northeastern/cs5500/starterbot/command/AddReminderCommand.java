@@ -69,6 +69,8 @@ public class AddReminderCommand implements SlashCommandHandler {
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
         log.info("event: /add-reminder");
+
+        // get reminder input
         String discordUserId = event.getUser().getId();
         String title = Objects.requireNonNull(event.getOption("title")).getAsString();
         String reminderTimeString =
@@ -78,10 +80,12 @@ public class AddReminderCommand implements SlashCommandHandler {
         OptionMapping intervalOption = event.getOption("repeat-interval");
         OptionMapping unitOption = event.getOption("interval-unit");
 
+        // null check on nullable inputs
         Integer offset = offsetOption == null ? 10 : offsetOption.getAsInt();
         Integer interval = intervalOption == null ? null : intervalOption.getAsInt();
         String unitString = unitOption == null ? null : unitOption.getAsString();
 
+        // parse reminder time
         LocalTime reminderTime = null;
         try {
             reminderTime = ReminderEntryController.parseReminderTime(reminderTimeString);
@@ -90,6 +94,7 @@ public class AddReminderCommand implements SlashCommandHandler {
             return;
         }
 
+        // parse reminder repeat time unit
         TimeUnit unit = null;
         if (interval != null && unitString != null) {
             try {
@@ -100,9 +105,12 @@ public class AddReminderCommand implements SlashCommandHandler {
                 return;
             }
         }
+
+        // add reminder to database
         reminderEntryController.addReminder(
                 discordUserId, title, reminderTime, offset, interval, unit);
 
+        // return reminder info in confirmation message to user
         List<MessageEmbed> embeds = new ArrayList<>();
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.addField("Title", title, false);
