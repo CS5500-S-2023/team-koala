@@ -1,17 +1,26 @@
 package edu.northeastern.cs5500.starterbot.command;
 
 import edu.northeastern.cs5500.starterbot.controller.ReminderEntryController;
+import edu.northeastern.cs5500.starterbot.exception.InvalidTimeUnitException;
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
 @Singleton
 @Slf4j
@@ -60,6 +69,8 @@ public class AddReminderCommand implements SlashCommandHandler {
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
         log.info("event: /add-reminder");
+
+        // get reminder input
         String discordUserId = event.getUser().getId();
         String title = Objects.requireNonNull(event.getOption("title")).getAsString();
         String reminderTimeString =
@@ -69,13 +80,54 @@ public class AddReminderCommand implements SlashCommandHandler {
         OptionMapping intervalOption = event.getOption("repeat-interval");
         OptionMapping unitOption = event.getOption("interval-unit");
 
+        // null check on nullable inputs
         Integer offset = offsetOption == null ? 10 : offsetOption.getAsInt();
         Integer interval = intervalOption == null ? null : intervalOption.getAsInt();
         String unitString = unitOption == null ? null : unitOption.getAsString();
 
-        reminderEntryController.addReminder(
-                discordUserId, title, reminderTimeString, offset, interval, unitString);
+        // parse reminder time
+        LocalTime reminderTime = null;
+        try {
+            reminderTime = ReminderEntryController.parseReminderTime(reminderTimeString);
+        } catch (DateTimeParseException e) {
+            event.reply("Please specify reminder time like 'hh:mm' (24-hour clock format)").queue();
+            return;
+        }
 
-        event.reply("Event Added!").queue();
+        // parse reminder repeat time unit
+        TimeUnit unit = null;
+        if (interval != null && unitString != null) {
+            try {
+                unit = ReminderEntryController.parseTimeUnit(unitString);
+            } catch (InvalidTimeUnitException e) {
+                event.reply("Please specify time unit with either m (minute), h (hour) or d (day)")
+                        .queue();
+                return;
+            }
+        }
+
+        // add reminder to database
+        reminderEntryController.addReminder(
+                discordUserId, title, reminderTime, offset, interval, unit);
+
+        // return reminder info in confirmation message to user
+        List<MessageEmbed> embeds = new ArrayList<>();
+        EmbedBuilder embedBuilder = new EmbedBuilder();
+        embedBuilder.addField("Title", title, false);
+        embedBuilder.addField("Reminder Time", reminderTimeString, false);
+        embedBuilder.addField("Reminder Offset", String.valueOf(offset), false);
+        if (interval != null) {
+            embedBuilder.addField("Repeat Interval", String.valueOf(interval), false);
+            embedBuilder.addField("Repeat Interval Time Unit", unitString, false);
+        }
+        MessageEmbed embed = embedBuilder.build();
+        embeds.add(embed);
+
+        MessageCreateBuilder messageCreateBuilder = new MessageCreateBuilder();
+        messageCreateBuilder = messageCreateBuilder.addEmbeds(embeds);
+        messageCreateBuilder =
+                messageCreateBuilder.setContent(
+                        "The following reminder has been successfully added!");
+        event.reply(messageCreateBuilder.build()).queue();
     }
 }

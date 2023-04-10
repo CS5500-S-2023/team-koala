@@ -28,8 +28,8 @@ public class ReminderEntry implements Model {
     @Nonnull Integer reminderOffset;
 
     // the interval between 2 reminders if the reminder entry is repeated
-    @Nullable Integer recurrenceInterval;
+    @Nullable Integer repeatInterval;
 
     // the unit of the recurrenceInterval;
-    @Nullable TimeUnit recurrencTimeUnit;
+    @Nullable TimeUnit repeatTimeUnit;
 }
