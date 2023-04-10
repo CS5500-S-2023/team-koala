@@ -2,17 +2,32 @@ package edu.northeastern.cs5500.starterbot.controller;
 
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
+import edu.northeastern.cs5500.starterbot.service.TrackPackageService;
 import javax.inject.Inject;
 import org.bson.types.ObjectId;
 
 public class PackageController {
 
     GenericRepository<Package> packageRepository; // data access object
-    public final String SUCCESS = "success";
+    public static final String SUCCESS = "success";
+    TrackPackageService trackPackageService;
 
     @Inject
-    public PackageController(GenericRepository<Package> packageRepository) {
+    public PackageController(
+            GenericRepository<Package> packageRepository, TrackPackageService trackPackageService) {
         this.packageRepository = packageRepository;
+        this.trackPackageService = trackPackageService;
+    }
+
+    /**
+     * The updated status will be written in the passed-in package object.
+     *
+     * <p>Expected: If the status and statusTime is null, then it means no status is available yet.
+     *
+     * @param package1
+     */
+    public void getPackageLatestStatus(Package package1) {
+        trackPackageService.getPackageLatestStatus(package1);
     }
 
     // add package to database after create tracking item via third-party api

@@ -5,6 +5,9 @@
 ### Code ###
 .vscode/*
 
+### eclipse ###
+.settings/*
+
 ### Java ###
 # Compiled class file
 *.class
