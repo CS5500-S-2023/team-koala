@@ -3,14 +3,12 @@ package edu.northeastern.cs5500.starterbot.model;
 import com.mongodb.lang.Nullable;
 import java.sql.Timestamp;
 import javax.annotation.Nonnull;
-import lombok.AllArgsConstructor; // only for test purpose
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Builder
 public class Package implements Model {
 
     ObjectId id;

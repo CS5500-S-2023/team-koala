@@ -11,7 +11,12 @@ import org.junit.jupiter.api.Test;
 public class PackageControllerTest {
     private PackageController packageController;
     private Package package1 =
-            new Package(null, "first pacakge", "1Z9A170W0337231977", "ups", "user id", null, null);
+            Package.builder()
+                    .trackingNumber("1Z9A170W0337231977")
+                    .carrierId("ups")
+                    .userId("user id")
+                    .name("first pacakge")
+                    .build();
 
     PackageControllerTest() {
         // Avoid using MongoDB service

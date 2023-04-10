@@ -5,7 +5,7 @@
 ### Code ###
 .vscode/*
 
-### eclipse ###
+### Eclipse Settings ###
 .settings/*
 
 ### Java ###
