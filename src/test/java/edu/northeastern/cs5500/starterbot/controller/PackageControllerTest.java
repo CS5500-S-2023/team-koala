@@ -12,6 +12,8 @@ public class PackageControllerTest {
             new Package(null, "first pacakge", "firstPackage", "1Z9A170W0337231977", "ups");
     private Package package2 =
             new Package(null, "second package", "trackingNumber2", "1Z9A170W0337231977", "ups");
+    private Package package3 =
+            new Package(null, "third package", "trackingNumber2", "1Z9A170W0337231977", "notUPS");
 
     PackageControllerTest() {
         // Avoid using MongoDB service
@@ -24,9 +26,10 @@ public class PackageControllerTest {
     }
 
     @Test
-    public void testDisplayPackage() {
+    public void testGetUsersPackages() {
         packageController.createPackage(package1);
         packageController.createPackage(package2);
+        packageController.createPackage(package3);
         assertEquals(packageController.getUsersPackages(package1.getUserId()).size(), 2);
     }
 

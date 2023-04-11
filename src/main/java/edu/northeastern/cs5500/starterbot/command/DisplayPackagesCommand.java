@@ -12,10 +12,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.components.*;
-import net.dv8tion.jda.api.interactions.components.selections.*;
-import net.dv8tion.jda.api.interactions.components.text.*;
-import net.dv8tion.jda.api.interactions.modals.*;
 import org.bson.types.ObjectId;
 
 @Singleton
@@ -45,19 +41,15 @@ public class DisplayPackagesCommand implements SlashCommandHandler {
         log.info("event: /display_packages");
 
         String userId = event.getUser().getId();
-        List<Package> packages = packageController.getUsersPackages(userId);
+        List<Package> myPackages = packageController.getUsersPackages(userId);
 
         EmbedBuilder embedBuilder =
-                new EmbedBuilder().setColor(Color.LIGHT_GRAY).setTitle("Displaying Packages");
-        for (Package p : packages) {
-            embedBuilder.addField("Id: ", displayPackageId(p.getId()), true);
-            embedBuilder.addField("Name: ", displayPackageName(p.getName()), true);
+                new EmbedBuilder().setColor(Color.red).setTitle("Displaying Your Packages");
+        for (Package p : myPackages) {
+            embedBuilder.addField("Package Id: ", displayPackageId(p.getId()), true);
+            embedBuilder.addField("Carrier: ", displayCarrierId(p.getCarrierId()), true);
             embedBuilder.addField(
                     "Tracking Number: ", displayTrackingNumber(p.getTrackingNumber()), true);
-            // .addField(
-            //         "ETA: ",
-            //         displayEstimatedDeliveryDate(p.getEstimatedDeliveryDate()),
-            //         true);
         }
 
         event.replyEmbeds(embedBuilder.build()).queue();
@@ -69,18 +61,12 @@ public class DisplayPackagesCommand implements SlashCommandHandler {
     }
 
     @Nonnull
-    private String displayPackageName(@Nonnull String name) {
-        return name;
+    private String displayCarrierId(@Nonnull String carrierId) {
+        return carrierId;
     }
 
     @Nonnull
     private String displayTrackingNumber(@Nonnull String trackingNumber) {
         return trackingNumber;
     }
-
-    // private String displayEstimatedDeliveryDate(Date estimatedDeliveryDate) {
-    //     DateFormat dateFormat = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
-    //     String strEstimatedDeliveryDate = dateFormat.format(estimatedDeliveryDate);
-    //     return strEstimatedDeliveryDate;
-    // }
 }

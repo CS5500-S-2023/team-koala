@@ -82,6 +82,7 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
 
         // retrieve user info
         User user = event.getUser();
+        System.out.println(user.getId());
 
         // set package data
         package1 = new Package(); // avoid newing several objects

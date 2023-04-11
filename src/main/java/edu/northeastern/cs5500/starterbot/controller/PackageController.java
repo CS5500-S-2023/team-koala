@@ -11,7 +11,7 @@ import org.bson.types.ObjectId;
 public class PackageController {
 
     GenericRepository<Package> packageRepository; // data access object
-    public final String SUCCESS = "success";
+    public static final String SUCCESS = "success";
 
     @Inject
     public PackageController(GenericRepository<Package> packageRepository) {
@@ -40,12 +40,14 @@ public class PackageController {
 
     public List<Package> getUsersPackages(String userId) {
         Collection<Package> allPackages = packageRepository.getAll();
+
         List<Package> usersPackages = new ArrayList<>();
         for (Package p : allPackages) {
             if (p.getUserId().equals(userId)) {
                 usersPackages.add(p);
             }
         }
+
         return usersPackages;
     }
 }
