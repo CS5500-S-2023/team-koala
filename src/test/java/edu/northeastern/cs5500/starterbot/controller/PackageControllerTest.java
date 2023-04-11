@@ -17,10 +17,22 @@ public class PackageControllerTest {
                     .userId("user id")
                     .name("first pacakge")
                     .build();
+
     private Package package2 =
-            new Package(null, "second package", "trackingNumber2", "1Z9A170W0337231977", "ups");
+            Package.builder()
+                    .trackingNumber("1Z9A170W0337231976")
+                    .carrierId("ups")
+                    .userId("user id")
+                    .name("second package")
+                    .build();
+
     private Package package3 =
-            new Package(null, "third package", "trackingNumber2", "1Z9A170W0337231977", "notUPS");
+            Package.builder()
+                    .trackingNumber("1Z9A170W0337231975")
+                    .carrierId("fedex")
+                    .userId("user id 2")
+                    .name("third package")
+                    .build();
 
     PackageControllerTest() {
         // Avoid using MongoDB service
