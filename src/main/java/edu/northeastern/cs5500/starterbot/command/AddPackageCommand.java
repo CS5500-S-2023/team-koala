@@ -15,10 +15,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.components.*;
 import net.dv8tion.jda.api.interactions.components.selections.*;
-import net.dv8tion.jda.api.interactions.components.text.*;
-import net.dv8tion.jda.api.interactions.modals.*;
 
 @Singleton
 @Slf4j
@@ -26,7 +23,6 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
 
     @Inject PackageController packageController;
 
-    private Package package1;
     // may have a better solution to read the data from csv file
     // https://github.com/CS5500-S-2023/team-koala/issues/15
     private final Map<String, String> carrieMap =
@@ -64,8 +60,8 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
                         true)
                 .addOption(
                         OptionType.STRING,
-                        "package_alias",
-                        "The bot will record the alias for the package",
+                        "package_name",
+                        "The bot will record the name for the package",
                         false);
     }
 
@@ -74,31 +70,31 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
         log.info("event: /add_package");
 
         // retrieve option data
-        OptionMapping aliasOption = event.getOption("package_alias");
+        OptionMapping nameOption = event.getOption("package_name");
         OptionMapping trackingNumberOption =
                 Objects.requireNonNull(
                         event.getOption("tracking_number"),
                         "Received null value for mandatory parameter 'tracking_number'");
 
-        // retrieve user info
-        User user = event.getUser();
-        System.out.println(user.getId());
-
-        // set package data
-        package1 = new Package(); // avoid newing several objects
-        if (aliasOption != null) {
-            package1.setName(aliasOption.getAsString());
+        // collect package data
+        String packageName = "";
+        if (nameOption != null) {
+            packageName = nameOption.getAsString();
         }
         String trackingNumber = trackingNumberOption.getAsString();
-        package1.setTrackingNumber(trackingNumber);
-        package1.setUserId(user.getId());
+        log.info(
+                "Collected data: packageName - {}, trackingNumber - {}",
+                packageName,
+                trackingNumber);
 
         // Reply with a select menu for users to choose a carrier
-        StringSelectMenu.Builder carrierBuilder =
-                StringSelectMenu.create("string_select_add_package");
+        StringSelectMenu.Builder carrierBuilder = StringSelectMenu.create("add_package");
         for (Map.Entry<String, String> entry : carrieMap.entrySet()) {
             carrierBuilder.addOption(
-                    entry.getKey(), entry.getValue(), "carrier name"); // label, value, description
+                    entry.getKey(),
+                    String.format(
+                            "%s::%s::%s",
+                            packageName, trackingNumber, entry.getValue())); // label, value
         }
 
         event.reply("Select the carrier for your package")
@@ -108,16 +104,35 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
 
     @Override
     public void onStringSelectInteraction(StringSelectInteractionEvent event) {
-        log.info("event: /string_select_add_package");
-        String carrier = event.getValues().get(0);
+        log.info("event: /add_package:StringSelectInteractionEvent - {}", event.getValues().get(0));
 
-        package1.setCarrierId(carrier);
-        log.info(package1.toString());
+        // collect passed in data from previous step
+        String[] paramArray = event.getValues().get(0).split("::");
+        String packageName = paramArray[0];
+        String trackingNumber = paramArray[1];
+        String carrierId = paramArray[2];
+
+        // retrieve user info
+        User user = event.getUser();
+        if (packageName.isBlank()) {
+            log.info("The package name is null");
+            packageName = null;
+        }
+
+        Package pkg =
+                Package.builder()
+                        .trackingNumber(trackingNumber)
+                        .carrierId(carrierId)
+                        .userId(user.getId())
+                        .name(packageName)
+                        .build();
+        log.info(pkg.toString());
 
         // create a package and receives success or error messages
-        String created = packageController.createPackage(package1);
+        String created = packageController.createPackage(pkg);
+        log.info("package creation : " + created);
 
-        if (created.equals(packageController.SUCCESS)) {
+        if (created.equals(PackageController.SUCCESS)) {
             event.reply("Your package has been created successfully!").setEphemeral(true).queue();
         } else {
             event.reply("Your package was not created successfuly because of " + created)

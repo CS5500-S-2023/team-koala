@@ -1,14 +1,15 @@
 package edu.northeastern.cs5500.starterbot.controller;
 
+import edu.northeastern.cs5500.starterbot.exception.InvalidTimeUnitException;
 import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 public class ReminderEntryController {
-
     GenericRepository<ReminderEntry> reminderEntryRepository;
 
     @Inject
@@ -16,51 +17,48 @@ public class ReminderEntryController {
         this.reminderEntryRepository = reminderEntryRepository;
     }
 
+    public static LocalTime parseReminderTime(String timeString) throws DateTimeParseException {
+        return LocalTime.parse(timeString);
+    }
+
+    public static TimeUnit parseTimeUnit(String unitString) throws InvalidTimeUnitException {
+        TimeUnit unit = null;
+        switch (unitString) {
+            case "m":
+                unit = TimeUnit.MINUTES;
+                break;
+
+            case "h":
+                unit = TimeUnit.HOURS;
+                break;
+
+            case "d":
+                unit = TimeUnit.DAYS;
+                break;
+
+            default:
+                throw new InvalidTimeUnitException(
+                        "Repeat time unit can only be m(minute) / h(hour) / d(day)");
+        }
+        return unit;
+    }
+
     public void addReminder(
             String discordUserId,
             String title,
-            String reminderTimeString,
+            LocalTime reminderTime,
             Integer offset,
             Integer interval,
-            String unitString) {
-
-        // TODO: boweill - add more format validation here
-        String[] reminderHourMin = reminderTimeString.split(":");
-        Integer hour = Integer.parseInt(reminderHourMin[0]);
-        Integer min = Integer.parseInt(reminderHourMin[1]);
-
-        LocalTime reminderTime = LocalTime.of(hour, min);
-
-        TimeUnit unit = null;
-        if (interval != null) {
-            switch (unitString) {
-                case "m":
-                    unit = TimeUnit.MINUTES;
-                    break;
-
-                case "h":
-                    unit = TimeUnit.HOURS;
-                    break;
-
-                case "d":
-                    unit = TimeUnit.DAYS;
-                    break;
-
-                default:
-                    unit = TimeUnit.MINUTES;
-                    break;
-            }
-        }
+            TimeUnit unit) {
         ReminderEntry reminderEntry =
                 ReminderEntry.builder()
                         .discordUserId(discordUserId)
                         .title(title)
                         .reminderTime(reminderTime)
                         .reminderOffset(offset)
-                        .recurrenceInterval(interval)
-                        .recurrencTimeUnit(unit)
+                        .repeatInterval(interval)
+                        .repeatTimeUnit(unit)
                         .build();
-
         reminderEntryRepository.add(reminderEntry);
     }
 
