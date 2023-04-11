@@ -121,17 +121,12 @@ public class AddReminderCommand implements SlashCommandHandler {
                 return;
             }
         }
-<<<<<<< HEAD
 
         // add reminder to database
-        reminderEntryController.addReminder(
-                discordUserId, title, reminderTime, offset, interval, unit);
-=======
         ReminderEntry savedEntry =
                 reminderEntryController.addReminder(
                         discordUserId, title, reminderTime, offset, interval, unit);
         scheduleMessage(savedEntry, event);
->>>>>>> ab644b3 (merged changed from addReminderConfirm)
 
         // return reminder info in confirmation message to user
         List<MessageEmbed> embeds = new ArrayList<>();
