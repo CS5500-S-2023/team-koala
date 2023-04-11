@@ -18,6 +18,22 @@ public class PackageControllerTest {
                     .name("first pacakge")
                     .build();
 
+    private Package package2 =
+            Package.builder()
+                    .trackingNumber("1Z9A170W0337231976")
+                    .carrierId("ups")
+                    .userId("user id")
+                    .name("second package")
+                    .build();
+
+    private Package package3 =
+            Package.builder()
+                    .trackingNumber("1Z9A170W0337231975")
+                    .carrierId("fedex")
+                    .userId("user id 2")
+                    .name("third package")
+                    .build();
+
     PackageControllerTest() {
         // Avoid using MongoDB service
         GenericRepository repo = new InMemoryRepository<>();
@@ -26,6 +42,22 @@ public class PackageControllerTest {
 
     @Test
     public void testCreatePackage() {
-        assertEquals(PackageController.SUCCESS, packageController.createPackage(package1));
+        assertEquals(packageController.createPackage(package1), packageController.SUCCESS);
+    }
+
+    @Test
+    public void testGetUsersPackages() {
+        packageController.createPackage(package1);
+        packageController.createPackage(package2);
+        packageController.createPackage(package3);
+        assertEquals(packageController.getUsersPackages(package1.getUserId()).size(), 2);
+    }
+
+    @Test
+    public void testDeletePackage() {
+        packageController.createPackage(package1);
+        packageController.createPackage(package2);
+        packageController.deletePackage(package1.getId());
+        assertEquals(packageController.getUsersPackages(package1.getUserId()).size(), 1);
     }
 }

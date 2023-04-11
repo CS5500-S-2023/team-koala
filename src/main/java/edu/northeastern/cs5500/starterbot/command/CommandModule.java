@@ -28,6 +28,20 @@ public class CommandModule {
 
     @Provides
     @IntoSet
+    public SlashCommandHandler provideDeletePackageCommand(
+            DeletePackageCommand deletePackageCommand) {
+        return deletePackageCommand;
+    }
+
+    @Provides
+    @IntoSet
+    public SlashCommandHandler provideDisplayPackagesCommand(
+            DisplayPackagesCommand displayPackagesCommand) {
+        return displayPackagesCommand;
+    }
+
+    @Provides
+    @IntoSet
     public SlashCommandHandler providePreferredNameCommand(
             PreferredNameCommand preferredNameCommand) {
         return preferredNameCommand;

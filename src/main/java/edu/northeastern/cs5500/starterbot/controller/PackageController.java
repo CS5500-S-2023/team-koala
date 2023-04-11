@@ -3,6 +3,9 @@ package edu.northeastern.cs5500.starterbot.controller;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import edu.northeastern.cs5500.starterbot.service.TrackPackageService;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import javax.inject.Inject;
 import org.bson.types.ObjectId;
 
@@ -44,5 +47,22 @@ public class PackageController {
 
     public Package getPackage(ObjectId id) {
         return this.packageRepository.get(id);
+    }
+
+    public void deletePackage(ObjectId id) {
+        packageRepository.delete(id);
+    }
+
+    public List<Package> getUsersPackages(String userId) {
+        Collection<Package> allPackages = packageRepository.getAll();
+
+        List<Package> usersPackages = new ArrayList<>();
+        for (Package p : allPackages) {
+            if (p.getUserId().equals(userId)) {
+                usersPackages.add(p);
+            }
+        }
+
+        return usersPackages;
     }
 }
