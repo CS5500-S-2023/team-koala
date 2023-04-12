@@ -4,7 +4,6 @@ import edu.northeastern.cs5500.starterbot.exception.InvalidTimeUnitException;
 import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import java.time.LocalTime;
-import java.time.format.DateTimeParseException;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
@@ -16,10 +15,6 @@ public class ReminderEntryController {
     @Inject
     ReminderEntryController(GenericRepository<ReminderEntry> reminderEntryRepository) {
         this.reminderEntryRepository = reminderEntryRepository;
-    }
-
-    public static LocalTime parseReminderTime(String timeString) throws DateTimeParseException {
-        return LocalTime.parse(timeString);
     }
 
     public static TimeUnit parseTimeUnit(String unitString) throws InvalidTimeUnitException {

@@ -97,20 +97,13 @@ public class AddReminderCommand implements SlashCommandHandler {
         // parse reminder time
         LocalTime reminderTime = null;
         try {
-            reminderTime = ReminderEntryController.parseReminderTime(reminderTimeString);
+            reminderTime = LocalTime.parse(reminderTimeString);
         } catch (DateTimeParseException e) {
             event.reply("Please specify reminder time like 'hh:mm' (24-hour clock format)").queue();
             return;
         }
 
-        // parse reminder repeat time unit
-        LocalTime actualReminderTime = reminderTime.minusMinutes(offset);
-        if (interval == null && LocalTime.now().compareTo(actualReminderTime) >= 0) {
-            event.reply(
-                            "Sorry we cannot schedule reminder for past events, please double check the time.")
-                    .queue();
-        }
-
+        // parse reminder time unit
         TimeUnit unit = null;
         if (interval != null && unitString != null) {
             try {
@@ -151,32 +144,12 @@ public class AddReminderCommand implements SlashCommandHandler {
 
     private void scheduleMessage(ReminderEntry entry, SlashCommandInteractionEvent event) {
         String reminderId = entry.getId().toString();
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("America/Los_Angeles"));
         Integer offset = entry.getReminderOffset();
         LocalTime reminderTimeActual = entry.getReminderTime().minusMinutes(offset);
         Integer repeatInterval = entry.getRepeatInterval();
         TimeUnit unit = entry.getRepeatTimeUnit();
-        ZonedDateTime nextReminder =
-                now.withHour(reminderTimeActual.getHour())
-                        .withMinute(reminderTimeActual.getMinute());
-
-        int today = now.getDayOfMonth();
-        while (now.compareTo(nextReminder) >= 0
-                && repeatInterval != null
-                && nextReminder.getDayOfMonth() == today) {
-            switch (unit) {
-                case MINUTES:
-                    nextReminder = nextReminder.plusMinutes(repeatInterval);
-                    break;
-                case HOURS:
-                    nextReminder = nextReminder.plusHours(repeatInterval);
-                    break;
-                case DAYS:
-                    nextReminder = nextReminder.plusDays(repeatInterval);
-                    break;
-            }
-        }
-
+        ZonedDateTime nextReminder = getNextReminderTime(reminderTimeActual, unit, repeatInterval);
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("America/Los_Angeles"));
         Duration durationTilNextReminder = Duration.between(now, nextReminder);
 
         long initialDelay = durationTilNextReminder.getSeconds();
@@ -211,5 +184,36 @@ public class AddReminderCommand implements SlashCommandHandler {
                 initialDelay,
                 unit.toSeconds(1) * entry.getRepeatInterval(),
                 TimeUnit.SECONDS);
+    }
+
+    // By default reminder messages start the next time the clock hits reminderTime
+    // e.g. now is 10am the user scheduled a reminder at 8am then the first reminder
+    // message will be at 8am the next day
+    private ZonedDateTime getNextReminderTime(
+            LocalTime reminderTimeActual, TimeUnit unit, Integer repeatInterval) {
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("America/Los_Angeles"));
+        ZonedDateTime nextReminder =
+                now.withHour(reminderTimeActual.getHour())
+                        .withMinute(reminderTimeActual.getMinute());
+
+        int today = now.getDayOfMonth();
+        while (now.compareTo(nextReminder) >= 0
+                && repeatInterval != null
+                && nextReminder.getDayOfMonth() == today) {
+            switch (unit) {
+                case MINUTES:
+                    nextReminder = nextReminder.plusMinutes(repeatInterval);
+                    break;
+                case HOURS:
+                    nextReminder = nextReminder.plusHours(repeatInterval);
+                    break;
+                case DAYS:
+                    nextReminder = nextReminder.plusDays(repeatInterval);
+                    break;
+                default:
+                    break;
+            }
+        }
+        return nextReminder;
     }
 }
