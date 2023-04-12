@@ -3,6 +3,7 @@ package edu.northeastern.cs5500.starterbot.command;
 import edu.northeastern.cs5500.starterbot.controller.PackageController;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import java.awt.Color;
+import java.sql.Timestamp;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -18,6 +19,7 @@ import org.bson.types.ObjectId;
 @Slf4j
 public class DisplayPackagesCommand implements SlashCommandHandler {
 
+    public static final String UNKNOWN = "Unknown";
     @Inject PackageController packageController;
 
     @Inject
@@ -42,7 +44,6 @@ public class DisplayPackagesCommand implements SlashCommandHandler {
 
         String userId = event.getUser().getId();
         List<Package> myPackages = packageController.getUsersPackages(userId);
-
         EmbedBuilder embedBuilder =
                 new EmbedBuilder().setColor(Color.red).setTitle("Displaying Your Packages");
         for (Package p : myPackages) {
@@ -50,6 +51,8 @@ public class DisplayPackagesCommand implements SlashCommandHandler {
             embedBuilder.addField("Carrier: ", displayCarrierId(p.getCarrierId()), true);
             embedBuilder.addField(
                     "Tracking Number: ", displayTrackingNumber(p.getTrackingNumber()), true);
+            embedBuilder.addField("Status: ", displayStatus(p.getStatus()), true);
+            embedBuilder.addField("ETA: ", displayStatusTime(p.getStatusTime()), true);
         }
 
         event.replyEmbeds(embedBuilder.build()).queue();
@@ -68,5 +71,17 @@ public class DisplayPackagesCommand implements SlashCommandHandler {
     @Nonnull
     private String displayTrackingNumber(@Nonnull String trackingNumber) {
         return trackingNumber;
+    }
+
+    @Nonnull
+    private String displayStatus(String status) {
+        if (status == null) return UNKNOWN;
+        return status;
+    }
+
+    @Nonnull
+    private String displayStatusTime(Timestamp statusTime) {
+        if (statusTime.equals(null)) return UNKNOWN;
+        return statusTime.toString();
     }
 }
