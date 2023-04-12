@@ -5,8 +5,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import edu.northeastern.cs5500.starterbot.controller.PackageController;
+import edu.northeastern.cs5500.starterbot.model.KeyDeliveryStatus;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import java.io.BufferedReader;
@@ -26,7 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 public class TrackPackageService implements Service {
 
     private static final String REALTIME_URL = "https://www.kd100.com/api/v1/tracking/realtime";
-    private static final String CREATE_TRACKING_URL = "https://www.kd100.com/api/v1/tracking/create";
+    private static final String CREATE_TRACKING_URL =
+            "https://www.kd100.com/api/v1/tracking/create";
     private static final String API_KEY =
             new ProcessBuilder().environment().get("KEY_DELIVERY_API_KEY");
     private static final String SECRET =
@@ -55,7 +56,7 @@ public class TrackPackageService implements Service {
         String carrier_id = package1.getCarrierId();
         String tracking_number = package1.getTrackingNumber();
 
-        String result = getData(carrier_id, tracking_number, webhookAddress, CREATE_TRACKING_URL);
+        String result = getData(CREATE_TRACKING_URL, carrier_id, tracking_number, webhookAddress);
 
         // read the result and handle errors
         return readResponse(result);
@@ -131,6 +132,7 @@ public class TrackPackageService implements Service {
      * Construct JSON strings and send post requests to a KeyDelivery API Create tracking API and
      * Realtime tracking API both use this function
      *
+     * @param url - third party api url
      * @param carrier_id
      * @param tracking_number
      * @param webhook_url
@@ -187,7 +189,7 @@ public class TrackPackageService implements Service {
                 response.append(line);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         } finally {
             try {
                 if (null != out) {
@@ -254,8 +256,4 @@ class MD5Utils {
             return null;
         }
     }
-
-    
-
-   
 }

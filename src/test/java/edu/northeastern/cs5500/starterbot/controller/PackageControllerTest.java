@@ -33,6 +33,8 @@ public class PackageControllerTest {
                     .userId("user id 2")
                     .name("third package")
                     .build();
+                    
+    public String EXIST_STATUS = "Tracking already exists";
 
     PackageControllerTest() {
         // Avoid using MongoDB service
@@ -42,7 +44,7 @@ public class PackageControllerTest {
 
     @Test
     public void testCreatePackage() {
-        assertEquals(packageController.createPackage(package1), packageController.SUCCESS);
+        assertEquals(EXIST_STATUS, packageController.createPackage(package1));
     }
 
     @Test

@@ -1,4 +1,4 @@
-package edu.northeastern.cs5500.starterbot.service;
+package edu.northeastern.cs5500.starterbot.model;
 
 import com.google.gson.annotations.SerializedName;
 import java.sql.Timestamp;

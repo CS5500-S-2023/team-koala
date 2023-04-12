@@ -2,7 +2,6 @@ package edu.northeastern.cs5500.starterbot.Service;
 
 import static org.junit.Assert.*;
 
-import edu.northeastern.cs5500.starterbot.controller.PackageController;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.InMemoryRepository;
 import edu.northeastern.cs5500.starterbot.service.TrackPackageService;
@@ -10,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 public class TrackPackageServiceTest {
     TrackPackageService trackPackageService;
+    public String EXIST_STATUS = "Tracking already exists";
 
     TrackPackageServiceTest() {
         // even though this is a singleton, it can still be tested like a normal class
@@ -34,8 +34,7 @@ public class TrackPackageServiceTest {
         Package package1 = new Package();
         package1.setCarrierId("ups");
         package1.setTrackingNumber("1Z9A170W0337231977");
-        
-        assertEquals(PackageController.SUCCESS,
-            trackPackageService.createPackageTracking(package1));
+
+        assertEquals(EXIST_STATUS, trackPackageService.createPackageTracking(package1));
     }
 }

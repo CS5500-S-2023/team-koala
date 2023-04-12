@@ -4,11 +4,8 @@ import static spark.Spark.get;
 import static spark.Spark.port;
 import static spark.Spark.post;
 
-import java.util.HashMap;
-
 import com.google.gson.Gson;
-
-import edu.northeastern.cs5500.starterbot.model.WebhookRequest;
+import edu.northeastern.cs5500.starterbot.model.KeyDeliveryWebhookRequest;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -32,9 +29,13 @@ public class App {
                     String tracking_number = request.attribute("tracking_number");
 
                     Gson gson = new Gson();
-                    WebhookRequest webhookRequest = gson.fromJson(request.body(), WebhookRequest.class);
+                    KeyDeliveryWebhookRequest webhookRequest =
+                            gson.fromJson(request.body(), KeyDeliveryWebhookRequest.class);
 
-                    log.info(webhookRequest.getCarrierId() + " " + webhookRequest.getTrackingNumber());
+                    log.info(
+                            webhookRequest.getCarrierId()
+                                    + " "
+                                    + webhookRequest.getTrackingNumber());
                     return "{\"status\": \"OK\"}";
 
                     // read the first/latest item's context, time, order_status_description
@@ -42,7 +43,6 @@ public class App {
                     // invoke dao - update into database
 
                     // notify corresponding user - read user_id from the returned update
-                }
-        );
+                });
     }
 }
