@@ -31,6 +31,7 @@ public class TrackPackageService implements Service {
             new ProcessBuilder().environment().get("KEY_DELIVERY_API_KEY");
     private static final String SECRET =
             new ProcessBuilder().environment().get("KEY_DELIVERY_API_SECRET");
+    private static String webhookAddress;
     private static final int CONNECT_TIMEOUT = 1000;
     private static final int READ_TIMEOUT = 5000;
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
@@ -41,6 +42,8 @@ public class TrackPackageService implements Service {
     @Inject
     public TrackPackageService(GenericRepository<Package> packageRepository) {
         this.packageRepository = packageRepository;
+        ProcessBuilder processBuilder = new ProcessBuilder();
+        webhookAddress = processBuilder.environment().get("WEBHOOK_ADDRESS");
     }
 
     /**
@@ -51,10 +54,8 @@ public class TrackPackageService implements Service {
     public String createPackageTracking(Package package1) {
         String carrier_id = package1.getCarrierId();
         String tracking_number = package1.getTrackingNumber();
-        // use default for now
-        String webhook_url = "https://www.kd100.com/webhook_url";
 
-        String result = getData(carrier_id, tracking_number, webhook_url, CREATE_TRACKING_URL);
+        String result = getData(carrier_id, tracking_number, webhookAddress, CREATE_TRACKING_URL);
 
         // read the result and handle errors
         return readResponse(result);
