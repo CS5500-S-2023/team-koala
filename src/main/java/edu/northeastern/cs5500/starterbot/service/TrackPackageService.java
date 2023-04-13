@@ -38,7 +38,7 @@ public class TrackPackageService implements Service {
     private static final String SECRET =
             new ProcessBuilder().environment().get("KEY_DELIVERY_API_SECRET");
 
-    // Response code
+    // Error Codes from API response
     private static final int OK = 200;
     private static final int PACKAGE_NOT_EXIST = 60101;
 
