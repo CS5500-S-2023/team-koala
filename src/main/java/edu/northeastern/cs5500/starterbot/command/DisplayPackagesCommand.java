@@ -50,7 +50,9 @@ public class DisplayPackagesCommand implements SlashCommandHandler {
                         .setTitle("Displaying Your Packages")
                         .addBlankField(false);
         for (Package p : myPackages) {
-            embedBuilder.addField("Package Id: ", displayPackageId(p.getId()), false);
+            embedBuilder.addField("Package Id: ", displayPackageId(p.getId()), true);
+            embedBuilder.addField("Package Name: ", displayPackageName(p.getName()), true);
+            embedBuilder.addBlankField(true);
             embedBuilder.addField("Carrier: ", displayCarrierId(p.getCarrierId()), true);
             embedBuilder.addField(
                     "Tracking Number: ", displayTrackingNumber(p.getTrackingNumber()), true);
@@ -67,6 +69,12 @@ public class DisplayPackagesCommand implements SlashCommandHandler {
     @Nonnull
     private String displayPackageId(@Nonnull ObjectId id) {
         return id.toString();
+    }
+
+    @Nonnull
+    private String displayPackageName(@Nonnull String name) {
+        if (name == null) return UNKNOWN;
+        return name;
     }
 
     @Nonnull

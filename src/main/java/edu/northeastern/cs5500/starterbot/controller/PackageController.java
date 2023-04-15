@@ -71,12 +71,12 @@ public class PackageController {
         return usersPackages;
     }
 
-    public Package updatePackage(
-            ObjectId id, String name, String trackingNumber, String carrierId) {
+    public String updatePackage(ObjectId id, String name, String trackingNumber, String carrierId) {
         Package p = packageRepository.get(id);
         p.setName(name);
         p.setTrackingNumber(trackingNumber);
         p.setCarrierId(carrierId);
-        return p;
+        packageRepository.update(p);
+        return SUCCESS;
     }
 }

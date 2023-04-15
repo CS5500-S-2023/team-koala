@@ -42,7 +42,7 @@ public class PackageControllerTest {
 
     @Test
     public void testCreatePackage() {
-        assertEquals(packageController.createPackage(package1), packageController.SUCCESS);
+        assertEquals(PackageController.SUCCESS, packageController.createPackage(package1));
     }
 
     @Test
@@ -57,7 +57,16 @@ public class PackageControllerTest {
     public void testDeletePackage() {
         packageController.createPackage(package1);
         packageController.createPackage(package2);
-        packageController.deletePackage(package1.getId());
+        packageController.deletePackage(package1.getId(), package1.getUserId());
         assertEquals(packageController.getUsersPackages(package1.getUserId()).size(), 1);
+    }
+
+    @Test
+    public void testUpdatePackage() {
+        packageController.createPackage(package1);
+        assertEquals(
+                PackageController.SUCCESS,
+                packageController.updatePackage(
+                        package1.getId(), "New name", "New tracking", "New carrier"));
     }
 }

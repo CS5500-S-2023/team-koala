@@ -73,10 +73,6 @@ public class UpdatePackageCommand implements SlashCommandHandler {
         String trackingNumber = event.getOption("tracking_number", OptionMapping::getAsString);
         String carrierId = event.getOption("carrier_id", OptionMapping::getAsString);
 
-        System.out.println(name);
-        System.out.println(trackingNumber);
-        System.out.println(carrierId);
-
         if (name == null) name = p.getName();
         if (trackingNumber == null) trackingNumber = p.getTrackingNumber();
         if (carrierId == null) carrierId = p.getCarrierId();

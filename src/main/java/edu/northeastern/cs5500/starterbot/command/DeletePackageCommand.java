@@ -53,7 +53,7 @@ public class DeletePackageCommand implements SlashCommandHandler {
         String packageId = packageIdOption.getAsString();
         ObjectId objectId = new ObjectId(packageId);
 
-        Boolean deleted = packageController.deletePackage(objectId, userId);
+        boolean deleted = packageController.deletePackage(objectId, userId);
 
         if (deleted) {
             event.reply("Your package has been deleted successfully").queue();
