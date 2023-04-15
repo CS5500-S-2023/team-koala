@@ -3,7 +3,6 @@ package edu.northeastern.cs5500.starterbot.controller;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import edu.northeastern.cs5500.starterbot.service.TrackPackageService;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -60,6 +59,7 @@ public class PackageController {
         List<Package> usersPackages = new ArrayList<>();
         for (Package p : allPackages) {
             if (p.getUserId().equals(userId)) {
+                getPackageLatestStatus(p);
                 usersPackages.add(p);
             }
         }
@@ -68,18 +68,11 @@ public class PackageController {
     }
 
     public Package updatePackage(
-            ObjectId id,
-            String name,
-            String trackingNumber,
-            String carrierId,
-            String status,
-            Timestamp statusTime) {
+            ObjectId id, String name, String trackingNumber, String carrierId) {
         Package p = packageRepository.get(id);
         p.setName(name);
         p.setTrackingNumber(trackingNumber);
         p.setCarrierId(carrierId);
-        p.setStatus(status);
-        p.setStatusTime(statusTime);
         return p;
     }
 }

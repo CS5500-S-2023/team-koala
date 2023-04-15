@@ -3,7 +3,7 @@ package edu.northeastern.cs5500.starterbot.command;
 import edu.northeastern.cs5500.starterbot.controller.PackageController;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import java.awt.Color;
-import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -45,14 +45,20 @@ public class DisplayPackagesCommand implements SlashCommandHandler {
         String userId = event.getUser().getId();
         List<Package> myPackages = packageController.getUsersPackages(userId);
         EmbedBuilder embedBuilder =
-                new EmbedBuilder().setColor(Color.red).setTitle("Displaying Your Packages");
+                new EmbedBuilder()
+                        .setColor(Color.red)
+                        .setTitle("Displaying Your Packages")
+                        .addBlankField(false);
         for (Package p : myPackages) {
-            embedBuilder.addField("Package Id: ", displayPackageId(p.getId()), true);
+            embedBuilder.addField("Package Id: ", displayPackageId(p.getId()), false);
             embedBuilder.addField("Carrier: ", displayCarrierId(p.getCarrierId()), true);
             embedBuilder.addField(
                     "Tracking Number: ", displayTrackingNumber(p.getTrackingNumber()), true);
+            embedBuilder.addBlankField(true);
             embedBuilder.addField("Status: ", displayStatus(p.getStatus()), true);
             embedBuilder.addField("ETA: ", displayStatusTime(p.getStatusTime()), true);
+            embedBuilder.addBlankField(true);
+            embedBuilder.addBlankField(false);
         }
 
         event.replyEmbeds(embedBuilder.build()).queue();
@@ -65,7 +71,7 @@ public class DisplayPackagesCommand implements SlashCommandHandler {
 
     @Nonnull
     private String displayCarrierId(@Nonnull String carrierId) {
-        return carrierId;
+        return carrierId.toUpperCase();
     }
 
     @Nonnull
@@ -80,8 +86,8 @@ public class DisplayPackagesCommand implements SlashCommandHandler {
     }
 
     @Nonnull
-    private String displayStatusTime(Timestamp statusTime) {
-        if (statusTime.equals(null)) return UNKNOWN;
+    private String displayStatusTime(Date statusTime) {
+        if (statusTime == null) return UNKNOWN;
         return statusTime.toString();
     }
 }

@@ -54,6 +54,9 @@ public class TrackPackageService implements Service {
         String result = getData(REALTIME_URL, carrier_id, tracking_number, null);
         log.info("getPackageLatestStatus: " + package1.getId() + " - " + result);
 
+        if (result.contains("No result found")) {
+            return;
+        }
         // read the delivery updates
         readDeliveryResponse(result, package1);
 

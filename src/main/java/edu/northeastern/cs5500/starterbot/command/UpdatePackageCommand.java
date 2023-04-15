@@ -2,7 +2,6 @@ package edu.northeastern.cs5500.starterbot.command;
 
 import edu.northeastern.cs5500.starterbot.controller.PackageController;
 import edu.northeastern.cs5500.starterbot.model.Package;
-import java.sql.Timestamp;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -40,7 +39,22 @@ public class UpdatePackageCommand implements SlashCommandHandler {
                         OptionType.STRING,
                         "package_id",
                         "The bot will update the package associated with the package ID",
-                        true);
+                        true)
+                .addOption(
+                        OptionType.STRING,
+                        "package_name",
+                        "The bot will record the name for the package",
+                        false)
+                .addOption(
+                        OptionType.STRING,
+                        "tracking_number",
+                        "The bot will record the name for the package",
+                        false)
+                .addOption(
+                        OptionType.STRING,
+                        "carrier_id",
+                        "The bot will record the name for the package",
+                        false);
     }
 
     @Override
@@ -51,30 +65,23 @@ public class UpdatePackageCommand implements SlashCommandHandler {
                         event.getOption("package_id"),
                         "Received null value for mandatory parameter 'package_id'");
 
-        OptionMapping nameOption = event.getOption("name");
-        OptionMapping trackingNumberOption = event.getOption("tracking_number");
-        OptionMapping carrierIdOption = event.getOption("carrier");
-        OptionMapping statusOption = event.getOption("status");
-        OptionMapping statusTimeOption = event.getOption("status_time");
-
         String packageId = packageIdOption.getAsString();
         ObjectId objectId = new ObjectId(packageId);
         Package p = packageController.getPackage(objectId);
 
-        String name = nameOption.getAsString();
-        String trackingNumber = trackingNumberOption.getAsString();
-        String carrierId = carrierIdOption.getAsString();
-        String status = statusOption.getAsString();
-        Timestamp statusTime = Timestamp.valueOf(statusTimeOption.getAsString());
+        String name = event.getOption("package_name", OptionMapping::getAsString);
+        String trackingNumber = event.getOption("tracking_number", OptionMapping::getAsString);
+        String carrierId = event.getOption("carrier_id", OptionMapping::getAsString);
+
+        System.out.println(name);
+        System.out.println(trackingNumber);
+        System.out.println(carrierId);
 
         if (name == null) name = p.getName();
         if (trackingNumber == null) trackingNumber = p.getTrackingNumber();
         if (carrierId == null) carrierId = p.getCarrierId();
-        if (status == null) status = p.getStatus();
-        if (statusTime == null) statusTime = p.getStatusTime();
 
-        packageController.updatePackage(
-                objectId, name, trackingNumber, carrierId, status, statusTime);
+        packageController.updatePackage(objectId, name, trackingNumber, carrierId);
 
         event.reply("Your package has been updated successfully").queue();
     }
