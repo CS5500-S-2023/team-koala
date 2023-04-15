@@ -20,6 +20,7 @@ class ReminderEntryControllerTest {
     static final LocalTime REMINDER_TIME = LocalTime.of(14, 00);
     static final TimeUnit REPEAT_TIME_UNIT = TimeUnit.MINUTES;
     private ReminderEntryController reminderEntryController;
+    private ReminderEntry testEntry;
 
     private ReminderEntryController getReminderEntryController() {
         return new ReminderEntryController(new InMemoryRepository<>());
@@ -31,13 +32,14 @@ class ReminderEntryControllerTest {
         reminderEntryController = getReminderEntryController();
 
         // mutation
-        reminderEntryController.addReminder(
-                DISCORD_USER_ID,
-                TITLE,
-                REMINDER_TIME,
-                REMINDER_OFFSET,
-                REPEAT_INTERVAL,
-                REPEAT_TIME_UNIT);
+        testEntry =
+                reminderEntryController.addReminder(
+                        DISCORD_USER_ID,
+                        TITLE,
+                        REMINDER_TIME,
+                        REMINDER_OFFSET,
+                        REPEAT_INTERVAL,
+                        REPEAT_TIME_UNIT);
     }
 
     @Test
@@ -52,15 +54,44 @@ class ReminderEntryControllerTest {
     @Test
     void testAddReminder() {
 
-        ReminderEntry savedEntry =
-                reminderEntryController.getReminderEntryForUserId(DISCORD_USER_ID);
+        ReminderEntry[] reminders =
+                reminderEntryController
+                        .getRemindersForUser(DISCORD_USER_ID)
+                        .toArray(new ReminderEntry[0]);
+        ReminderEntry savedEntry = reminders[0];
 
-        // postcondition
-        assertThat(savedEntry.getDiscordUserId()).isEqualTo(DISCORD_USER_ID);
-        assertThat(savedEntry.getTitle()).isEqualTo(TITLE);
-        assertThat(savedEntry.getReminderTime()).isEqualTo(REMINDER_TIME);
-        assertThat(savedEntry.getReminderOffset()).isEqualTo(REMINDER_OFFSET);
-        assertThat(savedEntry.getRepeatInterval()).isEqualTo(REPEAT_INTERVAL);
-        assertThat(savedEntry.getRepeatTimeUnit()).isEqualTo(REPEAT_TIME_UNIT);
+        assertThat(savedEntry).isNotNull();
+        assertThat(savedEntry).isEqualTo(testEntry);
+    }
+
+    @Test
+    void testGetRemindersForUser() {
+        ReminderEntry[] reminders =
+                reminderEntryController
+                        .getRemindersForUser(DISCORD_USER_ID)
+                        .toArray(new ReminderEntry[0]);
+
+        assertThat(reminders.length).isGreaterThan(0);
+        for (ReminderEntry reminder : reminders) {
+            assertThat(reminder.getDiscordUserId()).isEqualTo(DISCORD_USER_ID);
+        }
+    }
+
+    @Test
+    void testGetReminder() {
+        String reminderId = testEntry.getId().toString();
+
+        ReminderEntry retrievedEntry = reminderEntryController.getReminder(reminderId);
+
+        assertThat(retrievedEntry).isNotNull();
+        assertThat(retrievedEntry).isEqualTo(testEntry);
+    }
+
+    @Test
+    void testDeleteReminder() {
+        String reminderId = testEntry.getId().toString();
+        reminderEntryController.deleteReminder(reminderId);
+        ReminderEntry retrievedEntry = reminderEntryController.getReminder(reminderId);
+        assertThat(retrievedEntry).isNull();
     }
 }

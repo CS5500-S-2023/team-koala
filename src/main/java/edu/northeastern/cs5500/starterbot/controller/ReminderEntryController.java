@@ -4,6 +4,7 @@ import edu.northeastern.cs5500.starterbot.exception.InvalidTimeUnitException;
 import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
@@ -58,15 +59,16 @@ public class ReminderEntryController {
         return reminderEntryRepository.add(reminderEntry);
     }
 
-    public ReminderEntry getReminderEntryForUserId(String discordUserId) {
+    public Collection<ReminderEntry> getRemindersForUser(String discordUserId) {
         Collection<ReminderEntry> reminderEntries = reminderEntryRepository.getAll();
+        Collection<ReminderEntry> remindersForUser = new ArrayList<>();
         for (ReminderEntry reminderEntry : reminderEntries) {
             if (reminderEntry.getDiscordUserId().equals(discordUserId)) {
-                return reminderEntry;
+                remindersForUser.add(reminderEntry);
             }
         }
 
-        return null;
+        return remindersForUser;
     }
 
     public ReminderEntry getReminder(String reminderId) {

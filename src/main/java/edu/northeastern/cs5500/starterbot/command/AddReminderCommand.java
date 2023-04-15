@@ -148,8 +148,9 @@ public class AddReminderCommand implements SlashCommandHandler {
         LocalTime reminderTimeActual = entry.getReminderTime().minusMinutes(offset);
         Integer repeatInterval = entry.getRepeatInterval();
         TimeUnit unit = entry.getRepeatTimeUnit();
-        ZonedDateTime nextReminder = getNextReminderTime(reminderTimeActual, unit, repeatInterval);
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of("America/Los_Angeles"));
+        ZonedDateTime nextReminder =
+                getNextReminderTime(reminderTimeActual, unit, repeatInterval, now);
         Duration durationTilNextReminder = Duration.between(now, nextReminder);
 
         long initialDelay = durationTilNextReminder.getSeconds();
@@ -163,9 +164,11 @@ public class AddReminderCommand implements SlashCommandHandler {
                             return;
                         }
                         String message =
-                                "Reminder: You have "
-                                        + retrivedEntry.getTitle()
-                                        + " coming up! Get ready!";
+                                String.format(
+                                        "Hello <@%s>! You have %s coming up in %d minutes, get ready!",
+                                        retrivedEntry.getDiscordUserId(),
+                                        retrivedEntry.getTitle(),
+                                        retrivedEntry.getReminderOffset());
                         JDA jda = event.getJDA();
                         for (Guild guild : jda.getGuilds()) {
                             guild.getDefaultChannel().asTextChannel().sendMessage(message).queue();
@@ -186,20 +189,24 @@ public class AddReminderCommand implements SlashCommandHandler {
                 TimeUnit.SECONDS);
     }
 
-    // By default reminder messages start the next time the clock hits reminderTime
+    // Reminder messages start the next time the clock hits reminderTime
     // e.g. now is 10am the user scheduled a reminder at 8am then the first reminder
     // message will be at 8am the next day
-    private ZonedDateTime getNextReminderTime(
-            LocalTime reminderTimeActual, TimeUnit unit, Integer repeatInterval) {
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("America/Los_Angeles"));
+    public ZonedDateTime getNextReminderTime(
+            LocalTime reminderTimeActual,
+            TimeUnit unit,
+            Integer repeatInterval,
+            ZonedDateTime now) {
         ZonedDateTime nextReminder =
                 now.withHour(reminderTimeActual.getHour())
                         .withMinute(reminderTimeActual.getMinute());
+        if (repeatInterval == null) {
+            repeatInterval = 1;
+            unit = TimeUnit.DAYS;
+        }
 
         int today = now.getDayOfMonth();
-        while (now.compareTo(nextReminder) >= 0
-                && repeatInterval != null
-                && nextReminder.getDayOfMonth() == today) {
+        while (now.compareTo(nextReminder) >= 0 && nextReminder.getDayOfMonth() == today) {
             switch (unit) {
                 case MINUTES:
                     nextReminder = nextReminder.plusMinutes(repeatInterval);

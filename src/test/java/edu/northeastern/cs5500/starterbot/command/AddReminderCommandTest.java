@@ -2,8 +2,12 @@ package edu.northeastern.cs5500.starterbot.command;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
@@ -51,5 +55,33 @@ class AddReminderCommandTest {
             assertThat(options.get(i).getType().equals(OPTIONS.get(i).getType()));
             assertThat(options.get(i).isRequired() == OPTIONS.get(i).isRequired());
         }
+    }
+
+    @Test
+    void testGetNextReminderTime() {
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("America/Los_Angeles"));
+        now = now.withHour(1).withMinute(0);
+        AddReminderCommand addReminderCommand = new AddReminderCommand();
+
+        ZonedDateTime timeMinute =
+                addReminderCommand.getNextReminderTime(
+                        LocalTime.of(0, 57), TimeUnit.MINUTES, 10, now);
+        ZonedDateTime expectedTimeMinute = now.withHour(1).withMinute(7);
+        assertThat(timeMinute).isEqualTo(expectedTimeMinute);
+
+        ZonedDateTime timeHour =
+                addReminderCommand.getNextReminderTime(LocalTime.of(0, 57), TimeUnit.HOURS, 1, now);
+        ZonedDateTime expectedTimeHour = now.withHour(1).withMinute(57);
+        assertThat(timeHour).isEqualTo(expectedTimeHour);
+
+        ZonedDateTime timeDay =
+                addReminderCommand.getNextReminderTime(LocalTime.of(0, 57), TimeUnit.DAYS, 1, now);
+        ZonedDateTime expectedTimeDay = now.withHour(0).withMinute(57).plusDays(1);
+        assertThat(timeDay).isEqualTo(expectedTimeDay);
+
+        ZonedDateTime timeNonRepeat =
+                addReminderCommand.getNextReminderTime(LocalTime.of(0, 57), null, null, now);
+        ZonedDateTime expectedTimeNonRepeat = now.withHour(0).withMinute(57).plusDays(1);
+        assertThat(timeNonRepeat).isEqualTo(expectedTimeNonRepeat);
     }
 }
