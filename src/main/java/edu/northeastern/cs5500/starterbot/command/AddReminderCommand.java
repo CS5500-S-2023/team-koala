@@ -30,22 +30,36 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 
+/**
+ * The command that allows users to add a reminder by specifying title, reminder time, offset repeat
+ * interval (optional), and reminder time unit (optional)
+ */
 @Singleton
 @Slf4j
 public class AddReminderCommand implements SlashCommandHandler {
 
     @Inject ReminderEntryController reminderEntryController;
-    ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(20);
+    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(20);
 
     @Inject
     public AddReminderCommand() {}
 
+    /**
+     * Returns the name of the command.
+     *
+     * @return String - the name of the command.
+     */
     @Override
     @Nonnull
     public String getName() {
         return "add-reminder";
     }
 
+    /**
+     * Returns the name and options of this command.
+     *
+     * @return CommandData - information about this command
+     */
     @Override
     @Nonnull
     public CommandData getCommandData() {
@@ -75,6 +89,13 @@ public class AddReminderCommand implements SlashCommandHandler {
                                 false));
     }
 
+    /**
+     * When user interacts with this command ('event' happens) The command checks the input while
+     * parsing the data, Stores the reminder info into database, And schedules reminder messages
+     * based on reminder info.
+     *
+     * @param event - user's interaction event
+     */
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
         log.info("event: /add-reminder");
@@ -158,11 +179,16 @@ public class AddReminderCommand implements SlashCommandHandler {
                 new Runnable() {
                     @Override
                     public void run() {
+                        // load the reminder from database
                         ReminderEntry retrivedEntry =
                                 reminderEntryController.getReminder(reminderId);
+
+                        // If the reminder is not there any more we don't do anything
                         if (entry == null) {
                             return;
                         }
+
+                        // Send the message
                         String message =
                                 String.format(
                                         "Hello <@%s>! You have %s coming up in %d minutes, get ready!",
@@ -173,11 +199,14 @@ public class AddReminderCommand implements SlashCommandHandler {
                         for (Guild guild : jda.getGuilds()) {
                             guild.getDefaultChannel().asTextChannel().sendMessage(message).queue();
                         }
+
+                        // Delete reminder if it's one time
                         if (entry.getRepeatInterval() == null) {
                             reminderEntryController.deleteReminder(reminderId);
                         }
                     }
                 };
+        // Schdule the message(s)
         if (repeatInterval == null) {
             scheduler.schedule(task, initialDelay, TimeUnit.SECONDS);
             return;
@@ -189,9 +218,16 @@ public class AddReminderCommand implements SlashCommandHandler {
                 TimeUnit.SECONDS);
     }
 
-    // Reminder messages start the next time the clock hits reminderTime
-    // e.g. now is 10am the user scheduled a reminder at 8am then the first reminder
-    // message will be at 8am the next day
+    /**
+     * Reminder messages start the next time the clock hits reminderTime e.g. now is 10am the user
+     * scheduled a reminder at 8am then the first reminder message will be at 8am the next day
+     *
+     * @param reminderTimeActual - the actual message time = reminderTime - offset
+     * @param unit - TimeUnit of repeating reminders
+     * @param repeatInterval - interval between two reminder messages if the reminder repeats
+     * @param now - time of execution
+     * @return ZonedDateTime - the time of the next reminder message
+     */
     public ZonedDateTime getNextReminderTime(
             LocalTime reminderTimeActual,
             TimeUnit unit,
