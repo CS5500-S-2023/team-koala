@@ -49,11 +49,16 @@ public class DeletePackageCommand implements SlashCommandHandler {
                         event.getOption("package_id"),
                         "Received null value for mandatory parameter 'package_id'");
 
+        String userId = event.getUser().getId();
         String packageId = packageIdOption.getAsString();
         ObjectId objectId = new ObjectId(packageId);
 
-        packageController.deletePackage(objectId);
+        Boolean deleted = packageController.deletePackage(objectId, userId);
 
-        event.reply("Your package has been deleted successfully").queue();
+        if (deleted) {
+            event.reply("Your package has been deleted successfully").queue();
+        } else {
+            event.reply("This package does not exist").queue();
+        }
     }
 }

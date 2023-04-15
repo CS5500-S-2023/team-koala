@@ -49,8 +49,12 @@ public class PackageController {
         return this.packageRepository.get(id);
     }
 
-    public void deletePackage(ObjectId id) {
-        packageRepository.delete(id);
+    public Boolean deletePackage(ObjectId id, String userId) {
+        if (getPackage(id).getUserId().equals(userId)) {
+            packageRepository.delete(id);
+            return true;
+        }
+        return false;
     }
 
     public List<Package> getUsersPackages(String userId) {
