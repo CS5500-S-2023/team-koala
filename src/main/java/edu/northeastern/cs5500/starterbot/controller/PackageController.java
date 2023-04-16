@@ -29,8 +29,8 @@ public class PackageController {
      *
      * @param package1
      */
-    public void getPackageLatestStatus(Package package1) {
-        trackPackageService.getPackageLatestStatus(package1);
+    public boolean getPackageLatestStatus(Package package1) {
+        return trackPackageService.getPackageLatestStatus(package1);
     }
 
     // add package to database after create tracking item via third-party api
@@ -63,7 +63,10 @@ public class PackageController {
         List<Package> usersPackages = new ArrayList<>();
         for (Package p : allPackages) {
             if (p.getUserId().equals(userId)) {
-                getPackageLatestStatus(p);
+                if (!getPackageLatestStatus(p)) {
+                    p.setStatus(null);
+                    p.setStatusTime(null);
+                }
                 usersPackages.add(p);
             }
         }
@@ -71,12 +74,13 @@ public class PackageController {
         return usersPackages;
     }
 
-    public String updatePackage(ObjectId id, String name, String trackingNumber, String carrierId) {
+    public Package updatePackage(
+            ObjectId id, String name, String trackingNumber, String carrierId) {
         Package p = packageRepository.get(id);
         p.setName(name);
         p.setTrackingNumber(trackingNumber);
         p.setCarrierId(carrierId);
         packageRepository.update(p);
-        return SUCCESS;
+        return p;
     }
 }

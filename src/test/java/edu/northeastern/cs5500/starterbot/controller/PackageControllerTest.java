@@ -1,5 +1,6 @@
 package edu.northeastern.cs5500.starterbot.controller;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.*;
 
 import edu.northeastern.cs5500.starterbot.model.Package;
@@ -64,9 +65,11 @@ public class PackageControllerTest {
     @Test
     public void testUpdatePackage() {
         packageController.createPackage(package1);
-        assertEquals(
-                PackageController.SUCCESS,
+        Package p =
                 packageController.updatePackage(
-                        package1.getId(), "New name", "New tracking", "New carrier"));
+                        package1.getId(), "new name", "new tracking", "new carrier");
+        assertThat(p.getName()).isEqualTo("new name");
+        assertThat(p.getTrackingNumber()).isEqualTo("new tracking");
+        assertThat(p.getCarrierId()).isEqualTo("new carrier");
     }
 }

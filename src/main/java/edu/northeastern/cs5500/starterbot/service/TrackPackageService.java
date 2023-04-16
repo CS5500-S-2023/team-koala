@@ -47,7 +47,7 @@ public class TrackPackageService implements Service {
      * @return package1 - If there no delivery updates, status and statusTime in Package will be
      *     null - Otherwise, they are not null
      */
-    public void getPackageLatestStatus(Package package1) {
+    public boolean getPackageLatestStatus(Package package1) {
         String carrier_id = package1.getCarrierId();
         String tracking_number = package1.getTrackingNumber();
 
@@ -55,13 +55,14 @@ public class TrackPackageService implements Service {
         log.info("getPackageLatestStatus: " + package1.getId() + " - " + result);
 
         if (result.contains("No result found")) {
-            return;
+            return false;
         }
         // read the delivery updates
         readDeliveryResponse(result, package1);
 
         // Update package info in database
         packageRepository.update(package1);
+        return true;
     }
 
     /**
