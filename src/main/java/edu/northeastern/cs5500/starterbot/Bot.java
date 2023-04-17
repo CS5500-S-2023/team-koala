@@ -7,21 +7,19 @@ import edu.northeastern.cs5500.starterbot.repository.RepositoryModule;
 import edu.northeastern.cs5500.starterbot.service.ServiceModule;
 import edu.northeastern.cs5500.starterbot.service.GetPackageStatusTask;
 import edu.northeastern.cs5500.starterbot.service.TrackPackageService;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
 
 @Component(modules = {CommandModule.class, RepositoryModule.class, ServiceModule.class})
 @Singleton
@@ -54,7 +52,7 @@ public class Bot {
 
     /**
      * Only notify users when there are updates for the package
-     * 
+     *
      * @param - jda is needed to send messages to discord user
      */
     public void getPackageStatusDaily(JDA jda) {
@@ -63,7 +61,7 @@ public class Bot {
 
         // The task is expected to run daily at noon of the day
         String startTime = "2023-04-17 12:00"; // By default, it is 24-hour clock
-        String pattern = "yyyy-MM-dd hh:mm"; 
+        String pattern = "yyyy-MM-dd hh:mm";
         SimpleDateFormat formatter = new SimpleDateFormat(pattern);
         Date startDate;
         try {
