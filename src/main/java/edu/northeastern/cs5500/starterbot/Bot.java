@@ -22,6 +22,8 @@ interface BotComponent {
 
 public class Bot {
 
+    private static JDA jda;
+
     @Inject
     Bot() {}
 
@@ -45,5 +47,9 @@ public class Bot {
         CommandListUpdateAction commands = jda.updateCommands();
         commands.addCommands(messageListener.allCommandData());
         commands.queue();
+    }
+
+    public static JDA getJDA() {
+        return jda;
     }
 }

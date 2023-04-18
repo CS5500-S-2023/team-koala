@@ -1,9 +1,13 @@
 package edu.northeastern.cs5500.starterbot.command;
 
+import edu.northeastern.cs5500.starterbot.Bot;
 import edu.northeastern.cs5500.starterbot.controller.ReminderEntryController;
 import edu.northeastern.cs5500.starterbot.exception.InvalidTimeUnitException;
 import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
+import edu.northeastern.cs5500.starterbot.service.ReminderMessageTask;
+import edu.northeastern.cs5500.starterbot.service.ReminderSchedulingService;
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -19,8 +23,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -29,6 +31,9 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.Guild;
 
 /**
  * The command that allows users to add a reminder by specifying title, reminder time, offset repeat
@@ -39,6 +44,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 public class AddReminderCommand implements SlashCommandHandler {
 
     @Inject ReminderEntryController reminderEntryController;
+    @Inject ReminderSchedulingService reminderSchedulingService;
     private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(20);
 
     @Inject
@@ -74,6 +80,11 @@ public class AddReminderCommand implements SlashCommandHandler {
                                 true),
                         new OptionData(
                                 OptionType.INTEGER,
+                                "delay",
+                                "how many days later the first reminder should start",
+                                false),
+                        new OptionData(
+                                OptionType.INTEGER,
                                 "reminder-offset",
                                 "how much earlier the user want to be reminded of some event",
                                 false),
@@ -106,11 +117,13 @@ public class AddReminderCommand implements SlashCommandHandler {
         String reminderTimeString =
                 Objects.requireNonNull(event.getOption("reminder-time")).getAsString();
 
+        OptionMapping delayOption = event.getOption("delay");
         OptionMapping offsetOption = event.getOption("reminder-offset");
         OptionMapping intervalOption = event.getOption("repeat-interval");
         OptionMapping unitOption = event.getOption("interval-unit");
 
         // null check on nullable inputs
+        Integer delay = delayOption == null ? 0 : delayOption.getAsInt();
         Integer offset = offsetOption == null ? 10 : offsetOption.getAsInt();
         Integer interval = intervalOption == null ? null : intervalOption.getAsInt();
         String unitString = unitOption == null ? null : unitOption.getAsString();
@@ -136,10 +149,20 @@ public class AddReminderCommand implements SlashCommandHandler {
             }
         }
 
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of(ReminderSchedulingService.TIME_ZONE));
+        ZonedDateTime firstReminderTimeZoned =
+                getFirstReminderTime(reminderTime, delay, unit, interval, now);
+        LocalDateTime firstReminderTime = firstReminderTimeZoned.toLocalDateTime();
         // add reminder to database
         ReminderEntry savedEntry =
                 reminderEntryController.addReminder(
-                        discordUserId, title, reminderTime, offset, interval, unit);
+                        discordUserId,
+                        title,
+                        reminderTime,
+                        firstReminderTime,
+                        offset,
+                        interval,
+                        unit);
         scheduleMessage(savedEntry, event);
 
         // return reminder info in confirmation message to user
@@ -148,6 +171,7 @@ public class AddReminderCommand implements SlashCommandHandler {
         embedBuilder.addField("Title", title, false);
         embedBuilder.addField("Reminder Time", reminderTimeString, false);
         embedBuilder.addField("Reminder Offset", String.valueOf(offset), false);
+        embedBuilder.addField("Delay", String.valueOf(delay), false);
         if (interval != null) {
             embedBuilder.addField("Repeat Interval", String.valueOf(interval), false);
             embedBuilder.addField("Repeat Interval Time Unit", unitString, false);
@@ -166,28 +190,41 @@ public class AddReminderCommand implements SlashCommandHandler {
     private void scheduleMessage(ReminderEntry entry, SlashCommandInteractionEvent event) {
         String reminderId = entry.getId().toString();
         Integer offset = entry.getReminderOffset();
-        LocalTime reminderTimeActual = entry.getReminderTime().minusMinutes(offset);
+        // LocalTime reminderTimeActual = entry.getReminderTime().minusMinutes(offset);
+        LocalDateTime firstReminderTimeLocal = entry.getFirstReminderTime();
+        ZonedDateTime firstReminderTime =
+                firstReminderTimeLocal.atZone(ZoneId.of(ReminderSchedulingService.TIME_ZONE));
         Integer repeatInterval = entry.getRepeatInterval();
         TimeUnit unit = entry.getRepeatTimeUnit();
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of("America/Los_Angeles"));
+        // ZonedDateTime reminderTimeActualDateTime =
+        // now.withHour(reminderTimeActual.getHour()).withMinute(reminderTimeActual.getMinute());
+        // ZonedDateTime nextReminder =
+        //         getNextReminderTime(reminderTimeActualDateTime, unit, repeatInterval, now);
         ZonedDateTime nextReminder =
-                getNextReminderTime(reminderTimeActual, unit, repeatInterval, now);
+                reminderSchedulingService.getNextReminderTime(
+                        firstReminderTime, unit, repeatInterval, now);
+        System.out.println(nextReminder);
         Duration durationTilNextReminder = Duration.between(now, nextReminder);
 
         long initialDelay = durationTilNextReminder.getSeconds();
+        reminderSchedulingService.scheduleReminder(
+                new ReminderMessageTask(reminderId), initialDelay, unit, repeatInterval);
         Runnable task =
                 new Runnable() {
                     @Override
                     public void run() {
+                        System.out.println("loading reminder: " + reminderId);
                         // load the reminder from database
-                        ReminderEntry retrivedEntry =
-                                reminderEntryController.getReminder(reminderId);
+                        ReminderEntry retrivedEntry = reminderEntryController.getReminder(reminderId);
 
                         // If the reminder is not there any more we don't do anything
-                        if (entry == null) {
-                            return;
+                        if (retrivedEntry == null) {
+                        System.out.println("null: returning...");
+                        return;
                         }
 
+                        System.out.println("Before message");
                         // Send the message
                         String message =
                                 String.format(
@@ -195,14 +232,19 @@ public class AddReminderCommand implements SlashCommandHandler {
                                         retrivedEntry.getDiscordUserId(),
                                         retrivedEntry.getTitle(),
                                         retrivedEntry.getReminderOffset());
-                        JDA jda = event.getJDA();
+
+                        System.out.println(message);
+                        JDA jda = Bot.getJDA();
+                        String userId = retrivedEntry.getDiscordUserId();
                         for (Guild guild : jda.getGuilds()) {
                             guild.getDefaultChannel().asTextChannel().sendMessage(message).queue();
                         }
+                        User user = jda.getUserById(userId);
+                        user.openPrivateChannel().queue(channel -> channel.sendMessage(message).queue());
 
                         // Delete reminder if it's one time
-                        if (entry.getRepeatInterval() == null) {
-                            reminderEntryController.deleteReminder(reminderId);
+                        if (retrivedEntry.getRepeatInterval() == null) {
+                        reminderEntryController.deleteReminder(reminderId);
                         }
                     }
                 };
@@ -228,35 +270,19 @@ public class AddReminderCommand implements SlashCommandHandler {
      * @param now - time of execution
      * @return ZonedDateTime - the time of the next reminder message
      */
-    public ZonedDateTime getNextReminderTime(
+    public ZonedDateTime getFirstReminderTime(
             LocalTime reminderTimeActual,
+            Integer delay,
             TimeUnit unit,
             Integer repeatInterval,
             ZonedDateTime now) {
         ZonedDateTime nextReminder =
                 now.withHour(reminderTimeActual.getHour())
                         .withMinute(reminderTimeActual.getMinute());
-        if (repeatInterval == null) {
-            repeatInterval = 1;
-            unit = TimeUnit.DAYS;
+        if (delay > 0) {
+            return nextReminder.plusDays(delay);
         }
-
-        int today = now.getDayOfMonth();
-        while (now.compareTo(nextReminder) >= 0 && nextReminder.getDayOfMonth() == today) {
-            switch (unit) {
-                case MINUTES:
-                    nextReminder = nextReminder.plusMinutes(repeatInterval);
-                    break;
-                case HOURS:
-                    nextReminder = nextReminder.plusHours(repeatInterval);
-                    break;
-                case DAYS:
-                    nextReminder = nextReminder.plusDays(repeatInterval);
-                    break;
-                default:
-                    break;
-            }
-        }
-        return nextReminder;
+        return reminderSchedulingService.getNextReminderTime(
+                nextReminder, unit, repeatInterval, now);
     }
 }

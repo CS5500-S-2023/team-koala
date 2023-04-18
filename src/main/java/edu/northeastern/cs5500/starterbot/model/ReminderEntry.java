@@ -1,5 +1,6 @@
 package edu.northeastern.cs5500.starterbot.model;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
@@ -29,6 +30,7 @@ public class ReminderEntry implements Model {
     @Nonnull String title;
     @Nonnull LocalTime reminderTime;
     @Nonnull Integer reminderOffset;
+    @Nonnull LocalDateTime firstReminderTime;
     @Nullable Integer repeatInterval;
     @Nullable TimeUnit repeatTimeUnit;
 }

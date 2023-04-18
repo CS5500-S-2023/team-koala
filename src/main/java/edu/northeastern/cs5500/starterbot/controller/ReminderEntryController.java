@@ -3,6 +3,7 @@ package edu.northeastern.cs5500.starterbot.controller;
 import edu.northeastern.cs5500.starterbot.exception.InvalidTimeUnitException;
 import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,6 +65,7 @@ public class ReminderEntryController {
             String discordUserId,
             String title,
             LocalTime reminderTime,
+            LocalDateTime firstReminderTime,
             Integer offset,
             Integer interval,
             TimeUnit unit) {
@@ -72,11 +74,16 @@ public class ReminderEntryController {
                         .discordUserId(discordUserId)
                         .title(title)
                         .reminderTime(reminderTime)
+                        .firstReminderTime(firstReminderTime)
                         .reminderOffset(offset)
                         .repeatInterval(interval)
                         .repeatTimeUnit(unit)
                         .build();
         return reminderEntryRepository.add(reminderEntry);
+    }
+
+    public Collection<ReminderEntry> getAllReminders() {
+        return reminderEntryRepository.getAll();
     }
 
     /**

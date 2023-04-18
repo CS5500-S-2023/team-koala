@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import edu.northeastern.cs5500.starterbot.exception.InvalidTimeUnitException;
 import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
 import edu.northeastern.cs5500.starterbot.repository.InMemoryRepository;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,6 +19,7 @@ class ReminderEntryControllerTest {
     static final Integer REPEAT_INTERVAL = 60;
 
     static final LocalTime REMINDER_TIME = LocalTime.of(14, 00);
+    static final LocalDateTime FIRST_REMINDER_TIME = LocalDateTime.of(2023, 04, 17, 1, 0, 0);
     static final TimeUnit REPEAT_TIME_UNIT = TimeUnit.MINUTES;
     private ReminderEntryController reminderEntryController;
     private ReminderEntry testEntry;
@@ -37,6 +39,7 @@ class ReminderEntryControllerTest {
                         DISCORD_USER_ID,
                         TITLE,
                         REMINDER_TIME,
+                        FIRST_REMINDER_TIME,
                         REMINDER_OFFSET,
                         REPEAT_INTERVAL,
                         REPEAT_TIME_UNIT);
