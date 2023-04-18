@@ -4,14 +4,13 @@ import dagger.Component;
 import edu.northeastern.cs5500.starterbot.command.CommandModule;
 import edu.northeastern.cs5500.starterbot.listener.MessageListener;
 import edu.northeastern.cs5500.starterbot.repository.RepositoryModule;
-import java.util.Collection;
-import java.util.EnumSet;
-import javax.annotation.Nonnull;
+import edu.northeastern.cs5500.starterbot.service.OpenTelemetryService;
+import edu.northeastern.cs5500.starterbot.service.ServiceModule;
+import io.opentelemetry.api.trace.SpanKind;
+import io.opentelemetry.context.Scope;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 
 @Component(modules = {CommandModule.class, RepositoryModule.class})
@@ -22,22 +21,29 @@ interface BotComponent {
 
 public class Bot {
 
-    private static JDA jda;
-
     @Inject
     Bot() {}
 
     @Inject MessageListener messageListener;
+    @Inject OpenTelemetryService openTelemetryService;
+    @Inject JDA jda;
 
     static String getBotToken() {
         return new ProcessBuilder().environment().get("BOT_TOKEN");
     }
 
     void start() {
-        String token = getBotToken();
-        if (token == null) {
-            throw new IllegalArgumentException(
-                    "The BOT_TOKEN environment variable is not defined.");
+        var span = openTelemetryService.span("updateCommands", SpanKind.PRODUCER);
+        try (Scope scope = span.makeCurrent()) {
+            jda.addEventListener(messageListener);
+            CommandListUpdateAction commands = jda.updateCommands();
+            commands.addCommands(messageListener.allCommandData());
+            commands.queue();
+        } catch (Exception e) {
+            log.error("Unable to add message listeners", e);
+            span.recordException(e);
+        } finally {
+            span.end();
         }
         @SuppressWarnings("null")
         @Nonnull
@@ -47,9 +53,5 @@ public class Bot {
         CommandListUpdateAction commands = jda.updateCommands();
         commands.addCommands(messageListener.allCommandData());
         commands.queue();
-    }
-
-    public static JDA getJDA() {
-        return jda;
     }
 }
