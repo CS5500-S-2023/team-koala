@@ -1,6 +1,7 @@
 package edu.northeastern.cs5500.starterbot.command;
 
 import edu.northeastern.cs5500.starterbot.controller.PackageController;
+import edu.northeastern.cs5500.starterbot.exception.NotYourPackageException;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import java.util.Objects;
 import javax.annotation.Nonnull;
@@ -64,8 +65,14 @@ public class UpdatePackageCommand implements SlashCommandHandler {
                         event.getOption("package_id"),
                         "Received null value for mandatory parameter 'package_id'");
 
+        String userId = event.getUser().getId();
         String packageId = packageIdOption.getAsString();
-        Package p = packageController.getPackage(packageId);
+        Package p = null;
+        try {
+            p = packageController.getPackage(packageId);
+        } catch (IllegalArgumentException e) {
+            event.reply("This is not a valid package id!").queue();
+        }
 
         String name = event.getOption("package_name", OptionMapping::getAsString);
         String trackingNumber = event.getOption("tracking_number", OptionMapping::getAsString);
@@ -75,7 +82,13 @@ public class UpdatePackageCommand implements SlashCommandHandler {
         if (trackingNumber == null) trackingNumber = p.getTrackingNumber();
         if (carrierId == null) carrierId = p.getCarrierId();
 
-        packageController.updatePackage(packageId, name, trackingNumber, carrierId);
+        try {
+            packageController.updatePackage(packageId, userId, name, trackingNumber, carrierId);
+        } catch (NotYourPackageException e) {
+            event.reply(e.getMessage()).queue();
+        } catch (IllegalArgumentException e) {
+            event.reply("This is not a valid package id!").queue();
+        }
 
         event.reply("Your package has been updated successfully").queue();
     }

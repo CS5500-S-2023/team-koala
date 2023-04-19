@@ -1,5 +1,6 @@
 package edu.northeastern.cs5500.starterbot.controller;
 
+import edu.northeastern.cs5500.starterbot.exception.NotYourPackageException;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import edu.northeastern.cs5500.starterbot.service.TrackPackageService;
@@ -45,18 +46,20 @@ public class PackageController {
         return SUCCESS;
     }
 
-    public Package getPackage(String id) {
+    public Package getPackage(String id) throws IllegalArgumentException {
         ObjectId objectId = new ObjectId(id);
         return this.packageRepository.get(objectId);
     }
 
-    public Boolean deletePackage(String id, String userId) {
-        if (getPackage(id).getUserId().equals(userId)) {
-            ObjectId objectId = new ObjectId(id);
-            packageRepository.delete(objectId);
-            return true;
+    public boolean deletePackage(String id, String userId)
+            throws IllegalArgumentException, NotYourPackageException {
+        ObjectId objectId = new ObjectId(id);
+        Package p = packageRepository.get(objectId);
+        if (!p.getUserId().equals(userId)) {
+            throw new NotYourPackageException("This is not your package");
         }
-        return false;
+        packageRepository.delete(objectId);
+        return true;
     }
 
     public List<Package> getUsersPackages(String userId) {
@@ -76,10 +79,14 @@ public class PackageController {
         return usersPackages;
     }
 
-    public Package updatePackage(String id, String name, String trackingNumber, String carrierId) {
+    public Package updatePackage(
+            String id, String userId, String name, String trackingNumber, String carrierId)
+            throws IllegalArgumentException, NotYourPackageException {
         ObjectId objectId = new ObjectId(id);
         Package p = packageRepository.get(objectId);
-        System.out.println(p);
+        if (!p.getUserId().equals(userId)) {
+            throw new NotYourPackageException("This is not your package");
+        }
         p.setName(name);
         p.setTrackingNumber(trackingNumber);
         p.setCarrierId(carrierId);
