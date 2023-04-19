@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import org.bson.types.ObjectId;
 
 @Singleton
 @Slf4j
@@ -66,8 +65,7 @@ public class UpdatePackageCommand implements SlashCommandHandler {
                         "Received null value for mandatory parameter 'package_id'");
 
         String packageId = packageIdOption.getAsString();
-        ObjectId objectId = new ObjectId(packageId);
-        Package p = packageController.getPackage(objectId);
+        Package p = packageController.getPackage(packageId);
 
         String name = event.getOption("package_name", OptionMapping::getAsString);
         String trackingNumber = event.getOption("tracking_number", OptionMapping::getAsString);
@@ -77,7 +75,7 @@ public class UpdatePackageCommand implements SlashCommandHandler {
         if (trackingNumber == null) trackingNumber = p.getTrackingNumber();
         if (carrierId == null) carrierId = p.getCarrierId();
 
-        packageController.updatePackage(objectId, name, trackingNumber, carrierId);
+        packageController.updatePackage(packageId, name, trackingNumber, carrierId);
 
         event.reply("Your package has been updated successfully").queue();
     }

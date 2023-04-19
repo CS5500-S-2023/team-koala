@@ -11,7 +11,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import org.bson.types.ObjectId;
 
 @Singleton
 @Slf4j
@@ -51,9 +50,8 @@ public class DeletePackageCommand implements SlashCommandHandler {
 
         String userId = event.getUser().getId();
         String packageId = packageIdOption.getAsString();
-        ObjectId objectId = new ObjectId(packageId);
 
-        boolean deleted = packageController.deletePackage(objectId, userId);
+        boolean deleted = packageController.deletePackage(packageId, userId);
 
         if (deleted) {
             event.reply("Your package has been deleted successfully").queue();

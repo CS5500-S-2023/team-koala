@@ -45,13 +45,15 @@ public class PackageController {
         return SUCCESS;
     }
 
-    public Package getPackage(ObjectId id) {
-        return this.packageRepository.get(id);
+    public Package getPackage(String id) {
+        ObjectId objectId = new ObjectId(id);
+        return this.packageRepository.get(objectId);
     }
 
-    public Boolean deletePackage(ObjectId id, String userId) {
+    public Boolean deletePackage(String id, String userId) {
         if (getPackage(id).getUserId().equals(userId)) {
-            packageRepository.delete(id);
+            ObjectId objectId = new ObjectId(id);
+            packageRepository.delete(objectId);
             return true;
         }
         return false;
@@ -74,9 +76,10 @@ public class PackageController {
         return usersPackages;
     }
 
-    public Package updatePackage(
-            ObjectId id, String name, String trackingNumber, String carrierId) {
-        Package p = packageRepository.get(id);
+    public Package updatePackage(String id, String name, String trackingNumber, String carrierId) {
+        ObjectId objectId = new ObjectId(id);
+        Package p = packageRepository.get(objectId);
+        System.out.println(p);
         p.setName(name);
         p.setTrackingNumber(trackingNumber);
         p.setCarrierId(carrierId);

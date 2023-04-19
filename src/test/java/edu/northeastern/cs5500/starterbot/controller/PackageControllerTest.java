@@ -58,7 +58,7 @@ public class PackageControllerTest {
     public void testDeletePackage() {
         packageController.createPackage(package1);
         packageController.createPackage(package2);
-        packageController.deletePackage(package1.getId(), package1.getUserId());
+        packageController.deletePackage(package1.getId().toString(), package1.getUserId());
         assertEquals(packageController.getUsersPackages(package1.getUserId()).size(), 1);
     }
 
@@ -67,7 +67,7 @@ public class PackageControllerTest {
         packageController.createPackage(package1);
         Package p =
                 packageController.updatePackage(
-                        package1.getId(), "new name", "new tracking", "new carrier");
+                        package1.getId().toString(), "new name", "new tracking", "new carrier");
         assertThat(p.getName()).isEqualTo("new name");
         assertThat(p.getTrackingNumber()).isEqualTo("new tracking");
         assertThat(p.getCarrierId()).isEqualTo("new carrier");
