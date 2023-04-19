@@ -15,9 +15,10 @@ import org.bson.types.ObjectId;
 /**
  * The model that contains the info about a reminder: discordUserId - user who created this reminder
  * entry; title - title of reminder. reminderTime - the time the reminded event is supposed to
- * start; reminderOffset - how much earlier (in minutes) the reminder should be sent; repeatInterval
- * - the interval between 2 reminders if the reminder entry is repeated; repeatTimeUnit - time unit
- * of the repeat interval.
+ * start; nextReminderTime - the time when the next message for this reminder will be sent;
+ * reminderOffset - how much earlier (in minutes) the reminder should be sent; repeatInterval - the
+ * interval between 2 reminders if the reminder entry is repeated; repeatTimeUnit - time unit of the
+ * repeat interval.
  */
 @Data
 @Builder
@@ -30,7 +31,7 @@ public class ReminderEntry implements Model {
     @Nonnull String title;
     @Nonnull LocalTime reminderTime;
     @Nonnull Integer reminderOffset;
-    @Nonnull LocalDateTime firstReminderTime;
+    @Nonnull LocalDateTime nextReminderTime;
     @Nullable Integer repeatInterval;
     @Nullable TimeUnit repeatTimeUnit;
 }

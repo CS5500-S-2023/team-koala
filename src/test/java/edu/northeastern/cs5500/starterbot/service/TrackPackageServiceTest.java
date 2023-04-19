@@ -1,10 +1,9 @@
-package edu.northeastern.cs5500.starterbot.Service;
+package edu.northeastern.cs5500.starterbot.service;
 
 import static org.junit.Assert.*;
 
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.InMemoryRepository;
-import edu.northeastern.cs5500.starterbot.service.TrackPackageService;
 import org.junit.jupiter.api.Test;
 
 public class TrackPackageServiceTest {

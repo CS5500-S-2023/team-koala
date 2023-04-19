@@ -74,7 +74,7 @@ public class ReminderEntryController {
                         .discordUserId(discordUserId)
                         .title(title)
                         .reminderTime(reminderTime)
-                        .firstReminderTime(firstReminderTime)
+                        .nextReminderTime(firstReminderTime)
                         .reminderOffset(offset)
                         .repeatInterval(interval)
                         .repeatTimeUnit(unit)
@@ -122,5 +122,17 @@ public class ReminderEntryController {
     public void deleteReminder(String reminderId) {
         ObjectId id = new ObjectId(reminderId);
         reminderEntryRepository.delete(id);
+    }
+
+    /**
+     * Updates the nextReminderTime for the reminder identified by reminderId.
+     *
+     * @param reminderId - the id of the reminder to be updated.
+     * @param nextReminderTime - the new nextReminderTime for the reminder.
+     */
+    public void updateNextReminderTime(String reminderId, LocalDateTime nextReminderTime) {
+        ReminderEntry reminder = getReminder(reminderId);
+        reminder.setNextReminderTime(nextReminderTime);
+        reminderEntryRepository.update(reminder);
     }
 }
