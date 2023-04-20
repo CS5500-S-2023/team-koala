@@ -4,11 +4,14 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import edu.northeastern.cs5500.starterbot.exception.InvalidTimeUnitException;
+import edu.northeastern.cs5500.starterbot.exception.ReminderNotFoundException;
+import edu.northeastern.cs5500.starterbot.exception.UnableToAddReminderException;
 import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
 import edu.northeastern.cs5500.starterbot.repository.InMemoryRepository;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.concurrent.TimeUnit;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -19,8 +22,10 @@ class ReminderEntryControllerTest {
     static final Integer REPEAT_INTERVAL = 60;
 
     static final LocalTime REMINDER_TIME = LocalTime.of(14, 00);
-    static final LocalDateTime FIRST_REMINDER_TIME = LocalDateTime.of(2023, 04, 17, 1, 0, 0);
+    static final LocalDateTime NEXT_REMINDER_TIME = LocalDateTime.of(2023, 04, 17, 1, 0, 0);
     static final TimeUnit REPEAT_TIME_UNIT = TimeUnit.MINUTES;
+    static final String MALFORMED_ID = "someid1234567";
+    static final String INVALID_ID = new ObjectId().toString();
     private ReminderEntryController reminderEntryController;
     private ReminderEntry testEntry;
 
@@ -29,7 +34,7 @@ class ReminderEntryControllerTest {
     }
 
     @BeforeEach
-    void beforeEach() {
+    void beforeEach() throws UnableToAddReminderException {
         // setup
         reminderEntryController = getReminderEntryController();
 
@@ -39,7 +44,7 @@ class ReminderEntryControllerTest {
                         DISCORD_USER_ID,
                         TITLE,
                         REMINDER_TIME,
-                        FIRST_REMINDER_TIME,
+                        NEXT_REMINDER_TIME,
                         REMINDER_OFFSET,
                         REPEAT_INTERVAL,
                         REPEAT_TIME_UNIT);
@@ -88,13 +93,38 @@ class ReminderEntryControllerTest {
 
         assertThat(retrievedEntry).isNotNull();
         assertThat(retrievedEntry).isEqualTo(testEntry);
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> reminderEntryController.getReminder(MALFORMED_ID));
     }
 
     @Test
-    void testDeleteReminder() {
+    void testDeleteReminder() throws IllegalArgumentException {
         String reminderId = testEntry.getId().toString();
         reminderEntryController.deleteReminder(reminderId);
         ReminderEntry retrievedEntry = reminderEntryController.getReminder(reminderId);
         assertThat(retrievedEntry).isNull();
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> reminderEntryController.deleteReminder(MALFORMED_ID));
+    }
+
+    @Test
+    void testUpdateNextReminderTime() throws ReminderNotFoundException {
+        String reminderId = testEntry.getId().toString();
+        LocalDateTime newNextReminderTime = NEXT_REMINDER_TIME.plusMinutes(20);
+        reminderEntryController.updateNextReminderTime(reminderId, newNextReminderTime);
+        ReminderEntry retrievedEntry = reminderEntryController.getReminder(reminderId);
+        assertThat(retrievedEntry.getNextReminderTime()).isEqualTo(newNextReminderTime);
+        assertThrows(
+                ReminderNotFoundException.class,
+                () ->
+                        reminderEntryController.updateNextReminderTime(
+                                INVALID_ID, newNextReminderTime));
+        assertThrows(
+                IllegalArgumentException.class,
+                () ->
+                        reminderEntryController.updateNextReminderTime(
+                                MALFORMED_ID, newNextReminderTime));
     }
 }

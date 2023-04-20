@@ -1,6 +1,9 @@
 package edu.northeastern.cs5500.starterbot.controller;
 
+import com.mongodb.MongoException;
 import edu.northeastern.cs5500.starterbot.exception.InvalidTimeUnitException;
+import edu.northeastern.cs5500.starterbot.exception.ReminderNotFoundException;
+import edu.northeastern.cs5500.starterbot.exception.UnableToAddReminderException;
 import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import java.time.LocalDateTime;
@@ -16,7 +19,7 @@ public class ReminderEntryController {
     GenericRepository<ReminderEntry> reminderEntryRepository;
 
     @Inject
-    ReminderEntryController(GenericRepository<ReminderEntry> reminderEntryRepository) {
+    public ReminderEntryController(GenericRepository<ReminderEntry> reminderEntryRepository) {
         this.reminderEntryRepository = reminderEntryRepository;
     }
 
@@ -68,7 +71,8 @@ public class ReminderEntryController {
             LocalDateTime firstReminderTime,
             Integer offset,
             Integer interval,
-            TimeUnit unit) {
+            TimeUnit unit)
+            throws UnableToAddReminderException {
         ReminderEntry reminderEntry =
                 ReminderEntry.builder()
                         .discordUserId(discordUserId)
@@ -79,7 +83,12 @@ public class ReminderEntryController {
                         .repeatInterval(interval)
                         .repeatTimeUnit(unit)
                         .build();
-        return reminderEntryRepository.add(reminderEntry);
+        try {
+            return reminderEntryRepository.add(reminderEntry);
+        } catch (MongoException me) {
+            throw new UnableToAddReminderException(
+                    "Could not add reminder, something went wrong when writing to database");
+        }
     }
 
     public Collection<ReminderEntry> getAllReminders() {
@@ -110,7 +119,7 @@ public class ReminderEntryController {
      * @param reminderId - the id of the reminder to be found.
      * @return ReminderEntry - the reminder with reminderId or null if it doesn't exist
      */
-    public ReminderEntry getReminder(String reminderId) {
+    public ReminderEntry getReminder(String reminderId) throws IllegalArgumentException {
         return reminderEntryRepository.get(new ObjectId(reminderId));
     }
 
@@ -119,7 +128,7 @@ public class ReminderEntryController {
      *
      * @param reminderId - the id of the reminder to be deleted.
      */
-    public void deleteReminder(String reminderId) {
+    public void deleteReminder(String reminderId) throws IllegalArgumentException {
         ObjectId id = new ObjectId(reminderId);
         reminderEntryRepository.delete(id);
     }
@@ -130,8 +139,13 @@ public class ReminderEntryController {
      * @param reminderId - the id of the reminder to be updated.
      * @param nextReminderTime - the new nextReminderTime for the reminder.
      */
-    public void updateNextReminderTime(String reminderId, LocalDateTime nextReminderTime) {
+    public void updateNextReminderTime(String reminderId, LocalDateTime nextReminderTime)
+            throws IllegalArgumentException, ReminderNotFoundException {
         ReminderEntry reminder = getReminder(reminderId);
+        if (reminder == null) {
+            throw new ReminderNotFoundException(
+                    String.format("Reminder with id %s does not exist", reminderId));
+        }
         reminder.setNextReminderTime(nextReminderTime);
         reminderEntryRepository.update(reminder);
     }

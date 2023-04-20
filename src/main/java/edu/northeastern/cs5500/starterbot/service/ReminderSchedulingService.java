@@ -1,6 +1,7 @@
 package edu.northeastern.cs5500.starterbot.service;
 
 import edu.northeastern.cs5500.starterbot.controller.ReminderEntryController;
+import edu.northeastern.cs5500.starterbot.exception.ReminderNotFoundException;
 import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
 import java.time.Duration;
 import java.time.ZoneId;
@@ -32,26 +33,48 @@ public class ReminderSchedulingService implements Service {
     public ReminderSchedulingService(ReminderEntryController reminderEntryController, JDA jda) {
         this.reminderEntryController = reminderEntryController;
         this.jda = jda;
+        if (jda != null) {
+            ZonedDateTime now = ZonedDateTime.now(ZoneId.of(TIME_ZONE));
+            Runnable initializeTask = () -> initializeReminders(now);
+            scheduleTask(initializeTask, 0, null, null);
+        } else {
+            log.error("JDA not initialized!");
+        }
+    }
 
-        Collection<ReminderEntry> allReminders = this.reminderEntryController.getAllReminders();
+    /**
+     * Restart the messages for exsiting reminders in the nearest future compared to now.
+     *
+     * @param now - time of execution / initialization.
+     */
+    public void initializeReminders(ZonedDateTime now) {
+        Collection<ReminderEntry> allReminders = reminderEntryController.getAllReminders();
         // for each reminder in the database, restart their messages
         for (ReminderEntry reminder : allReminders) {
-            ZonedDateTime now = ZonedDateTime.now(ZoneId.of(TIME_ZONE));
             ZonedDateTime firstReminderTime =
                     reminder.getNextReminderTime().atZone(ZoneId.of(TIME_ZONE));
             TimeUnit repeatTimeUnit = reminder.getRepeatTimeUnit();
             Integer repeatInterval = reminder.getRepeatInterval();
             ZonedDateTime nextReminderTime =
                     getNextReminderTime(firstReminderTime, repeatTimeUnit, repeatInterval, now);
-            reminderEntryController.updateNextReminderTime(
-                    reminder.getId().toString(), nextReminderTime.toLocalDateTime());
+            String reminderId = reminder.getId().toString();
+            try {
+                reminderEntryController.updateNextReminderTime(
+                        reminderId, nextReminderTime.toLocalDateTime());
+            } catch (ReminderNotFoundException rnfe) {
+                log.error(
+                        "Could restart reminder with id {} because reminder no longer exists",
+                        reminderId);
+            }
             Duration durationTilNextReminder = Duration.between(now, nextReminderTime);
 
             long initialDelay = durationTilNextReminder.getSeconds();
             ReminderMessageTask messageTask =
                     new ReminderMessageTask(
                             reminder.getId().toString(), reminderEntryController, jda);
-            scheduleReminder(messageTask, initialDelay, repeatTimeUnit, repeatInterval);
+            if (jda != null) {
+                scheduleTask(messageTask, initialDelay, repeatTimeUnit, repeatInterval);
+            }
         }
     }
 
@@ -64,11 +87,8 @@ public class ReminderSchedulingService implements Service {
      * @param repeatInterval - interval between two reminder messages if the reminder repeats, its
      *     unit being the unit above.
      */
-    public void scheduleReminder(
-            ReminderMessageTask messageTask,
-            long initialDelay,
-            TimeUnit unit,
-            Integer repeatInterval) {
+    public static void scheduleTask(
+            Runnable messageTask, long initialDelay, TimeUnit unit, Integer repeatInterval) {
         // Schdule the message(s)
         if (repeatInterval == null) {
             scheduler.schedule(messageTask, initialDelay, TimeUnit.SECONDS);

@@ -2,6 +2,7 @@ package edu.northeastern.cs5500.starterbot.command;
 
 import edu.northeastern.cs5500.starterbot.controller.ReminderEntryController;
 import edu.northeastern.cs5500.starterbot.exception.InvalidTimeUnitException;
+import edu.northeastern.cs5500.starterbot.exception.UnableToAddReminderException;
 import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
 import edu.northeastern.cs5500.starterbot.service.ReminderMessageTask;
 import edu.northeastern.cs5500.starterbot.service.ReminderSchedulingService;
@@ -152,15 +153,29 @@ public class AddReminderCommand implements SlashCommandHandler {
                 getFirstReminderTime(reminderTime, delay, unit, interval, now);
         LocalDateTime firstReminderTime = firstReminderTimeZoned.toLocalDateTime();
         // add reminder to database
-        ReminderEntry savedEntry =
-                reminderEntryController.addReminder(
-                        discordUserId,
-                        title,
-                        reminderTime,
-                        firstReminderTime,
-                        offset,
-                        interval,
-                        unit);
+        ReminderEntry savedEntry = ReminderEntry.builder().build();
+        try {
+            savedEntry =
+                    reminderEntryController.addReminder(
+                            discordUserId,
+                            title,
+                            reminderTime,
+                            firstReminderTime,
+                            offset,
+                            interval,
+                            unit);
+        } catch (UnableToAddReminderException utare) {
+            event.reply("Sorry! Something went wrong when saving your reminder, please try again.")
+                    .queue();
+            log.error(
+                    "Unable to preserve reminder for user {}.\n Details - title: {}, reminder time: {}, offset: {}, interval: {}, unit: {}",
+                    discordUserId,
+                    title,
+                    reminderTime,
+                    offset,
+                    interval,
+                    unit);
+        }
         scheduleMessage(savedEntry);
 
         // return reminder info in confirmation message to user
@@ -202,7 +217,7 @@ public class AddReminderCommand implements SlashCommandHandler {
         Duration durationTilNextReminder = Duration.between(now, nextReminder);
 
         long initialDelay = durationTilNextReminder.getSeconds();
-        reminderSchedulingService.scheduleReminder(
+        reminderSchedulingService.scheduleTask(
                 new ReminderMessageTask(reminderId, reminderEntryController, jda),
                 initialDelay,
                 unit,

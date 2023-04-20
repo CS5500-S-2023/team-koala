@@ -2,17 +2,61 @@ package edu.northeastern.cs5500.starterbot.service;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import edu.northeastern.cs5500.starterbot.controller.ReminderEntryController;
+import edu.northeastern.cs5500.starterbot.exception.UnableToAddReminderException;
+import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
+import edu.northeastern.cs5500.starterbot.repository.InMemoryRepository;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.concurrent.TimeUnit;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class ReminderSchedulingServiceTest {
+    static final String DISCORD_USER_ID = "1071543384809930763";
+    static final String TITLE = "Reminder";
+    static final Integer REMINDER_OFFSET = 5;
+    static final Integer REPEAT_INTERVAL = 60;
+
+    static final LocalTime REMINDER_TIME = LocalTime.of(14, 00);
+    static final LocalDateTime NEXT_REMINDER_TIME = LocalDateTime.of(2023, 04, 17, 1, 0, 0);
+    static final TimeUnit REPEAT_TIME_UNIT = TimeUnit.MINUTES;
+    private ZonedDateTime now;
+    ReminderSchedulingService reminderSchedulingService;
+
+    @BeforeEach
+    void beforeEach() {
+        now = ZonedDateTime.now(ZoneId.of("America/Los_Angeles"));
+        now = now.withYear(2023).withMonth(4).withDayOfMonth(18).withHour(1).withMinute(0);
+    }
+
+    @Test
+    void testInitializeReminders() throws UnableToAddReminderException {
+        ReminderEntryController testController =
+                new ReminderEntryController(new InMemoryRepository<>());
+        ReminderEntry testEntry =
+                testController.addReminder(
+                        DISCORD_USER_ID,
+                        TITLE,
+                        REMINDER_TIME,
+                        NEXT_REMINDER_TIME,
+                        REMINDER_OFFSET,
+                        REPEAT_INTERVAL,
+                        REPEAT_TIME_UNIT);
+        String reminderId = testEntry.getId().toString();
+        reminderSchedulingService = new ReminderSchedulingService(testController, null);
+        reminderSchedulingService.initializeReminders(now);
+        ReminderEntry updatedEntry = testController.getReminder(reminderId);
+        LocalDateTime updatedTime = updatedEntry.getNextReminderTime();
+        assertThat(updatedTime.getDayOfMonth()).isEqualTo(18);
+        assertThat(updatedTime.getHour()).isEqualTo(2);
+        assertThat(updatedTime.getMinute()).isEqualTo(0);
+    }
 
     @Test
     void testGetNextReminderTime() {
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("America/Los_Angeles"));
-        now = now.withYear(2023).withMonth(4).withDayOfMonth(18).withHour(1).withMinute(0);
 
         ZonedDateTime lastReminderTime = now.withDayOfMonth(17).withHour(0).withMinute(57);
 
@@ -40,8 +84,6 @@ public class ReminderSchedulingServiceTest {
 
     @Test
     void testPlusInterval() {
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("America/Los_Angeles"));
-        now = now.withYear(2023).withMonth(4).withDayOfMonth(18).withHour(1).withMinute(0);
 
         ZonedDateTime plusMinutes =
                 ReminderSchedulingService.plusInterval(now, TimeUnit.MINUTES, 10);

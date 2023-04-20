@@ -1,10 +1,12 @@
 package edu.northeastern.cs5500.starterbot.service;
 
 import edu.northeastern.cs5500.starterbot.controller.ReminderEntryController;
+import edu.northeastern.cs5500.starterbot.exception.ReminderNotFoundException;
 import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.User;
 
@@ -12,6 +14,7 @@ import net.dv8tion.jda.api.entities.User;
  * The task that runs repeatedly at the rate specified by the repeat interval and repeat time unit
  * of the associated reminder.
  */
+@Slf4j
 public class ReminderMessageTask implements Runnable {
 
     private String reminderId;
@@ -62,7 +65,13 @@ public class ReminderMessageTask implements Runnable {
                                     retrivedEntry.getRepeatTimeUnit(),
                                     retrivedEntry.getRepeatInterval())
                             .toLocalDateTime();
-            reminderEntryController.updateNextReminderTime(reminderId, newNextReminderTime);
+            try {
+                reminderEntryController.updateNextReminderTime(reminderId, newNextReminderTime);
+            } catch (ReminderNotFoundException rnfe) {
+                log.error(
+                        "Could restart reminder with id {} because reminder no longer exists",
+                        reminderId);
+            }
         }
     }
 }
