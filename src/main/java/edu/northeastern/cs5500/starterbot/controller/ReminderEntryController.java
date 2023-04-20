@@ -31,7 +31,7 @@ public class ReminderEntryController {
      * @throws InvalidTimeUnitException - thrown when the input is not m (minute) / h (hour) / d
      *     (day)
      */
-    public static TimeUnit parseTimeUnit(String unitString) throws InvalidTimeUnitException {
+    public static TimeUnit parseTimeUnit(String unitString) {
         TimeUnit unit = null;
         switch (unitString) {
             case "m":
@@ -47,8 +47,7 @@ public class ReminderEntryController {
                 break;
 
             default:
-                throw new InvalidTimeUnitException(
-                        "Repeat time unit can only be m(minute) / h(hour) / d(day)");
+                break;
         }
         return unit;
     }

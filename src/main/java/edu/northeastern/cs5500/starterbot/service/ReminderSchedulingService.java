@@ -8,6 +8,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
 import java.util.concurrent.Executors;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
@@ -73,7 +74,13 @@ public class ReminderSchedulingService implements Service {
                     new ReminderMessageTask(
                             reminder.getId().toString(), reminderEntryController, jda);
             if (jda != null) {
-                scheduleTask(messageTask, initialDelay, repeatTimeUnit, repeatInterval);
+                try {
+                    scheduleTask(messageTask, initialDelay, repeatTimeUnit, repeatInterval);
+                } catch (RejectedExecutionException ree) {
+                    log.error(
+                            "Could restart reminder with id {}, task rejected by scheduler",
+                            reminderId);
+                }
             }
         }
     }
@@ -88,7 +95,8 @@ public class ReminderSchedulingService implements Service {
      *     unit being the unit above.
      */
     public static void scheduleTask(
-            Runnable messageTask, long initialDelay, TimeUnit unit, Integer repeatInterval) {
+            Runnable messageTask, long initialDelay, TimeUnit unit, Integer repeatInterval)
+            throws RejectedExecutionException {
         // Schdule the message(s)
         if (repeatInterval == null) {
             scheduler.schedule(messageTask, initialDelay, TimeUnit.SECONDS);

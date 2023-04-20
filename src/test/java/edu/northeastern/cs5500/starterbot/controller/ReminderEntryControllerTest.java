@@ -55,8 +55,6 @@ class ReminderEntryControllerTest {
         assertThat(ReminderEntryController.parseTimeUnit("m")).isEqualTo(TimeUnit.MINUTES);
         assertThat(ReminderEntryController.parseTimeUnit("h")).isEqualTo(TimeUnit.HOURS);
         assertThat(ReminderEntryController.parseTimeUnit("d")).isEqualTo(TimeUnit.DAYS);
-        assertThrows(
-                InvalidTimeUnitException.class, () -> ReminderEntryController.parseTimeUnit("r"));
     }
 
     @Test

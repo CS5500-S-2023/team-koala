@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.bson.types.ObjectId;
 
 /**
@@ -25,6 +26,7 @@ import org.bson.types.ObjectId;
 @EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class ReminderEntry implements Model {
     ObjectId id;
     @Nonnull String discordUserId;

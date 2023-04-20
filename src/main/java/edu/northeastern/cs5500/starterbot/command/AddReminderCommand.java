@@ -1,7 +1,6 @@
 package edu.northeastern.cs5500.starterbot.command;
 
 import edu.northeastern.cs5500.starterbot.controller.ReminderEntryController;
-import edu.northeastern.cs5500.starterbot.exception.InvalidTimeUnitException;
 import edu.northeastern.cs5500.starterbot.exception.UnableToAddReminderException;
 import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
 import edu.northeastern.cs5500.starterbot.service.ReminderMessageTask;
@@ -15,8 +14,7 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -43,7 +41,6 @@ public class AddReminderCommand implements SlashCommandHandler {
     @Inject ReminderEntryController reminderEntryController;
     @Inject ReminderSchedulingService reminderSchedulingService;
     @Inject JDA jda;
-    private ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(20);
 
     @Inject
     public AddReminderCommand() {}
@@ -74,28 +71,31 @@ public class AddReminderCommand implements SlashCommandHandler {
                         new OptionData(
                                 OptionType.STRING,
                                 "reminder-time",
-                                "Start time of the event to be reminded of",
+                                "when the reminded event start",
                                 true),
                         new OptionData(
                                 OptionType.INTEGER,
-                                "delay",
-                                "how many days later the first reminder should start",
+                                "reminder-offset",
+                                "how much earlier do you want us to remind you",
                                 false),
                         new OptionData(
                                 OptionType.INTEGER,
-                                "reminder-offset",
-                                "how much earlier the user want to be reminded of some event",
+                                "delay",
+                                "how many days later do you expect the first reminder",
                                 false),
                         new OptionData(
                                 OptionType.INTEGER,
                                 "repeat-interval",
-                                "Interval between 2 reminders if user wants repeated reminders",
+                                "Interval between 2 reminder messages if reminder is repeated",
                                 false),
                         new OptionData(
-                                OptionType.STRING,
-                                "interval-unit",
-                                "Time unit of the repeat interval",
-                                false));
+                                        OptionType.STRING,
+                                        "interval-unit",
+                                        "Time unit of the repeat interval",
+                                        false)
+                                .addChoice("minute", "m")
+                                .addChoice("hour", "h")
+                                .addChoice("day", "d"));
     }
 
     /**
@@ -136,24 +136,26 @@ public class AddReminderCommand implements SlashCommandHandler {
         }
 
         // parse reminder time unit
-        TimeUnit unit = null;
-        if (interval != null && unitString != null) {
-            try {
-                unit = ReminderEntryController.parseTimeUnit(unitString);
-            } catch (InvalidTimeUnitException e) {
-                event.reply("Please specify time unit with either m (minute), h (hour) or d (day)")
-                        .queue();
-                return;
-            }
-        }
+        TimeUnit unit = interval != null ? ReminderEntryController.parseTimeUnit(unitString) : null;
 
+        // calculate actual reminder message time and the time of the first reminder message
         reminderTime = reminderTime.minusMinutes(offset);
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of(ReminderSchedulingService.TIME_ZONE));
         ZonedDateTime firstReminderTimeZoned =
                 getFirstReminderTime(reminderTime, delay, unit, interval, now);
         LocalDateTime firstReminderTime = firstReminderTimeZoned.toLocalDateTime();
+
         // add reminder to database
-        ReminderEntry savedEntry = ReminderEntry.builder().build();
+        ReminderEntry savedEntry =
+                ReminderEntry.builder()
+                        .discordUserId(discordUserId)
+                        .title(title)
+                        .reminderTime(reminderTime)
+                        .nextReminderTime(firstReminderTime)
+                        .reminderOffset(offset)
+                        .repeatInterval(interval)
+                        .repeatTimeUnit(unit)
+                        .build();
         try {
             savedEntry =
                     reminderEntryController.addReminder(
@@ -164,19 +166,23 @@ public class AddReminderCommand implements SlashCommandHandler {
                             offset,
                             interval,
                             unit);
+            if (savedEntry == null) {
+                throw new UnableToAddReminderException("Null returned when persisting reminder");
+            }
+            scheduleMessage(savedEntry);
         } catch (UnableToAddReminderException utare) {
             event.reply("Sorry! Something went wrong when saving your reminder, please try again.")
                     .queue();
             log.error(
-                    "Unable to preserve reminder for user {}.\n Details - title: {}, reminder time: {}, offset: {}, interval: {}, unit: {}",
+                    "Unable to preserve reminder for user {}.\n Details - {}",
                     discordUserId,
-                    title,
-                    reminderTime,
-                    offset,
-                    interval,
-                    unit);
+                    savedEntry);
+        } catch (RejectedExecutionException ree) {
+            log.error(
+                    "Unable to schedule reminder for user {}.\n Details - {}",
+                    discordUserId,
+                    savedEntry);
         }
-        scheduleMessage(savedEntry);
 
         // return reminder info in confirmation message to user
         List<MessageEmbed> embeds = new ArrayList<>();
@@ -205,7 +211,7 @@ public class AddReminderCommand implements SlashCommandHandler {
      *
      * @param entry - the entry to schedule reminder messages for.
      */
-    private void scheduleMessage(ReminderEntry entry) {
+    private void scheduleMessage(ReminderEntry entry) throws RejectedExecutionException {
         String reminderId = entry.getId().toString();
         Integer repeatInterval = entry.getRepeatInterval();
         TimeUnit unit = entry.getRepeatTimeUnit();
@@ -217,7 +223,7 @@ public class AddReminderCommand implements SlashCommandHandler {
         Duration durationTilNextReminder = Duration.between(now, nextReminder);
 
         long initialDelay = durationTilNextReminder.getSeconds();
-        reminderSchedulingService.scheduleTask(
+        ReminderSchedulingService.scheduleTask(
                 new ReminderMessageTask(reminderId, reminderEntryController, jda),
                 initialDelay,
                 unit,
