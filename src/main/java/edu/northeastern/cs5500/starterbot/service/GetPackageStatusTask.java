@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import javax.inject.Inject;
 import java.util.Objects;
 import java.util.TimerTask;
 import lombok.extern.slf4j.Slf4j;
@@ -15,9 +16,10 @@ import net.dv8tion.jda.api.JDA;
  */
 @Slf4j
 public class GetPackageStatusTask extends TimerTask {
-    private JDA jda;
-    TrackPackageService trackPackageService;
+    @Inject JDA jda;
+    @Inject TrackPackageService trackPackageService;
 
+    @Inject
     public GetPackageStatusTask(JDA jda, TrackPackageService trackPackageService) {
         this.jda = jda;
         this.trackPackageService = trackPackageService;
