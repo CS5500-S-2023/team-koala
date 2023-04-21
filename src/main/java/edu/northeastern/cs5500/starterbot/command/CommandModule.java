@@ -42,6 +42,13 @@ public class CommandModule {
 
     @Provides
     @IntoSet
+    public SlashCommandHandler provideUpdatePackageCommand(
+            UpdatePackageCommand updatePackageCommand) {
+        return updatePackageCommand;
+    }
+
+    @Provides
+    @IntoSet
     public SlashCommandHandler providePreferredNameCommand(
             PreferredNameCommand preferredNameCommand) {
         return preferredNameCommand;

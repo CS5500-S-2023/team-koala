@@ -1,5 +1,6 @@
 package edu.northeastern.cs5500.starterbot.controller;
 
+import edu.northeastern.cs5500.starterbot.exception.NotYourPackageException;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import edu.northeastern.cs5500.starterbot.service.TrackPackageService;
@@ -29,8 +30,8 @@ public class PackageController {
      *
      * @param package1
      */
-    public void getPackageLatestStatus(Package package1) {
-        trackPackageService.getPackageLatestStatus(package1);
+    public boolean getPackageLatestStatus(Package package1) {
+        return trackPackageService.getPackageLatestStatus(package1);
     }
 
     // add package to database after create tracking item via third-party api
@@ -45,12 +46,20 @@ public class PackageController {
         return SUCCESS;
     }
 
-    public Package getPackage(ObjectId id) {
-        return this.packageRepository.get(id);
+    public Package getPackage(String id) throws IllegalArgumentException {
+        ObjectId objectId = new ObjectId(id);
+        return this.packageRepository.get(objectId);
     }
 
-    public void deletePackage(ObjectId id) {
-        packageRepository.delete(id);
+    public boolean deletePackage(String id, String userId)
+            throws IllegalArgumentException, NotYourPackageException {
+        ObjectId objectId = new ObjectId(id);
+        Package p = packageRepository.get(objectId);
+        if (!p.getUserId().equals(userId)) {
+            throw new NotYourPackageException("This is not your package");
+        }
+        packageRepository.delete(objectId);
+        return true;
     }
 
     public List<Package> getUsersPackages(String userId) {
@@ -59,10 +68,29 @@ public class PackageController {
         List<Package> usersPackages = new ArrayList<>();
         for (Package p : allPackages) {
             if (p.getUserId().equals(userId)) {
+                if (!getPackageLatestStatus(p)) {
+                    p.setStatus(null);
+                    p.setStatusTime(null);
+                }
                 usersPackages.add(p);
             }
         }
 
         return usersPackages;
+    }
+
+    public Package updatePackage(
+            String id, String userId, String name, String trackingNumber, String carrierId)
+            throws IllegalArgumentException, NotYourPackageException {
+        ObjectId objectId = new ObjectId(id);
+        Package p = packageRepository.get(objectId);
+        if (!p.getUserId().equals(userId)) {
+            throw new NotYourPackageException("This is not your package");
+        }
+        p.setName(name);
+        p.setTrackingNumber(trackingNumber);
+        p.setCarrierId(carrierId);
+        packageRepository.update(p);
+        return p;
     }
 }
