@@ -1,7 +1,6 @@
 package edu.northeastern.cs5500.starterbot.service;
 
 import edu.northeastern.cs5500.starterbot.model.Package;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,10 +24,10 @@ public class GetPackageStatusSubTask extends TimerTask {
     Package[] allPackages;
 
     /**
-     * Public constructor for usage in GetPackageStatusTask
-     * as GetPackageStatusTask is a task composing of multiple sub-tasks
-     * 
-     * @param jda  - represents a connection to discord
+     * Public constructor for usage in GetPackageStatusTask which is an overarching task composing
+     * of multiple sub-tasks
+     *
+     * @param jda - represents a connection to discord
      * @param trackPackageService
      * @param allPackages
      * @param startIdx
@@ -53,10 +52,9 @@ public class GetPackageStatusSubTask extends TimerTask {
     /**
      * Send the updated status of all packages in our database to users
      *
-     * 1. Get all packages from the MongoDB database. 
-     * 2. Get the latest status of packages via third-party API. 
-     * 3. If the status of a package doesn't have updates, no update will be sent to the user. 
-     * 4. Send a private message to users of packages about latest status.
+     * <p>1. Get all packages from the MongoDB database. 2. Get the latest status of packages via
+     * third-party API. 3. If the status of a package doesn't have updates, no update will be sent
+     * to the user. 4. Send a private message to users of packages about latest status.
      */
     @Override
     public void run() {
@@ -68,7 +66,12 @@ public class GetPackageStatusSubTask extends TimerTask {
         Map<String, StringBuilder> packageStatusMessages = new HashMap<>();
 
         Date currTime = new Date();
-        log.info("Getting status of {} - {} packages for task {} at time {}", startIdx, endIdx, taskId, currTime);
+        log.info(
+                "Getting status of {} - {} packages for task {} at time {}",
+                startIdx,
+                endIdx,
+                taskId,
+                currTime);
         // get their status and compare with the existing status
         for (int i = startIdx; i < endIdx; i++) {
             Package pkg = allPackages[i];
