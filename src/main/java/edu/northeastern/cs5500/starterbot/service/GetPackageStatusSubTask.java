@@ -1,6 +1,8 @@
 package edu.northeastern.cs5500.starterbot.service;
 
 import edu.northeastern.cs5500.starterbot.model.Package;
+
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -65,7 +67,8 @@ public class GetPackageStatusSubTask extends TimerTask {
         // retrieve all packages from the database
         Map<String, StringBuilder> packageStatusMessages = new HashMap<>();
 
-        log.info("Getting status of {} - {} packages for task {}", startIdx, endIdx, taskId);
+        Date currTime = new Date();
+        log.info("Getting status of {} - {} packages for task {} at time {}", startIdx, endIdx, taskId, currTime);
         // get their status and compare with the existing status
         for (int i = startIdx; i < endIdx; i++) {
             Package pkg = allPackages[i];

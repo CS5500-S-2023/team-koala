@@ -8,6 +8,9 @@ import net.dv8tion.jda.api.JDA;
 /** PackageSchedulingService is in charge of schedule tasks to send package updates to users */
 public class PackageSchedulingService {
 
+    // Delay in milliseconds that allows the task to be initialized after the bot is fully started
+    public static final long START_DELAY = TimeUnit.MINUTES.toMillis(1);
+
     JDA jda;
     TrackPackageService trackPackageService;
 
@@ -33,7 +36,7 @@ public class PackageSchedulingService {
         long dayIntervalInMilliseconds = TimeUnit.DAYS.toMillis(1);
         timer.schedule(
                 new GetPackageStatusTask(jda, trackPackageService),
-                2000,
+                START_DELAY,
                 dayIntervalInMilliseconds);
     }
 }
