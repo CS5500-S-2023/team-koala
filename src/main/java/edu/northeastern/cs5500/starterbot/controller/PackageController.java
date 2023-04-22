@@ -7,10 +7,12 @@ import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import edu.northeastern.cs5500.starterbot.service.TrackPackageService;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -19,9 +21,10 @@ import org.bson.types.ObjectId;
 /**
  * PackageController is a class for operations on the package model
  */
+@Slf4j
 public class PackageController {
 
-    GenericRepository<Package> packageRepository; // data access object
+    GenericRepository<Package> packageRepository; 
     TrackPackageService trackPackageService;
 
     public static final String SUCCESS = "success";
@@ -29,6 +32,7 @@ public class PackageController {
     public static final String THIRD_PARTY_API_FAILED_MESSAGE = "there is something wrong with connecting to the third-party api";
     public static final String UNKNOWN_ERROR = "there is something wrong.";
     public static final String TRY_AGAIN_MESSAGE = "Please try again later.";
+    private static final String PACKAGE_ALREADY_EXISTS_MESSAGE = "you have created this package in our database.";
 
     /**
      * Public Constructor for injection
@@ -49,6 +53,12 @@ public class PackageController {
      */
     public String createPackage(@Nonnull Package package1) {
 
+        // Check if this package already created by this user
+        Package packageExists = getPackageByUserCarrirerAndTrackingNumber(package1);
+        if (!Objects.equals(null, packageExists)) {
+            return PACKAGE_ALREADY_EXISTS_MESSAGE;
+        }
+
         // Verify if a package exists
         String validationResult = validatePackage(package1);
         if (!validationResult.equals(SUCCESS)) {
@@ -62,6 +72,37 @@ public class PackageController {
         return SUCCESS;
     }
 
+    /**
+     * Find a package based on userId, carrierId, and trackingNumber
+     * 
+     * @param package1
+     * @return null if this package is not created yet in our system;
+     *         a Package object if this package has been created.
+     */
+    private Package getPackageByUserCarrirerAndTrackingNumber(Package package1) {
+        log.info("getPackageByUserCarrirerAndTrackingNumber of package - {}", package1.getId());
+        String userId = package1.getUserId();
+        String carrierId = package1.getCarrierId();
+        String trackingNumber = package1.getTrackingNumber();
+        Collection<Package> allPackages = packageRepository.getAll();
+
+        for (Package p : allPackages) {
+            if (p.getUserId().equals(userId) 
+                && p.getCarrierId().equals(carrierId) 
+                && p.getTrackingNumber().equals(trackingNumber) ) {
+                    return p;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Verify if a package is existent via calling third-party(KeyDelivery) API
+     * 
+     * @param package1
+     * @return string - SUCESS or Any other error message
+     */
     private String validatePackage(@Nonnull Package package1) {
         try {
             getPackageLatestStatus(package1);

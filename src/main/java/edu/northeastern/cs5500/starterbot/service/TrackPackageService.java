@@ -37,7 +37,7 @@ public class TrackPackageService implements Service {
     private static final int OK = 200;
     private static final int PACKAGE_NOT_EXIST = 60101;
 
-    GenericRepository<Package> packageRepository; // data access object
+    GenericRepository<Package> packageRepository; 
 
     @Inject
     public TrackPackageService(GenericRepository<Package> packageRepository) {
@@ -46,9 +46,7 @@ public class TrackPackageService implements Service {
 
     /**
      * Call real-time tracking api to get the latest status Invoked when displaying list of packages
-     * Update package info in database
      *
-     * @return 
      * @throws KeyDeliveryCallException
      * @throws PackageNotExsitException
      */
@@ -67,7 +65,6 @@ public class TrackPackageService implements Service {
     /**
      * Parse the response from KeyDelivery to get their delivery latest status, time and description
      * 
-     *
      * @param result - the response from KeyDelivery
      * @param package1 - the provided package object
      * 
