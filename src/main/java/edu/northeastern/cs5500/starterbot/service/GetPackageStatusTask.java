@@ -2,86 +2,73 @@ package edu.northeastern.cs5500.starterbot.service;
 
 import edu.northeastern.cs5500.starterbot.model.Package;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import javax.inject.Inject;
-import java.util.Objects;
+import java.util.Date;
+import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 
 /*
- * This is a task which is scheduled to send the updated status of all packages
+ * GetPackageStatusTask is a timer task
+ * which schedules various timer tasks to retrieve packages' status at different time
  */
 @Slf4j
 public class GetPackageStatusTask extends TimerTask {
-    @Inject JDA jda;
-    @Inject TrackPackageService trackPackageService;
 
-    @Inject
+    public static final int TASK_FREQUENCEY = 24;
+
+    JDA jda;
+    TrackPackageService trackPackageService;
+
+    /**
+     * Public constructor for usage in PackageSchedulingService
+     *
+     * @param jda - represents a connection to discord
+     * @param trackPackageService
+     */
     public GetPackageStatusTask(JDA jda, TrackPackageService trackPackageService) {
         this.jda = jda;
         this.trackPackageService = trackPackageService;
     }
 
     /**
-     * Send the updated status of all packages in our database to users
-     *
-     * <p>1. Get all packages from the MongoDB database 2. Get the latest status of packages via
-     * third-party API 3. If the status of a package doesn't have updates, no update will be sent to
-     * the user. 4. Send a private message to users of packages about latest status
+     * 1. Retreive all packages and decide numOfPackagesEachTask based on the total cnt 2. Schedule
+     * sub-tasks to retrieve packages' status and send updates to users at different hours of a day
      */
     @Override
     public void run() {
-        // retrieve all packages from the database
         Collection<Package> allPackages = trackPackageService.packageRepository.getAll();
-        Map<String, StringBuilder> packageStatusMessages = new HashMap<>();
+        // The collection of packages needs to be accessed by index later so it is converted to
+        // array first and there will be no write operation on this array
+        Package[] packageArray = allPackages.toArray(new Package[0]);
 
-        log.info("Getting status of all packages");
-        // get their status and compare with the existing status
-        for (Package pkg : allPackages) {
-            String currStatus = pkg.getStatus();
-            trackPackageService.getPackageLatestStatus(pkg);
-            String latestStatus = pkg.getStatus();
+        // Calculate the number of packages each task should iterate over
+        long hourIntervalInMilliseconds = TimeUnit.HOURS.toMillis(1);
+        int numOfPackagesEachTask = (int) Math.ceil(allPackages.size() * 1.0 / TASK_FREQUENCEY);
 
-            // current status could be null
-            if (Objects.equals(currStatus, latestStatus)) continue;
+        Date currTime = new Date();
+        log.info("Starting daily package status retrieval task at {}", currTime);
 
-            // Display package's name (if not set, display tracking number)
-            // and the latest status
-            String packageIdentifier =
-                    Objects.equals(pkg.getName(), null) ? pkg.getTrackingNumber() : pkg.getName();
-            String statusMessage =
-                    String.format(
-                            "The latest status for your package %s is %s",
-                            packageIdentifier, pkg.getStatus());
+        // Start distribute work to sub-tasks
+        Timer timer = new Timer();
+        for (int i = 0; i < TASK_FREQUENCEY; i++) {
+            int endIdx = (i + 1) * numOfPackagesEachTask;
+            if (endIdx > allPackages.size()) {
+                endIdx = allPackages.size();
+            }
 
-            packageStatusMessages.putIfAbsent(pkg.getUserId(), new StringBuilder());
-            packageStatusMessages.get(pkg.getUserId()).append(statusMessage + "\n");
+            GetPackageStatusSubTask task =
+                    new GetPackageStatusSubTask(
+                            jda,
+                            trackPackageService,
+                            packageArray,
+                            i * numOfPackagesEachTask,
+                            endIdx,
+                            i);
+
+            // Fixed delay time for each task to execute at different time
+            timer.schedule(task, i * hourIntervalInMilliseconds);
         }
-
-        log.info("Sending messages of package status updates to users");
-        for (Entry<String, StringBuilder> entry : packageStatusMessages.entrySet()) {
-            sendMessage(entry.getKey(), entry.getValue().toString());
-        }
-    }
-
-    /**
-     * Send the latest status of all packages for a user in discord private channel
-     *
-     * @param userId - discord user id
-     * @param content - a long message string which contains the updates
-     */
-    private void sendMessage(String userId, String content) {
-
-        jda.retrieveUserById(userId)
-                .queue(
-                        user -> {
-                            user.openPrivateChannel()
-                                    .flatMap(channel -> channel.sendMessage(content))
-                                    .queue();
-                        });
-        log.info("Package status updates have been sent to discord user " + userId);
     }
 }

@@ -1,40 +1,39 @@
 package edu.northeastern.cs5500.starterbot.service;
 
 import java.util.Timer;
-import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
-import lombok.SneakyThrows;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import net.dv8tion.jda.api.JDA;
 
+/** PackageSchedulingService is in charge of schedule tasks to send package updates to users */
 public class PackageSchedulingService {
-    GetPackageStatusTask getPackageStatusTask;
 
+    JDA jda;
+    TrackPackageService trackPackageService;
+
+    /**
+     * Public constructor
+     *
+     * @param jda - represents a connection to discord
+     * @param trackPackageService
+     */
     @Inject
-    public PackageSchedulingService(GetPackageStatusTask getPackageStatusTask) {
-        this.getPackageStatusTask = getPackageStatusTask;
+    public PackageSchedulingService(JDA jda, TrackPackageService trackPackageService) {
+        this.jda = jda;
+        this.trackPackageService = trackPackageService;
     }
 
     /**
-     * Schedule tasks to notify users when there are updates for the package
-     *
-     * @param - jda is needed to send messages to discord user
+     * Schedule daily tasks to retrieve packages' status and notify users only when there are
+     * updates for their packages
      */
-    @SneakyThrows 
     public void scheduleTask() {
         Timer timer = new Timer();
 
-        String startTime = "2023-04-17 12:00"; // By default, it is 24-hour clock
-        String pattern = "yyyy-MM-dd hh:mm";
-        SimpleDateFormat formatter = new SimpleDateFormat(pattern);
-
-        // The ParseException(handled by annotation) should never be thrown as the input is valid and constant
-        Date startDate = formatter.parse(startTime);
-        
-        //long intervalInMilliseconds = TimeUnit.DAYS.toMillis(1);
-
-        //timer.schedule(task, startDate, intervalInMilliseconds);
-        timer.schedule(getPackageStatusTask,2000, 6000L);
+        long dayIntervalInMilliseconds = TimeUnit.DAYS.toMillis(1);
+        timer.schedule(
+                new GetPackageStatusTask(jda, trackPackageService),
+                2000,
+                dayIntervalInMilliseconds);
     }
 }

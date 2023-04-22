@@ -6,7 +6,6 @@ import edu.northeastern.cs5500.starterbot.listener.MessageListener;
 import edu.northeastern.cs5500.starterbot.repository.RepositoryModule;
 import edu.northeastern.cs5500.starterbot.service.PackageSchedulingService;
 import edu.northeastern.cs5500.starterbot.service.ServiceModule;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import net.dv8tion.jda.api.JDA;
@@ -40,6 +39,4 @@ public class Bot {
 
         packageSchedulingService.scheduleTask();
     }
-
-    
 }
