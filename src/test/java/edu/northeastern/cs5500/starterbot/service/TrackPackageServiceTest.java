@@ -2,6 +2,8 @@ package edu.northeastern.cs5500.starterbot.service;
 
 import static org.junit.Assert.*;
 
+import edu.northeastern.cs5500.starterbot.exception.KeyDeliveryCallException;
+import edu.northeastern.cs5500.starterbot.exception.PackageNotExsitException;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.InMemoryRepository;
 import org.junit.jupiter.api.Test;
@@ -15,7 +17,7 @@ public class TrackPackageServiceTest {
     }
 
     @Test
-    void testRealtimePackageTracking() {
+    void testRealtimePackageTracking() throws KeyDeliveryCallException, PackageNotExsitException {
         Package package1 =
                 Package.builder()
                         .carrierId("ups")

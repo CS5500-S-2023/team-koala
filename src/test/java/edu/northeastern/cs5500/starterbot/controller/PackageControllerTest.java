@@ -38,7 +38,7 @@ public class PackageControllerTest {
 
     PackageControllerTest() {
         // Avoid using MongoDB service
-        GenericRepository repo = new InMemoryRepository<>();
+        GenericRepository<Package> repo = new InMemoryRepository<>();
         this.packageController = new PackageController(repo, new TrackPackageService(repo));
     }
 

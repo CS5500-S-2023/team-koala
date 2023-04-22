@@ -1,21 +1,39 @@
 package edu.northeastern.cs5500.starterbot.controller;
 
+import edu.northeastern.cs5500.starterbot.exception.KeyDeliveryCallException;
 import edu.northeastern.cs5500.starterbot.exception.NotYourPackageException;
+import edu.northeastern.cs5500.starterbot.exception.PackageNotExsitException;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import edu.northeastern.cs5500.starterbot.service.TrackPackageService;
+import lombok.SneakyThrows;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import org.bson.types.ObjectId;
 
+/**
+ * PackageController is a class for operations on the package model
+ */
 public class PackageController {
 
     GenericRepository<Package> packageRepository; // data access object
-    public static final String SUCCESS = "success";
     TrackPackageService trackPackageService;
 
+    public static final String SUCCESS = "success";
+    public static final String PACKAGE_NOT_FOUND_MESSAGE = "we cannot find a package with the provided carrier id and tracking number.";
+    public static final String THIRD_PARTY_API_FAILED_MESSAGE = "there is something wrong with connecting to the third-party api";
+    public static final String UNKNOWN_ERROR = "there is something wrong.";
+    public static final String TRY_AGAIN_MESSAGE = "Please try again later.";
+
+    /**
+     * Public Constructor for injection
+     * @param packageRepository - actually provided with MongoDBRepository
+     */
     @Inject
     public PackageController(
             GenericRepository<Package> packageRepository, TrackPackageService trackPackageService) {
@@ -24,26 +42,51 @@ public class PackageController {
     }
 
     /**
-     * The updated status will be written in the passed-in package object.
-     *
-     * <p>Expected: If the status and statusTime is null, then it means no status is available yet.
-     *
+     * Add package to database after validating the existence of the package via third-party api
+     * 
      * @param package1
+     * @return string - SUCESS or Any other error message
      */
-    public boolean getPackageLatestStatus(Package package1) {
-        return trackPackageService.getPackageLatestStatus(package1);
-    }
+    public String createPackage(@Nonnull Package package1) {
 
-    // add package to database after create tracking item via third-party api
-    public String createPackage(Package package1) {
-
-        // create tracking item
+        // Verify if a package exists
+        String validationResult = validatePackage(package1);
+        if (!validationResult.equals(SUCCESS)) {
+            return validationResult;
+        }
 
         // write to database
         // assumed insertion success, otherwise will need to modify repository functions
         packageRepository.add(package1);
 
         return SUCCESS;
+    }
+
+    private String validatePackage(@Nonnull Package package1) {
+        try {
+            getPackageLatestStatus(package1);
+        } catch (PackageNotExsitException e) {
+            return String.format("%s %s",PACKAGE_NOT_FOUND_MESSAGE, TRY_AGAIN_MESSAGE);
+        } catch (KeyDeliveryCallException e) {
+            return String.format("%s %s",THIRD_PARTY_API_FAILED_MESSAGE, TRY_AGAIN_MESSAGE);
+        } catch (Exception e) {
+            return String.format("%s %s",UNKNOWN_ERROR, TRY_AGAIN_MESSAGE);
+        }
+
+        return SUCCESS;
+    }
+
+    /**
+     * The updated status will be written in the passed-in package object.
+     *
+     * <p>Expected: If the status and statusTime is null, then it means no status is available yet.
+     *
+     * @param package1
+     * @throws PackageNotExsitException
+     * @throws KeyDeliveryCallException
+     */
+    public void getPackageLatestStatus(Package package1) throws KeyDeliveryCallException, PackageNotExsitException {
+        trackPackageService.getPackageLatestStatus(package1);
     }
 
     /**
@@ -95,16 +138,16 @@ public class PackageController {
      * @param userId String that represents the user's discord id
      * @return List<Package> the packages that the user owns
      */
+    @SneakyThrows
     public List<Package> getUsersPackages(String userId) {
         Collection<Package> allPackages = packageRepository.getAll();
 
         List<Package> usersPackages = new ArrayList<>();
         for (Package p : allPackages) {
             if (p.getUserId().equals(userId)) {
-                if (!getPackageLatestStatus(p)) {
-                    p.setStatus(null);
-                    p.setStatusTime(null);
-                }
+                // TODO: whether to handle exception - All packages should be valid
+                getPackageLatestStatus(p);
+                
                 usersPackages.add(p);
             }
         }
@@ -144,6 +187,8 @@ public class PackageController {
         p.setName(name);
         p.setTrackingNumber(trackingNumber);
         p.setCarrierId(carrierId);
+
+
         packageRepository.update(p);
         return p;
     }
