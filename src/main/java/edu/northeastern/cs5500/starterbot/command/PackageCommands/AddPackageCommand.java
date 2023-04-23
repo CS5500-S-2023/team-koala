@@ -1,7 +1,10 @@
-package edu.northeastern.cs5500.starterbot.command;
+package edu.northeastern.cs5500.starterbot.command.PackageCommands;
 
+import edu.northeastern.cs5500.starterbot.command.SlashCommandHandler;
+import edu.northeastern.cs5500.starterbot.command.StringSelectHandler;
 import edu.northeastern.cs5500.starterbot.controller.PackageController;
 import edu.northeastern.cs5500.starterbot.model.Package;
+import edu.northeastern.cs5500.starterbot.service.TrackPackageService;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nonnull;
@@ -103,7 +106,7 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
     }
 
     @Override
-    public void onStringSelectInteraction(StringSelectInteractionEvent event) {
+    public void onStringSelectInteraction(@Nonnull StringSelectInteractionEvent event) {
         log.info("event: /add_package:StringSelectInteractionEvent - {}", event.getValues().get(0));
 
         // collect passed in data from previous step
@@ -131,11 +134,11 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
         // create a package and receives success or error messages
         String created = packageController.createPackage(pkg);
         log.info("package creation : " + created);
-
+ 
         if (created.equals(PackageController.SUCCESS)) {
             event.reply("Your package has been created successfully!").setEphemeral(true).queue();
         } else {
-            event.reply("Your package was not created successfuly because of " + created)
+            event.reply("Your package was not created successfuly because " + created)
                     .setEphemeral(true)
                     .queue();
         }
