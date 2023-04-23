@@ -87,7 +87,7 @@ public class TrackPackageService implements Service {
      * @throws PackageNotExsitException
      * @throws KeyDeliveryCallException
      */
-    private void readDeliveryResponse(String result, Package package1)
+    protected void readDeliveryResponse(String result, Package package1)
             throws PackageNotExsitException, KeyDeliveryCallException {
         log.info("readDeliveryResponse: got the delivery status of {}", package1.getId());
 

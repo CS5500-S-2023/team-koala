@@ -9,6 +9,16 @@ import edu.northeastern.cs5500.starterbot.repository.InMemoryRepository;
 import org.junit.jupiter.api.Test;
 
 public class TrackPackageServiceTest {
+
+    final String PACKAGE_NOT_FOUND_RESULT = "{\"code\": 60101, \"message\": \"no result found\"}";
+    final String KEYDELIVERY_ERROR_RESULT = "{\"code\": 404, \"message\": \"Invalid API key\"}";
+
+    final Package package1 =
+            Package.builder()
+                    .carrierId("ups")
+                    .trackingNumber("1Z9A170W0337231977")
+                    .userId("user id")
+                    .build();
     TrackPackageService trackPackageService;
 
     TrackPackageServiceTest() {
@@ -18,14 +28,27 @@ public class TrackPackageServiceTest {
 
     @Test
     void testRealtimePackageTracking() throws KeyDeliveryCallException, PackageNotExsitException {
-        Package package1 =
-                Package.builder()
-                        .carrierId("ups")
-                        .trackingNumber("1Z9A170W0337231977")
-                        .userId("user id")
-                        .build();
-
         trackPackageService.getPackageLatestStatus(package1);
         assertEquals("[SEATTLE, WA, US]DELIVERED", package1.getStatus());
+    }
+
+    @Test
+    void testReadDeliveryResponsePackgeNotExist() {
+        assertThrows(
+                "",
+                PackageNotExsitException.class,
+                () -> {
+                    trackPackageService.readDeliveryResponse(PACKAGE_NOT_FOUND_RESULT, package1);
+                });
+    }
+
+    @Test
+    void testReadDeliveryResponseOtherKeyDeliveryError() {
+        assertThrows(
+                "",
+                KeyDeliveryCallException.class,
+                () -> {
+                    trackPackageService.readDeliveryResponse(KEYDELIVERY_ERROR_RESULT, package1);
+                });
     }
 }

@@ -94,8 +94,8 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
         log.info("event: /add_package:StringSelectInteractionEvent - {}", event.getValues().get(0));
 
         // collect passed in data from previous step
-        String[] paramArray = event.getValues().get(0).split("::");
-        Package builtPacakge = buildPackage(paramArray, event.getUser().getId());
+        String params = event.getValues().get(0);
+        Package builtPacakge = buildPackage(params, event.getUser().getId());
         if (Objects.equals(builtPacakge, null)) {
             event.reply(
                             String.format(
@@ -119,10 +119,19 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
         }
     }
 
-    private Package buildPackage(String[] paramArray, @Nonnull String userId) {
-        String packageName = paramArray[0];
-        String trackingNumber = paramArray[1];
-        String carrierId = paramArray[2];
+    /**
+     * Check fields for nullability and build a valid package
+     *
+     * @param paramArray - extracted from event
+     * @param userId
+     * @return a built package object
+     */
+    protected Package buildPackage(String param, @Nonnull String userId) {
+        String[] paramArray = param.split("::");
+        int size = paramArray.length;
+        String packageName = size >= 1 ? paramArray[0] : "";
+        String trackingNumber = size >= 2 ? paramArray[1] : "";
+        String carrierId = size >= 3 ? paramArray[2] : "";
 
         // check null
         if (trackingNumber.isBlank() || carrierId.isBlank()) {
