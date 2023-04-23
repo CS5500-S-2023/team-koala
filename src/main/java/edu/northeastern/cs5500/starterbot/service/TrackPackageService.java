@@ -17,6 +17,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -33,8 +34,23 @@ public class TrackPackageService implements Service {
     private static final int CONNECT_TIMEOUT = 1000;
     private static final int READ_TIMEOUT = 5000;
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
+    // Response code
     private static final int OK = 200;
     private static final int PACKAGE_NOT_EXIST = 60101;
+
+    public static final Map<String, String> carrieMap =
+            Map.of(
+                    "UPS", "ups",
+                    "DHL", "dhl",
+                    "FedEx", "fedex",
+                    "USPS", "usps",
+                    "LaserShip", "lasership",
+                    "China-post", "cpcbe",
+                    "China Ems International", "china_ems_international",
+                    "GLS", "gls",
+                    "Canada Post", "canada_post",
+                    "Purolator", "purolator");
 
     GenericRepository<Package> packageRepository;
 
@@ -55,7 +71,7 @@ public class TrackPackageService implements Service {
         String tracking_number = package1.getTrackingNumber();
 
         String result = getData(REALTIME_URL, carrier_id, tracking_number, null);
-        log.info("getPackageLatestStatus: " + package1.getId() + " - " + result);
+        log.info(String.format("getPackageLatestStatus for package {}: {} ", package1.getId(), result));
 
         // read the delivery updates
         readDeliveryResponse(result, package1);

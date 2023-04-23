@@ -16,6 +16,8 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 
+import com.mongodb.MongoException;
+
 /** PackageController is a class for operations on the package model */
 @Slf4j
 public class PackageController {
@@ -25,13 +27,14 @@ public class PackageController {
 
     public static final String SUCCESS = "success";
     public static final String PACKAGE_NOT_FOUND_MESSAGE =
-            "we cannot find a package with the provided carrier id and tracking number.";
+            "there is no such package with the provided carrier id and tracking number.";
     public static final String THIRD_PARTY_API_FAILED_MESSAGE =
             "there is something wrong with connecting to the third-party api";
     public static final String UNKNOWN_ERROR = "there is something wrong.";
     public static final String TRY_AGAIN_MESSAGE = "Please try again later.";
-    private static final String PACKAGE_ALREADY_EXISTS_MESSAGE =
+    public static final String PACKAGE_ALREADY_EXISTS_MESSAGE =
             "you have created this package in our database.";
+    public static final String MONGODB_ADD_PACKAGE_FAILED_MESSAGE = "it is unable to add package to MongoDB database";
 
     /**
      * Public Constructor for injection
@@ -66,8 +69,12 @@ public class PackageController {
         }
 
         // write to database
-        // assumed insertion success, otherwise will need to modify repository functions
-        packageRepository.add(package1);
+        try {
+            packageRepository.add(package1);
+        } catch (MongoException e) {
+            log.error("{} because {}", MONGODB_ADD_PACKAGE_FAILED_MESSAGE, e.getMessage());
+            return MONGODB_ADD_PACKAGE_FAILED_MESSAGE;
+        }
 
         return SUCCESS;
     }

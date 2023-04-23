@@ -4,6 +4,8 @@ import edu.northeastern.cs5500.starterbot.command.SlashCommandHandler;
 import edu.northeastern.cs5500.starterbot.command.StringSelectHandler;
 import edu.northeastern.cs5500.starterbot.controller.PackageController;
 import edu.northeastern.cs5500.starterbot.model.Package;
+import edu.northeastern.cs5500.starterbot.service.TrackPackageService;
+
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nonnull;
@@ -23,22 +25,7 @@ import net.dv8tion.jda.api.interactions.components.selections.*;
 @Slf4j
 public class AddPackageCommand implements SlashCommandHandler, StringSelectHandler {
 
-    @Inject PackageController packageController;
-
-    // may have a better solution to read the data from csv file
-    // https://github.com/CS5500-S-2023/team-koala/issues/15
-    private final Map<String, String> carrieMap =
-            Map.of(
-                    "UPS", "ups",
-                    "DHL", "dhl",
-                    "FedEx", "fedex",
-                    "USPS", "usps",
-                    "LaserShip", "lasership",
-                    "China-post", "cpcbe",
-                    "China Ems International", "china_ems_international",
-                    "GLS", "gls",
-                    "Canada Post", "canada_post",
-                    "Purolator", "purolator");
+    @Inject PackageController packageController;    
 
     @Inject
     public AddPackageCommand() {
@@ -91,7 +78,7 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
 
         // Reply with a select menu for users to choose a carrier
         StringSelectMenu.Builder carrierBuilder = StringSelectMenu.create("add_package");
-        for (Map.Entry<String, String> entry : carrieMap.entrySet()) {
+        for (Map.Entry<String, String> entry : TrackPackageService.carrieMap.entrySet()) {
             carrierBuilder.addOption(
                     entry.getKey(),
                     String.format(
@@ -113,9 +100,14 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
         String packageName = paramArray[0];
         String trackingNumber = paramArray[1];
         String carrierId = paramArray[2];
-
-        // retrieve user info
         User user = event.getUser();
+
+        // check null
+        if (trackingNumber.isBlank() || carrierId.isBlank()) {
+            log.error("Mandatory fields are missing - trackingNumber: {}, carrierId: {}", trackingNumber, carrierId);
+            event.reply(
+                String.format("%s %s",PackageController.UNKNOWN_ERROR, PackageController.TRY_AGAIN_MESSAGE)).queue();
+        }
         if (packageName.isBlank()) {
             log.info("The package name is null");
             packageName = null;
@@ -132,7 +124,7 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
 
         // create a package and receives success or error messages
         String created = packageController.createPackage(pkg);
-        log.info("package creation : " + created);
+        log.info("package creation : {}", created);
 
         if (created.equals(PackageController.SUCCESS)) {
             event.reply("Your package has been created successfully!").setEphemeral(true).queue();
