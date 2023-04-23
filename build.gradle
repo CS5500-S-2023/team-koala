@@ -90,10 +90,9 @@ jacocoTestReport {
     reports {
         xml.enabled true
         // Change html.enabled to true if you want html reports
-        html.enabled true
+        html.enabled false
         csv.enabled false
         xml.destination file("${buildDir}/reports/jacoco.xml")
-        html.destination file("${buildDir}/reports/jacoco.html")
     }
 }
 

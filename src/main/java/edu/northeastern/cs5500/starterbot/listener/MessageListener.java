@@ -1,25 +1,28 @@
 package edu.northeastern.cs5500.starterbot.listener;
 
+import edu.northeastern.cs5500.starterbot.command.ButtonHandler;
 import edu.northeastern.cs5500.starterbot.command.SlashCommandHandler;
 import edu.northeastern.cs5500.starterbot.command.StringSelectHandler;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import lombok.Generated;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
+import net.dv8tion.jda.api.interactions.modals.*;
 
-@Generated
 @Slf4j
 public class MessageListener extends ListenerAdapter {
 
     @Inject Set<SlashCommandHandler> commands;
+    @Inject Set<ButtonHandler> buttons;
     @Inject Set<StringSelectHandler> stringSelects;
 
     @Inject
@@ -46,6 +49,23 @@ public class MessageListener extends ListenerAdapter {
             return new ArrayList<>();
         }
         return commandData;
+    }
+
+    @Override
+    public void onButtonInteraction(@Nonnull ButtonInteractionEvent event) {
+        log.info("onButtonInteraction: {}", event.getButton().getId());
+        String id = event.getButton().getId();
+        Objects.requireNonNull(id);
+        String handlerName = id.split(":", 2)[0];
+
+        for (ButtonHandler buttonHandler : buttons) {
+            if (buttonHandler.getName().equals(handlerName)) {
+                buttonHandler.onButtonInteraction(event);
+                return;
+            }
+        }
+
+        log.error("Unknown button handler: {}", handlerName);
     }
 
     @Override

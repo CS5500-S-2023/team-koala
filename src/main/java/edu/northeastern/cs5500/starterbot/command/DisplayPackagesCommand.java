@@ -1,6 +1,5 @@
-package edu.northeastern.cs5500.starterbot.command.PackageCommands;
+package edu.northeastern.cs5500.starterbot.command;
 
-import edu.northeastern.cs5500.starterbot.command.SlashCommandHandler;
 import edu.northeastern.cs5500.starterbot.controller.PackageController;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import java.awt.Color;

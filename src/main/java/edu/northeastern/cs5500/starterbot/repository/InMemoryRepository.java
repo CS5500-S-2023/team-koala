@@ -7,10 +7,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import lombok.Generated;
 import org.bson.types.ObjectId;
 
-@Generated
 @Singleton
 public class InMemoryRepository<T extends Model> implements GenericRepository<T> {
 
