@@ -48,12 +48,12 @@ public class UpdatePackageCommand implements SlashCommandHandler {
                 .addOption(
                         OptionType.STRING,
                         "tracking_number",
-                        "The bot will record the name for the package",
+                        "The bot will record the tracking number for the package",
                         false)
                 .addOption(
                         OptionType.STRING,
                         "carrier_id",
-                        "The bot will record the name for the package",
+                        "The bot will record the carrier id for the package",
                         false);
     }
 
@@ -70,19 +70,13 @@ public class UpdatePackageCommand implements SlashCommandHandler {
         Package p = null;
         try {
             p = packageController.getPackage(packageId);
-        } catch (IllegalArgumentException e) {
-            event.reply("This is not a valid package id!").queue();
-        }
+            String name = event.getOption("package_name", OptionMapping::getAsString);
+            String trackingNumber = event.getOption("tracking_number", OptionMapping::getAsString);
+            String carrierId = event.getOption("carrier_id", OptionMapping::getAsString);
 
-        String name = event.getOption("package_name", OptionMapping::getAsString);
-        String trackingNumber = event.getOption("tracking_number", OptionMapping::getAsString);
-        String carrierId = event.getOption("carrier_id", OptionMapping::getAsString);
-
-        if (name == null) name = p.getName();
-        if (trackingNumber == null) trackingNumber = p.getTrackingNumber();
-        if (carrierId == null) carrierId = p.getCarrierId();
-
-        try {
+            if (name == null) name = p.getName();
+            if (trackingNumber == null) trackingNumber = p.getTrackingNumber();
+            if (carrierId == null) carrierId = p.getCarrierId();
             packageController.updatePackage(packageId, userId, name, trackingNumber, carrierId);
         } catch (NotYourPackageException e) {
             event.reply(e.getMessage()).queue();

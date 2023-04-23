@@ -47,16 +47,27 @@ public class PackageController {
     }
 
     public Package getPackage(String id) throws IllegalArgumentException {
-        ObjectId objectId = new ObjectId(id);
+        ObjectId objectId = null;
+        try {
+            objectId = new ObjectId(id);
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }
         return this.packageRepository.get(objectId);
     }
 
-    public boolean deletePackage(String id, String userId)
-            throws IllegalArgumentException, NotYourPackageException {
-        ObjectId objectId = new ObjectId(id);
-        Package p = packageRepository.get(objectId);
+    public boolean deletePackage(String id, String userId) throws IllegalArgumentException {
+        ObjectId objectId = null;
+        Package p = null;
+        try {
+            objectId = new ObjectId(id);
+            p = packageRepository.get(objectId);
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }
+
         if (!p.getUserId().equals(userId)) {
-            throw new NotYourPackageException("This is not your package");
+            return false;
         }
         packageRepository.delete(objectId);
         return true;
@@ -82,8 +93,16 @@ public class PackageController {
     public Package updatePackage(
             String id, String userId, String name, String trackingNumber, String carrierId)
             throws IllegalArgumentException, NotYourPackageException {
-        ObjectId objectId = new ObjectId(id);
-        Package p = packageRepository.get(objectId);
+
+        ObjectId objectId = null;
+        Package p = null;
+        try {
+            objectId = new ObjectId(id);
+            p = packageRepository.get(objectId);
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }
+
         if (!p.getUserId().equals(userId)) {
             throw new NotYourPackageException("This is not your package");
         }

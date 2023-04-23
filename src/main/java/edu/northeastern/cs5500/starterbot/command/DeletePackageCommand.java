@@ -1,7 +1,6 @@
 package edu.northeastern.cs5500.starterbot.command;
 
 import edu.northeastern.cs5500.starterbot.controller.PackageController;
-import edu.northeastern.cs5500.starterbot.exception.NotYourPackageException;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -53,9 +52,10 @@ public class DeletePackageCommand implements SlashCommandHandler {
         String packageId = packageIdOption.getAsString();
 
         try {
-            packageController.deletePackage(packageId, userId);
-        } catch (NotYourPackageException e) {
-            event.reply(e.getMessage()).queue();
+            boolean deleted = packageController.deletePackage(packageId, userId);
+            if (!deleted) {
+                event.reply("This is not your package to delete").queue();
+            }
         } catch (IllegalArgumentException e) {
             event.reply("This is not a valid package id!");
         }
