@@ -4,7 +4,6 @@ import edu.northeastern.cs5500.starterbot.command.SlashCommandHandler;
 import edu.northeastern.cs5500.starterbot.command.StringSelectHandler;
 import edu.northeastern.cs5500.starterbot.controller.PackageController;
 import edu.northeastern.cs5500.starterbot.model.Package;
-import edu.northeastern.cs5500.starterbot.service.TrackPackageService;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nonnull;
@@ -134,7 +133,7 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
         // create a package and receives success or error messages
         String created = packageController.createPackage(pkg);
         log.info("package creation : " + created);
- 
+
         if (created.equals(PackageController.SUCCESS)) {
             event.reply("Your package has been created successfully!").setEphemeral(true).queue();
         } else {

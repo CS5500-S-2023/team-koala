@@ -4,13 +4,12 @@ import dagger.Component;
 import edu.northeastern.cs5500.starterbot.command.CommandModule;
 import edu.northeastern.cs5500.starterbot.listener.MessageListener;
 import edu.northeastern.cs5500.starterbot.repository.RepositoryModule;
-import lombok.Generated;
-
 import java.util.Collection;
 import java.util.EnumSet;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import lombok.Generated;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -21,6 +20,7 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 interface BotComponent {
     public Bot bot();
 }
+
 @Generated
 public class Bot {
 
