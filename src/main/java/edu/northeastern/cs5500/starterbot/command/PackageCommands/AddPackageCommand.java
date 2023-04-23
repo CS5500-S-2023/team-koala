@@ -5,14 +5,12 @@ import edu.northeastern.cs5500.starterbot.command.StringSelectHandler;
 import edu.northeastern.cs5500.starterbot.controller.PackageController;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.service.TrackPackageService;
-
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -25,7 +23,7 @@ import net.dv8tion.jda.api.interactions.components.selections.*;
 @Slf4j
 public class AddPackageCommand implements SlashCommandHandler, StringSelectHandler {
 
-    @Inject PackageController packageController;    
+    @Inject PackageController packageController;
 
     @Inject
     public AddPackageCommand() {
@@ -97,16 +95,42 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
 
         // collect passed in data from previous step
         String[] paramArray = event.getValues().get(0).split("::");
+        Package builtPacakge = buildPackage(paramArray, event.getUser().getId());
+        if (Objects.equals(builtPacakge, null)) {
+            event.reply(
+                            String.format(
+                                    "%s %s",
+                                    PackageController.UNKNOWN_ERROR,
+                                    PackageController.TRY_AGAIN_MESSAGE))
+                    .queue();
+            return;
+        }
+
+        // create a package and receives success or error messages
+        String created = packageController.createPackage(builtPacakge);
+        log.info("package creation : {}", created);
+
+        if (created.equals(PackageController.SUCCESS)) {
+            event.reply("Your package has been created successfully!").setEphemeral(true).queue();
+        } else {
+            event.reply("Your package was not created successfuly because " + created)
+                    .setEphemeral(true)
+                    .queue();
+        }
+    }
+
+    private Package buildPackage(String[] paramArray, @Nonnull String userId) {
         String packageName = paramArray[0];
         String trackingNumber = paramArray[1];
         String carrierId = paramArray[2];
-        User user = event.getUser();
 
         // check null
         if (trackingNumber.isBlank() || carrierId.isBlank()) {
-            log.error("Mandatory fields are missing - trackingNumber: {}, carrierId: {}", trackingNumber, carrierId);
-            event.reply(
-                String.format("%s %s",PackageController.UNKNOWN_ERROR, PackageController.TRY_AGAIN_MESSAGE)).queue();
+            log.error(
+                    "Mandatory fields are missing - trackingNumber: {}, carrierId: {}",
+                    trackingNumber,
+                    carrierId);
+            return null;
         }
         if (packageName.isBlank()) {
             log.info("The package name is null");
@@ -117,21 +141,11 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
                 Package.builder()
                         .trackingNumber(trackingNumber)
                         .carrierId(carrierId)
-                        .userId(user.getId())
+                        .userId(userId)
                         .name(packageName)
                         .build();
         log.info(pkg.toString());
 
-        // create a package and receives success or error messages
-        String created = packageController.createPackage(pkg);
-        log.info("package creation : {}", created);
-
-        if (created.equals(PackageController.SUCCESS)) {
-            event.reply("Your package has been created successfully!").setEphemeral(true).queue();
-        } else {
-            event.reply("Your package was not created successfuly because " + created)
-                    .setEphemeral(true)
-                    .queue();
-        }
+        return pkg;
     }
 }

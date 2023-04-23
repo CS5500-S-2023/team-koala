@@ -27,10 +27,6 @@ import lombok.extern.slf4j.Slf4j;
 public class TrackPackageService implements Service {
 
     private static final String REALTIME_URL = "https://www.kd100.com/api/v1/tracking/realtime";
-    private static final String API_KEY =
-            new ProcessBuilder().environment().get("KEY_DELIVERY_API_KEY");
-    private static final String SECRET =
-            new ProcessBuilder().environment().get("KEY_DELIVERY_API_SECRET");
     private static final int CONNECT_TIMEOUT = 1000;
     private static final int READ_TIMEOUT = 5000;
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
@@ -52,11 +48,15 @@ public class TrackPackageService implements Service {
                     "Canada Post", "canada_post",
                     "Purolator", "purolator");
 
+    private String API_KEY;
+    private String SECRET;
     GenericRepository<Package> packageRepository;
 
     @Inject
     public TrackPackageService(GenericRepository<Package> packageRepository) {
         this.packageRepository = packageRepository;
+        this.API_KEY = new ProcessBuilder().environment().get("KEY_DELIVERY_API_KEY");
+        this.SECRET = new ProcessBuilder().environment().get("KEY_DELIVERY_API_SECRET");
     }
 
     /**
@@ -70,8 +70,10 @@ public class TrackPackageService implements Service {
         String carrier_id = package1.getCarrierId();
         String tracking_number = package1.getTrackingNumber();
 
-        String result = getData(REALTIME_URL, carrier_id, tracking_number, null);
-        log.info(String.format("getPackageLatestStatus for package {}: {} ", package1.getId(), result));
+        String result = getData(REALTIME_URL, carrier_id, tracking_number);
+        log.info(
+                String.format(
+                        "getPackageLatestStatus for package {}: {} ", package1.getId(), result));
 
         // read the delivery updates
         readDeliveryResponse(result, package1);
@@ -125,23 +127,17 @@ public class TrackPackageService implements Service {
     }
 
     /**
-     * Construct JSON strings and send post requests to a KeyDelivery API Create tracking API and
-     * Realtime tracking API both use this function
+     * Construct JSON strings and send post requests to a KeyDelivery API Realtime tracking
      *
      * @param carrier_id
      * @param tracking_number
-     * @param webhook_url
      * @return response from KeyDelivery
      */
-    private String getData(
-            String url, String carrier_id, String tracking_number, String webhook_url) {
+    private String getData(String url, String carrier_id, String tracking_number) {
 
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("carrier_id", carrier_id);
         jsonObject.addProperty("tracking_number", tracking_number);
-        if (webhook_url != null) {
-            jsonObject.addProperty("webhook_url", webhook_url);
-        }
         String param = jsonObject.toString();
         log.info("getData: json is constructed - " + param);
 

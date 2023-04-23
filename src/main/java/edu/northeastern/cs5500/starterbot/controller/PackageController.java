@@ -1,5 +1,6 @@
 package edu.northeastern.cs5500.starterbot.controller;
 
+import com.mongodb.MongoException;
 import edu.northeastern.cs5500.starterbot.exception.KeyDeliveryCallException;
 import edu.northeastern.cs5500.starterbot.exception.NotYourPackageException;
 import edu.northeastern.cs5500.starterbot.exception.PackageNotExsitException;
@@ -15,8 +16,6 @@ import javax.inject.Inject;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
-
-import com.mongodb.MongoException;
 
 /** PackageController is a class for operations on the package model */
 @Slf4j
@@ -34,7 +33,8 @@ public class PackageController {
     public static final String TRY_AGAIN_MESSAGE = "Please try again later.";
     public static final String PACKAGE_ALREADY_EXISTS_MESSAGE =
             "you have created this package in our database.";
-    public static final String MONGODB_ADD_PACKAGE_FAILED_MESSAGE = "it is unable to add package to MongoDB database";
+    public static final String MONGODB_ADD_PACKAGE_FAILED_MESSAGE =
+            "it is unable to add package to MongoDB database";
 
     /**
      * Public Constructor for injection
