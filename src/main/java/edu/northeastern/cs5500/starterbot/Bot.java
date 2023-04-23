@@ -9,6 +9,7 @@ import java.util.EnumSet;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import lombok.Generated;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -20,6 +21,7 @@ interface BotComponent {
     public Bot bot();
 }
 
+@Generated
 public class Bot {
 
     @Inject

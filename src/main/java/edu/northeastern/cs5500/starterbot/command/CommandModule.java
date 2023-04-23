@@ -3,15 +3,15 @@ package edu.northeastern.cs5500.starterbot.command;
 import dagger.Module;
 import dagger.Provides;
 import dagger.multibindings.IntoSet;
+import edu.northeastern.cs5500.starterbot.command.PackageCommands.AddPackageCommand;
+import edu.northeastern.cs5500.starterbot.command.PackageCommands.DeletePackageCommand;
+import edu.northeastern.cs5500.starterbot.command.PackageCommands.DisplayPackagesCommand;
+import edu.northeastern.cs5500.starterbot.command.PackageCommands.UpdatePackageCommand;
+import lombok.Generated;
 
+@Generated
 @Module
 public class CommandModule {
-
-    @Provides
-    @IntoSet
-    public SlashCommandHandler provideSayCommand(SayCommand sayCommand) {
-        return sayCommand;
-    }
 
     @Provides
     @IntoSet
@@ -49,38 +49,7 @@ public class CommandModule {
 
     @Provides
     @IntoSet
-    public SlashCommandHandler providePreferredNameCommand(
-            PreferredNameCommand preferredNameCommand) {
-        return preferredNameCommand;
-    }
-
-    @Provides
-    @IntoSet
     public SlashCommandHandler addReminderCommand(AddReminderCommand addReminderCommand) {
         return addReminderCommand;
-    }
-
-    @Provides
-    @IntoSet
-    public SlashCommandHandler provideButtonCommand(ButtonCommand buttonCommand) {
-        return buttonCommand;
-    }
-
-    @Provides
-    @IntoSet
-    public ButtonHandler provideButtonCommandClickHandler(ButtonCommand buttonCommand) {
-        return buttonCommand;
-    }
-
-    @Provides
-    @IntoSet
-    public SlashCommandHandler provideDropdownCommand(DropdownCommand dropdownCommand) {
-        return dropdownCommand;
-    }
-
-    @Provides
-    @IntoSet
-    public StringSelectHandler provideDropdownCommandMenuHandler(DropdownCommand dropdownCommand) {
-        return dropdownCommand;
     }
 }
