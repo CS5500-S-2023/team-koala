@@ -84,7 +84,7 @@ public class PackageController {
         }
 
         if (!p.getUserId().equals(userId)) {
-            throw new NotYourPackageException("This is not your package");
+            throw new NotYourPackageException("This is not your package!");
         }
         packageRepository.delete(objectId);
     }
