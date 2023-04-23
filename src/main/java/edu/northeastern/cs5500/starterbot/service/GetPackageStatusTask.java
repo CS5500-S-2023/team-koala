@@ -32,10 +32,7 @@ public class GetPackageStatusTask extends TimerTask {
         this.trackPackageService = trackPackageService;
     }
 
-    /**
-     * 1. Retreive all packages and decide numOfPackagesEachTask based on the total cnt 2. Schedule
-     * sub-tasks to retrieve packages' status and send updates to users at different hours of a day
-     */
+    /** Run method to retrieve all packages and assign to sub-tasks */
     @Override
     public void run() {
         Collection<Package> allPackages = trackPackageService.packageRepository.getAll();

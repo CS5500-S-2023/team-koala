@@ -49,13 +49,7 @@ public class GetPackageStatusSubTask extends TimerTask {
         this.trackPackageService = trackPackageService;
     }
 
-    /**
-     * Send the updated status of all packages in our database to users
-     *
-     * <p>1. Get all packages from the MongoDB database. 2. Get the latest status of packages via
-     * third-party API. 3. If the status of a package doesn't have updates, no update will be sent
-     * to the user. 4. Send a private message to users of packages about latest status.
-     */
+    /** Send the updated status of ranged packages to users */
     @Override
     public void run() {
         if (startIdx >= endIdx) {
@@ -82,8 +76,7 @@ public class GetPackageStatusSubTask extends TimerTask {
             // current status could be null
             if (Objects.equals(currStatus, latestStatus)) continue;
 
-            // Display package's name (if not set, display tracking number)
-            // and the latest status
+            // construct the message to sent
             String packageIdentifier =
                     Objects.equals(pkg.getName(), null) ? pkg.getTrackingNumber() : pkg.getName();
             String statusMessage =
