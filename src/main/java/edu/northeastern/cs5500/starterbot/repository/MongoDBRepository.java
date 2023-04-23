@@ -11,10 +11,8 @@ import java.util.Collection;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
-import lombok.Generated;
 import org.bson.types.ObjectId;
 
-@Generated
 public class MongoDBRepository<T extends Model> implements GenericRepository<T> {
 
     static final String MONGODB_ID_FIELD = "_id";
