@@ -22,7 +22,7 @@ public class PackageControllerTest {
 
     private Package package2 =
             Package.builder()
-                    .trackingNumber("1Z9A170W0337231976")
+                    .trackingNumber("1Z9X8Y670391444580")
                     .carrierId("ups")
                     .userId("user id")
                     .name("second package")
@@ -30,7 +30,7 @@ public class PackageControllerTest {
 
     private Package package3 =
             Package.builder()
-                    .trackingNumber("1Z9A170W0337231975")
+                    .trackingNumber("1Z9A170W0337231977")
                     .carrierId("fedex")
                     .userId("user id 2")
                     .name("third package")
