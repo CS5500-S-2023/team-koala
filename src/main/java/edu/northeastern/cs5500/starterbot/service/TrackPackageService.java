@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-
 import edu.northeastern.cs5500.starterbot.exception.KeyDeliveryCallException;
 import edu.northeastern.cs5500.starterbot.exception.PackageNotExsitException;
 import edu.northeastern.cs5500.starterbot.model.Package;
@@ -37,7 +36,7 @@ public class TrackPackageService implements Service {
     private static final int OK = 200;
     private static final int PACKAGE_NOT_EXIST = 60101;
 
-    GenericRepository<Package> packageRepository; 
+    GenericRepository<Package> packageRepository;
 
     @Inject
     public TrackPackageService(GenericRepository<Package> packageRepository) {
@@ -50,7 +49,8 @@ public class TrackPackageService implements Service {
      * @throws KeyDeliveryCallException
      * @throws PackageNotExsitException
      */
-    public void getPackageLatestStatus(Package package1) throws KeyDeliveryCallException, PackageNotExsitException {
+    public void getPackageLatestStatus(Package package1)
+            throws KeyDeliveryCallException, PackageNotExsitException {
         String carrier_id = package1.getCarrierId();
         String tracking_number = package1.getTrackingNumber();
 
@@ -59,19 +59,18 @@ public class TrackPackageService implements Service {
 
         // read the delivery updates
         readDeliveryResponse(result, package1);
-        
     }
 
     /**
      * Parse the response from KeyDelivery to get their delivery latest status, time and description
-     * 
+     *
      * @param result - the response from KeyDelivery
      * @param package1 - the provided package object
-     * 
      * @throws PackageNotExsitException
      * @throws KeyDeliveryCallException
      */
-    private void readDeliveryResponse(String result, Package package1) throws PackageNotExsitException, KeyDeliveryCallException {
+    private void readDeliveryResponse(String result, Package package1)
+            throws PackageNotExsitException, KeyDeliveryCallException {
         log.info("readDeliveryResponse: got the delivery status of {}", package1.getId());
 
         Gson gson = new GsonBuilder().setDateFormat(DATE_FORMAT).create();
@@ -81,11 +80,13 @@ public class TrackPackageService implements Service {
         String message = response.get("message").getAsString();
         if (code != OK) {
             if (code == PACKAGE_NOT_EXIST) {
-                log.error("readDeliveryResponse - error - {} : {}",PACKAGE_NOT_EXIST, message);
-                throw new PackageNotExsitException(String.format("Code: %s, Message: %s ", code, message));
+                log.error("readDeliveryResponse - error - {} : {}", PACKAGE_NOT_EXIST, message);
+                throw new PackageNotExsitException(
+                        String.format("Code: %s, Message: %s ", code, message));
             } else {
-                log.error("readDeliveryResponse - error - {} : {}",code, message);
-                throw new KeyDeliveryCallException(String.format("Code: %s, Message: %s ", code, message));
+                log.error("readDeliveryResponse - error - {} : {}", code, message);
+                throw new KeyDeliveryCallException(
+                        String.format("Code: %s, Message: %s ", code, message));
             }
         }
 

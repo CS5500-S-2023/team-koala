@@ -6,36 +6,36 @@ import edu.northeastern.cs5500.starterbot.exception.PackageNotExsitException;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import edu.northeastern.cs5500.starterbot.service.TrackPackageService;
-import lombok.SneakyThrows;
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 
-/**
- * PackageController is a class for operations on the package model
- */
+/** PackageController is a class for operations on the package model */
 @Slf4j
 public class PackageController {
 
-    GenericRepository<Package> packageRepository; 
+    GenericRepository<Package> packageRepository;
     TrackPackageService trackPackageService;
 
     public static final String SUCCESS = "success";
-    public static final String PACKAGE_NOT_FOUND_MESSAGE = "we cannot find a package with the provided carrier id and tracking number.";
-    public static final String THIRD_PARTY_API_FAILED_MESSAGE = "there is something wrong with connecting to the third-party api";
+    public static final String PACKAGE_NOT_FOUND_MESSAGE =
+            "we cannot find a package with the provided carrier id and tracking number.";
+    public static final String THIRD_PARTY_API_FAILED_MESSAGE =
+            "there is something wrong with connecting to the third-party api";
     public static final String UNKNOWN_ERROR = "there is something wrong.";
     public static final String TRY_AGAIN_MESSAGE = "Please try again later.";
-    private static final String PACKAGE_ALREADY_EXISTS_MESSAGE = "you have created this package in our database.";
+    private static final String PACKAGE_ALREADY_EXISTS_MESSAGE =
+            "you have created this package in our database.";
 
     /**
      * Public Constructor for injection
+     *
      * @param packageRepository - actually provided with MongoDBRepository
      */
     @Inject
@@ -47,7 +47,7 @@ public class PackageController {
 
     /**
      * Add package to database after validating the existence of the package via third-party api
-     * 
+     *
      * @param package1
      * @return string - SUCESS or Any other error message
      */
@@ -74,10 +74,10 @@ public class PackageController {
 
     /**
      * Find a package based on userId, carrierId, and trackingNumber
-     * 
+     *
      * @param package1
-     * @return null if this package is not created yet in our system;
-     *         a Package object if this package has been created.
+     * @return null if this package is not created yet in our system; a Package object if this
+     *     package has been created.
      */
     private Package getPackageByUserCarrirerAndTrackingNumber(Package package1) {
         log.info("getPackageByUserCarrirerAndTrackingNumber of package - {}", package1.getId());
@@ -87,10 +87,10 @@ public class PackageController {
         Collection<Package> allPackages = packageRepository.getAll();
 
         for (Package p : allPackages) {
-            if (p.getUserId().equals(userId) 
-                && p.getCarrierId().equals(carrierId) 
-                && p.getTrackingNumber().equals(trackingNumber) ) {
-                    return p;
+            if (p.getUserId().equals(userId)
+                    && p.getCarrierId().equals(carrierId)
+                    && p.getTrackingNumber().equals(trackingNumber)) {
+                return p;
             }
         }
 
@@ -99,7 +99,7 @@ public class PackageController {
 
     /**
      * Verify if a package is existent via calling third-party(KeyDelivery) API
-     * 
+     *
      * @param package1
      * @return string - SUCESS or Any other error message
      */
@@ -107,11 +107,11 @@ public class PackageController {
         try {
             getPackageLatestStatus(package1);
         } catch (PackageNotExsitException e) {
-            return String.format("%s %s",PACKAGE_NOT_FOUND_MESSAGE, TRY_AGAIN_MESSAGE);
+            return String.format("%s %s", PACKAGE_NOT_FOUND_MESSAGE, TRY_AGAIN_MESSAGE);
         } catch (KeyDeliveryCallException e) {
-            return String.format("%s %s",THIRD_PARTY_API_FAILED_MESSAGE, TRY_AGAIN_MESSAGE);
+            return String.format("%s %s", THIRD_PARTY_API_FAILED_MESSAGE, TRY_AGAIN_MESSAGE);
         } catch (Exception e) {
-            return String.format("%s %s",UNKNOWN_ERROR, TRY_AGAIN_MESSAGE);
+            return String.format("%s %s", UNKNOWN_ERROR, TRY_AGAIN_MESSAGE);
         }
 
         return SUCCESS;
@@ -126,7 +126,8 @@ public class PackageController {
      * @throws PackageNotExsitException
      * @throws KeyDeliveryCallException
      */
-    public void getPackageLatestStatus(Package package1) throws KeyDeliveryCallException, PackageNotExsitException {
+    public void getPackageLatestStatus(Package package1)
+            throws KeyDeliveryCallException, PackageNotExsitException {
         trackPackageService.getPackageLatestStatus(package1);
     }
 
@@ -188,7 +189,7 @@ public class PackageController {
             if (p.getUserId().equals(userId)) {
                 // TODO: whether to handle exception - All packages should be valid
                 getPackageLatestStatus(p);
-                
+
                 usersPackages.add(p);
             }
         }
@@ -229,6 +230,7 @@ public class PackageController {
         p.setTrackingNumber(trackingNumber);
         p.setCarrierId(carrierId);
 
+        // TODO: Check if updated package is still valid
 
         packageRepository.update(p);
         return p;

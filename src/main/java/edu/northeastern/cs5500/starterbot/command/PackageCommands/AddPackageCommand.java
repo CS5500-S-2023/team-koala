@@ -105,7 +105,7 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
     }
 
     @Override
-    public void onStringSelectInteraction(StringSelectInteractionEvent event) {
+    public void onStringSelectInteraction(@Nonnull StringSelectInteractionEvent event) {
         log.info("event: /add_package:StringSelectInteractionEvent - {}", event.getValues().get(0));
 
         // collect passed in data from previous step
