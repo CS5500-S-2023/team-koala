@@ -13,12 +13,6 @@ public class CommandModule {
 
     @Provides
     @IntoSet
-    public SlashCommandHandler provideSayCommand(SayCommand sayCommand) {
-        return sayCommand;
-    }
-
-    @Provides
-    @IntoSet
     public SlashCommandHandler provideAddPackageCommand(AddPackageCommand addPackageCommand) {
         return addPackageCommand;
     }
@@ -53,38 +47,7 @@ public class CommandModule {
 
     @Provides
     @IntoSet
-    public SlashCommandHandler providePreferredNameCommand(
-            PreferredNameCommand preferredNameCommand) {
-        return preferredNameCommand;
-    }
-
-    @Provides
-    @IntoSet
     public SlashCommandHandler addReminderCommand(AddReminderCommand addReminderCommand) {
         return addReminderCommand;
-    }
-
-    @Provides
-    @IntoSet
-    public SlashCommandHandler provideButtonCommand(ButtonCommand buttonCommand) {
-        return buttonCommand;
-    }
-
-    @Provides
-    @IntoSet
-    public ButtonHandler provideButtonCommandClickHandler(ButtonCommand buttonCommand) {
-        return buttonCommand;
-    }
-
-    @Provides
-    @IntoSet
-    public SlashCommandHandler provideDropdownCommand(DropdownCommand dropdownCommand) {
-        return dropdownCommand;
-    }
-
-    @Provides
-    @IntoSet
-    public StringSelectHandler provideDropdownCommandMenuHandler(DropdownCommand dropdownCommand) {
-        return dropdownCommand;
     }
 }
