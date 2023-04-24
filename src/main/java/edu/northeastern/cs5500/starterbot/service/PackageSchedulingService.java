@@ -12,6 +12,7 @@ public class PackageSchedulingService implements Service {
 
     // Delay in milliseconds that allows the task to be initialized after the bot is fully started
     public static final long START_DELAY = TimeUnit.MINUTES.toMillis(1);
+    public static final long DAY_INTERVAL_MILLISECONDS = TimeUnit.DAYS.toMillis(1);
 
     @Inject JDA jda;
     @Inject TrackPackageService trackPackageService;
@@ -27,11 +28,10 @@ public class PackageSchedulingService implements Service {
     public void scheduleTask() {
         Timer timer = new Timer();
 
-        long dayIntervalInMilliseconds = TimeUnit.DAYS.toMillis(1);
         timer.schedule(
                 new GetPackageStatusTask(jda, trackPackageService),
                 START_DELAY,
-                dayIntervalInMilliseconds);
+                DAY_INTERVAL_MILLISECONDS);
     }
 
     @Override

@@ -17,6 +17,7 @@ import net.dv8tion.jda.api.JDA;
 public class GetPackageStatusTask extends TimerTask {
 
     public static final int TASK_FREQUENCEY = 24;
+    public static final long HOUR_INTERVAL_MILLISECONDS = TimeUnit.HOURS.toMillis(1);
 
     JDA jda;
     TrackPackageService trackPackageService;
@@ -36,13 +37,9 @@ public class GetPackageStatusTask extends TimerTask {
     @Override
     public void run() {
         Collection<Package> allPackages = trackPackageService.packageRepository.getAll();
-        // The collection of packages needs to be accessed by index later so it is converted to
-        // array first and there will be no write operation on this array
         Package[] packageArray = allPackages.toArray(new Package[0]);
 
-        // Calculate the number of packages each task should iterate over
-        long hourIntervalInMilliseconds = TimeUnit.HOURS.toMillis(1);
-        int numOfPackagesEachTask = (int) Math.ceil(allPackages.size() * 1.0 / TASK_FREQUENCEY);
+        int numOfPackagesEachTask = calculateNumEachTask(allPackages.size());
 
         Date currTime = new Date();
         log.info("Starting daily package status retrieval task at {}", currTime);
@@ -51,6 +48,7 @@ public class GetPackageStatusTask extends TimerTask {
         Timer timer = new Timer();
         for (int i = 0; i < TASK_FREQUENCEY; i++) {
             int endIdx = (i + 1) * numOfPackagesEachTask;
+
             if (endIdx > allPackages.size()) {
                 endIdx = allPackages.size();
             }
@@ -65,7 +63,12 @@ public class GetPackageStatusTask extends TimerTask {
                             i);
 
             // Fixed delay time for each task to execute at different time
-            timer.schedule(task, i * hourIntervalInMilliseconds);
+            timer.schedule(task, i * HOUR_INTERVAL_MILLISECONDS);
         }
+    }
+
+    private int calculateNumEachTask(int size) {
+        // Calculate the number of packages each task should iterate over
+        return (int) Math.ceil(size * 1.0 / TASK_FREQUENCEY);
     }
 }

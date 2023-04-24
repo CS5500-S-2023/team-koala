@@ -56,7 +56,7 @@ public class GetPackageStatusSubTask extends TimerTask {
             log.info("No more packages for task {} with start index {}", taskId, startIdx);
             return;
         }
-        // retrieve all packages from the database
+        // Store packages and their status update message
         Map<String, StringBuilder> packageStatusMessages = new HashMap<>();
 
         Date currTime = new Date();
@@ -66,23 +66,13 @@ public class GetPackageStatusSubTask extends TimerTask {
                 endIdx,
                 taskId,
                 currTime);
-        // get their status and compare with the existing status
+        
+        // Get package status and compare with the existing status
         for (int i = startIdx; i < endIdx; i++) {
             Package pkg = allPackages[i];
-            String currStatus = pkg.getStatus();
-            trackPackageService.getPackageLatestStatus(pkg);
-            String latestStatus = pkg.getStatus();
-
-            // current status could be null
-            if (Objects.equals(currStatus, latestStatus)) continue;
-
-            // construct the message to sent
-            String packageIdentifier =
-                    Objects.equals(pkg.getName(), null) ? pkg.getTrackingNumber() : pkg.getName();
-            String statusMessage =
-                    String.format(
-                            "The latest status for your package %s is %s",
-                            packageIdentifier, pkg.getStatus());
+            
+            String statusMessage = constructMessage(pkg);
+            if (statusMessage == null) continue;
 
             packageStatusMessages.putIfAbsent(pkg.getUserId(), new StringBuilder());
             packageStatusMessages.get(pkg.getUserId()).append(statusMessage + "\n");
@@ -92,6 +82,33 @@ public class GetPackageStatusSubTask extends TimerTask {
         for (Entry<String, StringBuilder> entry : packageStatusMessages.entrySet()) {
             sendMessage(entry.getKey(), entry.getValue().toString());
         }
+    }
+
+    /**
+     * Contruct a message of updated status for this package
+     * 
+     * @param pkg
+     * @return null if no updates; a message string if having updates
+     */
+    private String constructMessage(Package pkg) {
+        String currStatus = pkg.getStatus();
+        trackPackageService.getPackageLatestStatus(pkg);
+        String latestStatus = pkg.getStatus();
+
+        // current status could be null
+        if (Objects.equals(currStatus, latestStatus)) {
+            return null;
+        }
+
+        // construct the message to sent
+        String packageIdentifier =
+                Objects.equals(pkg.getName(), null) ? pkg.getTrackingNumber() : pkg.getName();
+        
+        return 
+                String.format(
+                        "The latest status for your package %s is %s",
+                        packageIdentifier, pkg.getStatus());
+
     }
 
     /**
