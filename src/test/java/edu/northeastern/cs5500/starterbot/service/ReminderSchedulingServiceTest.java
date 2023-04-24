@@ -23,6 +23,7 @@ public class ReminderSchedulingServiceTest {
     static final LocalTime REMINDER_TIME = LocalTime.of(14, 00);
     static final LocalDateTime NEXT_REMINDER_TIME = LocalDateTime.of(2023, 04, 17, 1, 0, 0);
     static final TimeUnit REPEAT_TIME_UNIT = TimeUnit.MINUTES;
+    static final String TIME_ZONE = "America/Los_Angeles";
     private ZonedDateTime now;
     ReminderSchedulingService reminderSchedulingService;
 
@@ -33,21 +34,24 @@ public class ReminderSchedulingServiceTest {
     }
 
     @Test
-    void testInitializeReminders() throws UnableToAddReminderException {
+    void testInitNextReminderTime() throws UnableToAddReminderException {
         ReminderEntryController testController =
                 new ReminderEntryController(new InMemoryRepository<>());
         ReminderEntry testEntry =
-                testController.addReminder(
-                        DISCORD_USER_ID,
-                        TITLE,
-                        REMINDER_TIME,
-                        NEXT_REMINDER_TIME,
-                        REMINDER_OFFSET,
-                        REPEAT_INTERVAL,
-                        REPEAT_TIME_UNIT);
+                ReminderEntry.builder()
+                        .discordUserId(DISCORD_USER_ID)
+                        .title(TITLE)
+                        .reminderTime(REMINDER_TIME)
+                        .reminderOffset(REMINDER_OFFSET)
+                        .nextReminderTime(NEXT_REMINDER_TIME)
+                        .repeatInterval(REPEAT_INTERVAL)
+                        .repeatTimeUnit(REPEAT_TIME_UNIT)
+                        .timeZone(TIME_ZONE)
+                        .build();
+        testEntry = testController.addReminder(testEntry);
         String reminderId = testEntry.getId().toString();
         reminderSchedulingService = new ReminderSchedulingService(testController, null);
-        reminderSchedulingService.initializeReminders(now);
+        reminderSchedulingService.initNextReminderTime(testEntry, now);
         ReminderEntry updatedEntry = testController.getReminder(reminderId);
         LocalDateTime updatedTime = updatedEntry.getNextReminderTime();
         assertThat(updatedTime.getDayOfMonth()).isEqualTo(18);

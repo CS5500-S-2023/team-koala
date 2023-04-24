@@ -13,32 +13,41 @@ class AddReminderCommandTest {
 
     static final List<OptionData> OPTIONS =
             Arrays.asList(
-                    new OptionData(OptionType.STRING, "title", "Title of the event")
+                    new OptionData(
+                                    OptionType.STRING,
+                                    "time-zone",
+                                    "time zone of your reminder",
+                                    true)
+                            .addChoices(AddReminderCommand.TIME_ZONE_CHOICES),
+                    new OptionData(
+                                    OptionType.STRING,
+                                    "title",
+                                    "title of the event to be reminded of")
                             .setRequired(true),
                     new OptionData(
                             OptionType.STRING,
                             "reminder-time",
-                            "Start time of the event to be reminded of",
+                            "when the reminded event start (hh:mm 24 hour clock format, 2 digit for hour and minute each)",
                             true),
                     new OptionData(
                             OptionType.INTEGER,
-                            "delay",
-                            "how many days later the first reminder should start",
+                            "reminder-offset",
+                            "how much earlier do you want us to remind you (in minutes, default: 10)",
                             false),
                     new OptionData(
                             OptionType.INTEGER,
-                            "reminder-offset",
-                            "how much earlier the user want to be reminded of some event",
+                            "delay",
+                            "how many days later do you expect the first reminder (default: 0)",
                             false),
                     new OptionData(
                             OptionType.INTEGER,
                             "repeat-interval",
-                            "Interval between 2 reminders if user wants repeated reminders",
+                            "interval between 2 reminder messages (defaults to null = reminder does not repeat)",
                             false),
                     new OptionData(
                             OptionType.STRING,
                             "interval-unit",
-                            "Time unit of the repeat interval",
+                            "time unit of the repeat interval (defaults to null = reminder does not repeat)",
                             false));
 
     @Test
@@ -49,7 +58,7 @@ class AddReminderCommandTest {
 
         assertThat(name).isEqualTo(commandData.getName());
         List<OptionData> options = commandData.getOptions();
-        assertThat(options.size()).isEqualTo(6);
+        assertThat(options.size()).isEqualTo(7);
 
         for (int i = 0; i < options.size(); i++) {
             assertThat(options.get(i).getName().equals(OPTIONS.get(i).getName()));

@@ -7,7 +7,6 @@ import edu.northeastern.cs5500.starterbot.exception.UnableToAddReminderException
 import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
@@ -63,25 +62,19 @@ public class ReminderEntryController {
      * @param unit - the time unit of the repeat interval
      * @return ReminderEntry - the saved ReminderEntry.
      */
-    public ReminderEntry addReminder(
-            String discordUserId,
-            String title,
-            LocalTime reminderTime,
-            LocalDateTime firstReminderTime,
-            Integer offset,
-            Integer interval,
-            TimeUnit unit)
+    public ReminderEntry addReminder(ReminderEntry reminderEntry)
             throws UnableToAddReminderException {
-        ReminderEntry reminderEntry =
-                ReminderEntry.builder()
-                        .discordUserId(discordUserId)
-                        .title(title)
-                        .reminderTime(reminderTime)
-                        .nextReminderTime(firstReminderTime)
-                        .reminderOffset(offset)
-                        .repeatInterval(interval)
-                        .repeatTimeUnit(unit)
-                        .build();
+        // ReminderEntry reminderEntry =
+        //         ReminderEntry.builder()
+        //                 .discordUserId(discordUserId)
+        //                 .title(title)
+        //                 .reminderTime(reminderTime)
+        //                 .nextReminderTime(firstReminderTime)
+        //                 .reminderOffset(offset)
+        //                 .timeZone(timeZone)
+        //                 .repeatInterval(interval)
+        //                 .repeatTimeUnit(unit)
+        //                 .build();
         try {
             return reminderEntryRepository.add(reminderEntry);
         } catch (MongoException me) {

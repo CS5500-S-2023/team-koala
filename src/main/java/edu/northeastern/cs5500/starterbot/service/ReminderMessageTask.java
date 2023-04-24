@@ -55,15 +55,16 @@ public class ReminderMessageTask implements Runnable {
             reminderEntryController.deleteReminder(reminderId);
         } else {
             // otherwise update the nextReminderTime
+            String timeZone = retrivedEntry.getTimeZone();
             ZonedDateTime lastReminderTime =
-                    retrivedEntry
-                            .getNextReminderTime()
-                            .atZone(ZoneId.of(ReminderSchedulingService.TIME_ZONE));
+                    retrivedEntry.getNextReminderTime().atZone(ZoneId.of(timeZone));
+            ZonedDateTime now = ZonedDateTime.now(ZoneId.of(timeZone));
             LocalDateTime newNextReminderTime =
-                    ReminderSchedulingService.plusInterval(
+                    ReminderSchedulingService.getNextReminderTime(
                                     lastReminderTime,
                                     retrivedEntry.getRepeatTimeUnit(),
-                                    retrivedEntry.getRepeatInterval())
+                                    retrivedEntry.getRepeatInterval(),
+                                    now)
                             .toLocalDateTime();
             try {
                 reminderEntryController.updateNextReminderTime(reminderId, newNextReminderTime);
