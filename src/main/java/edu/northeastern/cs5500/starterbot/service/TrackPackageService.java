@@ -1,5 +1,6 @@
 package edu.northeastern.cs5500.starterbot.service;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -87,7 +88,8 @@ public class TrackPackageService implements Service {
      * @throws PackageNotExsitException
      * @throws KeyDeliveryCallException
      */
-    protected void readDeliveryResponse(String result, Package package1)
+    @VisibleForTesting
+    void readDeliveryResponse(String result, Package package1)
             throws PackageNotExsitException, KeyDeliveryCallException {
         log.info("readDeliveryResponse: got the delivery status of {}", package1.getId());
 

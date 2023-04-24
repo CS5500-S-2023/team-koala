@@ -2,6 +2,7 @@ package edu.northeastern.cs5500.starterbot.command.PackageCommands;
 
 import edu.northeastern.cs5500.starterbot.command.SlashCommandHandler;
 import edu.northeastern.cs5500.starterbot.command.StringSelectHandler;
+import com.google.common.annotations.VisibleForTesting;
 import edu.northeastern.cs5500.starterbot.controller.PackageController;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.service.TrackPackageService;
@@ -126,7 +127,8 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
      * @param userId
      * @return a built package object
      */
-    protected Package buildPackage(String param, @Nonnull String userId) {
+    @VisibleForTesting
+    Package buildPackage(String param, @Nonnull String userId) {
         String[] paramArray = param.split("::");
         int size = paramArray.length;
         String packageName = size >= 1 ? paramArray[0] : "";
