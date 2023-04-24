@@ -57,7 +57,9 @@ public class AddReminderCommand implements SlashCommandHandler {
     }
 
     @Inject
-    public AddReminderCommand() {}
+    public AddReminderCommand() {
+        // empty as everything is injected
+    }
 
     /**
      * Returns the name of the command.
@@ -182,12 +184,11 @@ public class AddReminderCommand implements SlashCommandHandler {
                         .repeatInterval(interval)
                         .repeatTimeUnit(unit)
                         .build();
-        ;
         try {
             savedEntry = reminderEntryController.addReminder(savedEntry);
             scheduleMessage(savedEntry);
         } catch (UnableToAddReminderException | RejectedExecutionException e) {
-            if (savedEntry != null) {
+            if (savedEntry.getId() != null) {
                 reminderEntryController.deleteReminder(savedEntry.getId().toString());
             }
             event.reply("Sorry! Something went wrong when saving your reminder, please try again.")
@@ -228,6 +229,8 @@ public class AddReminderCommand implements SlashCommandHandler {
      * Schedule the reminder message to start at the nextReminderTime specified in entry
      *
      * @param entry - the entry to schedule reminder messages for.
+     * @throws RejectedExecutionException - when ScheduledExecutorService is not able to schedule
+     *     the message.
      */
     private void scheduleMessage(ReminderEntry entry) throws RejectedExecutionException {
         String reminderId = entry.getId().toString();

@@ -72,6 +72,13 @@ public class ReminderSchedulingService implements Service {
         }
     }
 
+    /**
+     * Initiates / updates next reminder time for existing reminders upon bot restart.
+     *
+     * @param reminder - the reminder to update.
+     * @param now - time of execution.
+     * @return long - return the initial delay until the first reminder message.
+     */
     public long initNextReminderTime(ReminderEntry reminder, ZonedDateTime now) {
         ZonedDateTime lastReminderTime =
                 reminder.getNextReminderTime().atZone(ZoneId.of(reminder.getTimeZone()));
@@ -103,6 +110,8 @@ public class ReminderSchedulingService implements Service {
      * @param unit - the time unit of the repeat interval of the task.
      * @param repeatInterval - interval between two reminder messages if the reminder repeats, its
      *     unit being the unit above.
+     * @throws RejectedExecutionException - thrown by ScheduledExecutorService when the task cannot
+     *     be scheduled.
      */
     public static void scheduleTask(
             Runnable messageTask, long initialDelay, TimeUnit unit, Integer repeatInterval)

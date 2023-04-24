@@ -61,20 +61,10 @@ public class ReminderEntryController {
      * @param interval - the interval between 2 reminder messages if reminder repeats
      * @param unit - the time unit of the repeat interval
      * @return ReminderEntry - the saved ReminderEntry.
+     * @throws UnableToAddReminderException - when MongoDB fails to save reminder data.
      */
     public ReminderEntry addReminder(ReminderEntry reminderEntry)
             throws UnableToAddReminderException {
-        // ReminderEntry reminderEntry =
-        //         ReminderEntry.builder()
-        //                 .discordUserId(discordUserId)
-        //                 .title(title)
-        //                 .reminderTime(reminderTime)
-        //                 .nextReminderTime(firstReminderTime)
-        //                 .reminderOffset(offset)
-        //                 .timeZone(timeZone)
-        //                 .repeatInterval(interval)
-        //                 .repeatTimeUnit(unit)
-        //                 .build();
         try {
             return reminderEntryRepository.add(reminderEntry);
         } catch (MongoException me) {
@@ -110,6 +100,7 @@ public class ReminderEntryController {
      *
      * @param reminderId - the id of the reminder to be found.
      * @return ReminderEntry - the reminder with reminderId or null if it doesn't exist
+     * @throws IllegalArgumentException - when reminderId is malformed.
      */
     public ReminderEntry getReminder(String reminderId) throws IllegalArgumentException {
         return reminderEntryRepository.get(new ObjectId(reminderId));
@@ -119,6 +110,7 @@ public class ReminderEntryController {
      * Deletes reminder with reminderId from database.
      *
      * @param reminderId - the id of the reminder to be deleted.
+     * @throws IllegalArgumentException - when reminderId is malformed.
      */
     public void deleteReminder(String reminderId) throws IllegalArgumentException {
         ObjectId id = new ObjectId(reminderId);
@@ -130,6 +122,8 @@ public class ReminderEntryController {
      *
      * @param reminderId - the id of the reminder to be updated.
      * @param nextReminderTime - the new nextReminderTime for the reminder.
+     * @throws IllegalArgumentException - when reminderId is malformed.
+     * @throws ReminderNotFoundException - when reminder with reminderId does not exist.
      */
     public void updateNextReminderTime(String reminderId, LocalDateTime nextReminderTime)
             throws IllegalArgumentException, ReminderNotFoundException {

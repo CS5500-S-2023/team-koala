@@ -29,7 +29,7 @@ public class ReminderSchedulingServiceTest {
 
     @BeforeEach
     void beforeEach() {
-        now = ZonedDateTime.now(ZoneId.of("America/Los_Angeles"));
+        now = ZonedDateTime.now(ZoneId.of(TIME_ZONE));
         now = now.withYear(2023).withMonth(4).withDayOfMonth(18).withHour(1).withMinute(0);
     }
 
