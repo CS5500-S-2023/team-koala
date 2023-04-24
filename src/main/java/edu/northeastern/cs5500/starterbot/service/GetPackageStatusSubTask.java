@@ -1,5 +1,6 @@
 package edu.northeastern.cs5500.starterbot.service;
 
+import com.google.common.annotations.VisibleForTesting;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import java.util.Date;
 import java.util.HashMap;
@@ -66,11 +67,11 @@ public class GetPackageStatusSubTask extends TimerTask {
                 endIdx,
                 taskId,
                 currTime);
-        
+
         // Get package status and compare with the existing status
         for (int i = startIdx; i < endIdx; i++) {
             Package pkg = allPackages[i];
-            
+
             String statusMessage = constructMessage(pkg);
             if (statusMessage == null) continue;
 
@@ -86,10 +87,11 @@ public class GetPackageStatusSubTask extends TimerTask {
 
     /**
      * Contruct a message of updated status for this package
-     * 
+     *
      * @param pkg
      * @return null if no updates; a message string if having updates
      */
+    @VisibleForTesting
     private String constructMessage(Package pkg) {
         String currStatus = pkg.getStatus();
         trackPackageService.getPackageLatestStatus(pkg);
@@ -103,12 +105,9 @@ public class GetPackageStatusSubTask extends TimerTask {
         // construct the message to sent
         String packageIdentifier =
                 Objects.equals(pkg.getName(), null) ? pkg.getTrackingNumber() : pkg.getName();
-        
-        return 
-                String.format(
-                        "The latest status for your package %s is %s",
-                        packageIdentifier, pkg.getStatus());
 
+        return String.format(
+                "The latest status for your package %s is %s", packageIdentifier, pkg.getStatus());
     }
 
     /**
