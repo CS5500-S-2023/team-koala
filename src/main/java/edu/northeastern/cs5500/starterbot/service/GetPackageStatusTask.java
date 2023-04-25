@@ -17,7 +17,7 @@ import net.dv8tion.jda.api.JDA;
 @Slf4j
 public class GetPackageStatusTask extends TimerTask {
 
-    public static final int TASK_FREQUENCEY = 24;
+    public static final int TASK_FREQUENCEY = 12;
     public static final long HOUR_INTERVAL_MILLISECONDS = TimeUnit.HOURS.toMillis(1);
 
     JDA jda;

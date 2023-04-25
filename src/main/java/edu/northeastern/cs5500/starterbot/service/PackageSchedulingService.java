@@ -1,5 +1,9 @@
 package edu.northeastern.cs5500.starterbot.service;
 
+import com.google.common.annotations.VisibleForTesting;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
@@ -10,8 +14,7 @@ import net.dv8tion.jda.api.JDA;
 /** PackageSchedulingService is in charge of schedule tasks to send package updates to users */
 public class PackageSchedulingService implements Service {
 
-    // Delay in milliseconds that allows the task to be initialized after the bot is fully started
-    public static final long START_DELAY = TimeUnit.MINUTES.toMillis(1);
+    public static final int STARTING_HOUR = 8; // 24-hour clock
     public static final long DAY_INTERVAL_MILLISECONDS = TimeUnit.DAYS.toMillis(1);
 
     @Inject JDA jda;
@@ -30,8 +33,36 @@ public class PackageSchedulingService implements Service {
 
         timer.schedule(
                 new GetPackageStatusTask(jda, trackPackageService),
-                START_DELAY,
+                getFirstStartTime(),
                 DAY_INTERVAL_MILLISECONDS);
+    }
+
+    /**
+     * Set the task start time at {@value #STARTING_HOUR} in 24-hour clock;
+     *
+     * <p>If current time(hh:mm:ss) has past {@value #STARTING_HOUR}, the start time is set to next
+     * day
+     *
+     * @return Date - first start time for the daily task
+     */
+    @VisibleForTesting
+    Date getFirstStartTime() {
+
+        TimeZone time_zone = TimeZone.getTimeZone("PST");
+        Calendar targetTime = Calendar.getInstance(time_zone);
+
+        targetTime.set(Calendar.HOUR_OF_DAY, STARTING_HOUR);
+        targetTime.set(Calendar.MINUTE, 0);
+        targetTime.set(Calendar.SECOND, 0);
+
+        Calendar currTime = Calendar.getInstance(time_zone);
+        // if current time has past the set start time, execute next day
+        if (currTime.after(targetTime)) {
+            targetTime.set(Calendar.DAY_OF_YEAR, currTime.get(Calendar.DAY_OF_YEAR) + 1);
+        }
+
+        log.info("Daily task startst at: {}", targetTime.getTime());
+        return targetTime.getTime();
     }
 
     @Override
