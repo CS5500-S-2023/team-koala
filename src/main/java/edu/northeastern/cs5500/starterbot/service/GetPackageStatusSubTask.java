@@ -92,7 +92,7 @@ public class GetPackageStatusSubTask extends TimerTask {
      * @return null if no updates; a message string if having updates
      */
     @VisibleForTesting
-    private String constructMessage(Package pkg) {
+    String constructMessage(Package pkg) {
         String currStatus = pkg.getStatus();
         trackPackageService.getPackageLatestStatus(pkg);
         String latestStatus = pkg.getStatus();
