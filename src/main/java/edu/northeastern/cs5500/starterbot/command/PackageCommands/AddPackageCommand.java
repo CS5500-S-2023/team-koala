@@ -107,7 +107,15 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
         }
 
         // create a package and receives success or error messages
-        String created = packageController.createPackage(builtPacakge);
+        String created = "";
+        try {
+            created = packageController.createPackage(builtPacakge);
+        } catch (Exception e) {
+            event.reply(String.format("%s %s", PackageController.UNKNOWN_ERROR, PackageController.TRY_AGAIN_MESSAGE))
+                    .queue();
+            return;
+        }
+        
         log.info("package creation : {}", created);
 
         if (created.equals(PackageController.SUCCESS)) {

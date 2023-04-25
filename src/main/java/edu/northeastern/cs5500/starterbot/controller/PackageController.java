@@ -73,7 +73,7 @@ public class PackageController {
             packageRepository.add(package1);
         } catch (MongoException e) {
             log.error("{} because {}", MONGODB_ADD_PACKAGE_FAILED_MESSAGE, e.getMessage());
-            return MONGODB_ADD_PACKAGE_FAILED_MESSAGE;
+            throw e;
         }
 
         return SUCCESS;
