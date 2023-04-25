@@ -1,8 +1,8 @@
 package edu.northeastern.cs5500.starterbot.command.PackageCommands;
 
+import com.google.common.annotations.VisibleForTesting;
 import edu.northeastern.cs5500.starterbot.command.SlashCommandHandler;
 import edu.northeastern.cs5500.starterbot.command.StringSelectHandler;
-import com.google.common.annotations.VisibleForTesting;
 import edu.northeastern.cs5500.starterbot.controller.PackageController;
 import edu.northeastern.cs5500.starterbot.exception.MissingMandatoryFieldsException;
 import edu.northeastern.cs5500.starterbot.model.Package;
