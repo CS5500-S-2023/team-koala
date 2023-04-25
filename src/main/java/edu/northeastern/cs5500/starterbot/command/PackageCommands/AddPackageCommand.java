@@ -4,6 +4,7 @@ import edu.northeastern.cs5500.starterbot.command.SlashCommandHandler;
 import edu.northeastern.cs5500.starterbot.command.StringSelectHandler;
 import com.google.common.annotations.VisibleForTesting;
 import edu.northeastern.cs5500.starterbot.controller.PackageController;
+import edu.northeastern.cs5500.starterbot.exception.MissingMandatoryFieldsException;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.service.TrackPackageService;
 import java.util.Map;
@@ -96,16 +97,18 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
 
         // collect passed in data from previous step
         String params = event.getValues().get(0);
-        Package builtPacakge = buildPackage(params, event.getUser().getId());
-        if (Objects.equals(builtPacakge, null)) {
-            event.reply(
-                            String.format(
+        Package builtPacakge = new Package();
+        try {
+            builtPacakge = buildPackage(params, event.getUser().getId());
+        } catch (MissingMandatoryFieldsException e) {
+            event.reply(String.format(
                                     "%s %s",
-                                    PackageController.UNKNOWN_ERROR,
+                                    e.getMessage(),
                                     PackageController.TRY_AGAIN_MESSAGE))
                     .queue();
             return;
         }
+        
 
         // create a package and receives success or error messages
         String created = packageController.createPackage(builtPacakge);
@@ -126,9 +129,10 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
      * @param paramArray - extracted from event
      * @param userId
      * @return a built package object
+     * @throws MissingMandatoryFieldsException
      */
     @VisibleForTesting
-    Package buildPackage(String param, @Nonnull String userId) {
+    Package buildPackage(String param, @Nonnull String userId) throws MissingMandatoryFieldsException {
         String[] paramArray = param.split("::");
         int size = paramArray.length;
         String packageName = size >= 1 ? paramArray[0] : "";
@@ -141,7 +145,7 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
                     "Mandatory fields are missing - trackingNumber: {}, carrierId: {}",
                     trackingNumber,
                     carrierId);
-            return null;
+            throw new MissingMandatoryFieldsException(String.format("trackingNumber: %s, carrierId: %s", trackingNumber, carrierId));
         }
         if (packageName.isBlank()) {
             log.info("The package name is null");

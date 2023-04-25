@@ -19,6 +19,13 @@ public class TrackPackageServiceTest {
                     .trackingNumber("1Z9A170W0337231977")
                     .userId("user id")
                     .build();
+    // Invalid tracking number and carrier id
+    final Package package2 =
+            Package.builder()
+                    .carrierId("fedex")
+                    .trackingNumber("1Z9A170W0337231978")
+                    .userId("user id")
+                    .build();
     TrackPackageService trackPackageService;
 
     TrackPackageServiceTest() {
@@ -35,17 +42,17 @@ public class TrackPackageServiceTest {
     @Test
     void testReadDeliveryResponsePackgeNotExist() {
         assertThrows(
-                "",
+                "PACKAGE_NOT_FOUND",
                 PackageNotExsitException.class,
                 () -> {
-                    trackPackageService.readDeliveryResponse(PACKAGE_NOT_FOUND_RESULT, package1);
+                    trackPackageService.readDeliveryResponse(PACKAGE_NOT_FOUND_RESULT, package2);
                 });
     }
 
     @Test
     void testReadDeliveryResponseOtherKeyDeliveryError() {
         assertThrows(
-                "",
+                "KEYDELIVERY_ERROR",
                 KeyDeliveryCallException.class,
                 () -> {
                     trackPackageService.readDeliveryResponse(KEYDELIVERY_ERROR_RESULT, package1);

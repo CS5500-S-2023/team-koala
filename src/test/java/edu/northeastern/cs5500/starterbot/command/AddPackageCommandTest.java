@@ -3,7 +3,12 @@ package edu.northeastern.cs5500.starterbot.command;
 import static com.google.common.truth.Truth.assertThat;
 
 import com.google.common.base.Objects;
+
+import edu.northeastern.cs5500.starterbot.exception.MissingMandatoryFieldsException;
 import edu.northeastern.cs5500.starterbot.model.Package;
+
+import static org.junit.Assert.assertThrows;
+
 import org.junit.jupiter.api.Test;
 
 public class AddPackageCommandTest {
@@ -24,7 +29,7 @@ public class AddPackageCommandTest {
     }
 
     @Test
-    void testBuildPackageAllValidValues() {
+    void testBuildPackageAllValidValues() throws MissingMandatoryFieldsException {
         Package returnedVal = this.addPackageCommand.buildPackage(valid_paramArray, userId);
         Package expectedVal =
                 Package.builder()
@@ -37,7 +42,7 @@ public class AddPackageCommandTest {
     }
 
     @Test
-    void testBuildPackageMissingPackageName() {
+    void testBuildPackageMissingPackageName() throws MissingMandatoryFieldsException {
         Package returnedVal =
                 this.addPackageCommand.buildPackage(missing_pkgName_paramArray, userId);
         Package expectedVal =
@@ -51,18 +56,17 @@ public class AddPackageCommandTest {
 
     @Test
     void testBuildPackageMissingTrackingNumber() {
-        Package returnedVal =
-                this.addPackageCommand.buildPackage(missing_trackingNumber_paramArray, userId);
+        assertThrows("missing_trackingNumber", MissingMandatoryFieldsException.class, () -> {
+            this.addPackageCommand.buildPackage(missing_trackingNumber_paramArray, userId);
+        });
 
-        assertThat(Objects.equal(null, returnedVal)).isTrue();
     }
 
     @Test
     void testBuildPackageMissingCarrierId() {
-        Package returnedVal =
-                this.addPackageCommand.buildPackage(missing_carrierId_paramArray, userId);
-
-        assertThat(Objects.equal(null, returnedVal)).isTrue();
+        assertThrows("missing_carrierId", MissingMandatoryFieldsException.class, () -> {
+            this.addPackageCommand.buildPackage(missing_carrierId_paramArray, userId);
+        });
     }
 
     @Test
