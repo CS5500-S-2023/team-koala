@@ -111,11 +111,15 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
         try {
             created = packageController.createPackage(builtPacakge);
         } catch (Exception e) {
-            event.reply(String.format("%s %s", PackageController.UNKNOWN_ERROR, PackageController.TRY_AGAIN_MESSAGE))
+            event.reply(
+                            String.format(
+                                    "%s %s",
+                                    PackageController.UNKNOWN_ERROR,
+                                    PackageController.TRY_AGAIN_MESSAGE))
                     .queue();
             return;
         }
-        
+
         log.info("package creation : {}", created);
 
         if (created.equals(PackageController.SUCCESS)) {
