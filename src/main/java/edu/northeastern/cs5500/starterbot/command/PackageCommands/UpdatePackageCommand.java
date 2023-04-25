@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 
-
 /** The command that allows the user to update a package that belongs to the user */
 @Singleton
 @Slf4j
@@ -33,7 +32,6 @@ public class UpdatePackageCommand implements SlashCommandHandler {
      *
      * @return String - the name of the command
      */
-
     @Override
     @Nonnull
     public String getName() {
@@ -63,7 +61,6 @@ public class UpdatePackageCommand implements SlashCommandHandler {
                         OptionType.STRING,
                         "tracking_number",
                         "The bot will record the tracking number for the package",
-                        "The bot will record the name for the package",
                         false)
                 .addOption(
                         OptionType.STRING,
@@ -84,10 +81,6 @@ public class UpdatePackageCommand implements SlashCommandHandler {
      * @exception NotYourPackageException caught if the packageId is valid but does not belong to
      *     the user
      */
-
-                        "The bot will record the name for the package",
-                        false);
-    }
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
         log.info("event: /update_package");
