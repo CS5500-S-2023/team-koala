@@ -20,6 +20,7 @@ public class ReminderMessageTask implements Runnable {
     private String reminderId;
     private JDA jda;
     private ReminderEntryController reminderEntryController;
+    private boolean stopped = false;
 
     public ReminderMessageTask(
             String reminderId, ReminderEntryController reminderEntryController, JDA jda) {
@@ -30,11 +31,15 @@ public class ReminderMessageTask implements Runnable {
 
     @Override
     public void run() {
+        if (stopped) {
+            return;
+        }
         // load the reminder from database
         ReminderEntry retrivedEntry = reminderEntryController.getReminder(reminderId);
 
-        // If the reminder is not there any more we don't do anything
+        // If the reminder is not there any more we don't do anything, set cancelation flag to true
         if (retrivedEntry == null) {
+            stopped = true;
             return;
         }
 
@@ -58,13 +63,11 @@ public class ReminderMessageTask implements Runnable {
             String timeZone = retrivedEntry.getTimeZone();
             ZonedDateTime lastReminderTime =
                     retrivedEntry.getNextReminderTime().atZone(ZoneId.of(timeZone));
-            ZonedDateTime now = ZonedDateTime.now(ZoneId.of(timeZone));
             LocalDateTime newNextReminderTime =
-                    ReminderSchedulingService.getNextReminderTime(
+                    ReminderSchedulingService.plusInterval(
                                     lastReminderTime,
                                     retrivedEntry.getRepeatTimeUnit(),
-                                    retrivedEntry.getRepeatInterval(),
-                                    now)
+                                    retrivedEntry.getRepeatInterval())
                             .toLocalDateTime();
             try {
                 reminderEntryController.updateNextReminderTime(reminderId, newNextReminderTime);

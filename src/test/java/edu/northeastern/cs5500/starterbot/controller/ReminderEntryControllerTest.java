@@ -3,7 +3,6 @@ package edu.northeastern.cs5500.starterbot.controller;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import edu.northeastern.cs5500.starterbot.exception.InvalidTimeUnitException;
 import edu.northeastern.cs5500.starterbot.exception.ReminderNotFoundException;
 import edu.northeastern.cs5500.starterbot.exception.UnableToAddReminderException;
 import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
@@ -56,7 +55,7 @@ class ReminderEntryControllerTest {
     }
 
     @Test
-    void testParseTimeUnit() throws InvalidTimeUnitException {
+    void testParseTimeUnit() {
         assertThat(ReminderEntryController.parseTimeUnit("m")).isEqualTo(TimeUnit.MINUTES);
         assertThat(ReminderEntryController.parseTimeUnit("h")).isEqualTo(TimeUnit.HOURS);
         assertThat(ReminderEntryController.parseTimeUnit("d")).isEqualTo(TimeUnit.DAYS);

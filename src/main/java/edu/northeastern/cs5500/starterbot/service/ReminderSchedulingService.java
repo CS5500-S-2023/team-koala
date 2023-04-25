@@ -142,6 +142,11 @@ public class ReminderSchedulingService implements Service {
             ZonedDateTime now) {
         ZonedDateTime nextReminder = reminderTimeActual;
 
+        if (repeatInterval == null) {
+            repeatInterval = 1;
+            unit = TimeUnit.DAYS;
+        }
+
         while (now.compareTo(nextReminder) >= 0) {
             nextReminder = plusInterval(nextReminder, unit, repeatInterval);
         }

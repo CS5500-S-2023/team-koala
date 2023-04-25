@@ -1,7 +1,6 @@
 package edu.northeastern.cs5500.starterbot.controller;
 
 import com.mongodb.MongoException;
-import edu.northeastern.cs5500.starterbot.exception.InvalidTimeUnitException;
 import edu.northeastern.cs5500.starterbot.exception.ReminderNotFoundException;
 import edu.northeastern.cs5500.starterbot.exception.UnableToAddReminderException;
 import edu.northeastern.cs5500.starterbot.model.ReminderEntry;

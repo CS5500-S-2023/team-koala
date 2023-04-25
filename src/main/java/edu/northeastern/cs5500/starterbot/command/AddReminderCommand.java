@@ -83,16 +83,10 @@ public class AddReminderCommand implements SlashCommandHandler {
         return Commands.slash(getName(), "Tell the bot about the reminder you want to add")
                 .addOptions(
                         new OptionData(
-                                        OptionType.STRING,
-                                        "time-zone",
-                                        "time zone of your reminder",
-                                        true)
-                                .addChoices(TIME_ZONE_CHOICES),
-                        new OptionData(
-                                        OptionType.STRING,
-                                        "title",
-                                        "title of the event to be reminded of")
-                                .setRequired(true),
+                                OptionType.STRING,
+                                "title",
+                                "title of the event to be reminded of",
+                                true),
                         new OptionData(
                                 OptionType.STRING,
                                 "reminder-time",
@@ -101,17 +95,18 @@ public class AddReminderCommand implements SlashCommandHandler {
                         new OptionData(
                                 OptionType.INTEGER,
                                 "reminder-offset",
-                                "how much earlier do you want us to remind you (in minutes, default: 10)",
+                                "how much earlier do you want us to remind you (in minutes, default: 0)",
                                 false),
+                        new OptionData(
+                                        OptionType.STRING,
+                                        "time-zone",
+                                        "let us know if you are not in PDT :)",
+                                        false)
+                                .addChoices(TIME_ZONE_CHOICES),
                         new OptionData(
                                 OptionType.INTEGER,
                                 "delay",
                                 "how many days later do you expect the first reminder (default: 0)",
-                                false),
-                        new OptionData(
-                                OptionType.INTEGER,
-                                "repeat-interval",
-                                "interval between 2 reminder messages (defaults to null = reminder does not repeat)",
                                 false),
                         new OptionData(
                                         OptionType.STRING,
@@ -120,7 +115,12 @@ public class AddReminderCommand implements SlashCommandHandler {
                                         false)
                                 .addChoice("minute", "m")
                                 .addChoice("hour", "h")
-                                .addChoice("day", "d"));
+                                .addChoice("day", "d"),
+                        new OptionData(
+                                OptionType.INTEGER,
+                                "repeat-interval",
+                                "interval between 2 reminder messages (defaults to null = reminder does not repeat)",
+                                false));
     }
 
     /**
@@ -148,10 +148,13 @@ public class AddReminderCommand implements SlashCommandHandler {
 
         // null check on nullable inputs
         Integer delay = delayOption == null ? 0 : delayOption.getAsInt();
-        Integer offset = offsetOption == null ? 10 : offsetOption.getAsInt();
+        Integer offset = offsetOption == null ? 0 : offsetOption.getAsInt();
         Integer interval = intervalOption == null ? null : intervalOption.getAsInt();
         String unitString = unitOption == null ? null : unitOption.getAsString();
-        String timeZone = timeZoneOption.getAsString();
+        String timeZone =
+                (timeZoneOption == null
+                        ? TIME_ZONE_CHOICES[5].getAsString()
+                        : timeZoneOption.getAsString());
 
         // parse reminder time
         LocalTime reminderTime = null;
