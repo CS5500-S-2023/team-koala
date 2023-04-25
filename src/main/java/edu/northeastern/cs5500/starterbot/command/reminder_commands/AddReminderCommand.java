@@ -158,9 +158,9 @@ public class AddReminderCommand implements SlashCommandHandler {
                         : timeZoneOption.getAsString());
 
         // check for negative values
-        if (offset < 0 || interval != null && interval < 0) {
+        if (delay < 0 || offset < 0 || interval != null && interval < 0) {
             event.reply(
-                            "Please specify reminder-offset / repeat-interval with a non-negative integer.")
+                            "Please specify delay / reminder-offset / repeat-interval with a non-negative integer.")
                     .queue();
             return;
         }
