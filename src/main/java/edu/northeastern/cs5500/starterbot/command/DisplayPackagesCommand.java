@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import org.bson.types.ObjectId;
 
+/** The command that allows the user to display all of the packages that belongs to the user */
 @Singleton
 @Slf4j
 public class DisplayPackagesCommand implements SlashCommandHandler {
@@ -27,17 +28,33 @@ public class DisplayPackagesCommand implements SlashCommandHandler {
         // Defined empty and public for dagger injection
     }
 
+    /**
+     * Returns the name of the command
+     *
+     * @return String - the name of the command
+     */
     @Nonnull
     public String getName() {
         return "display_packages";
     }
 
+    /**
+     * Returns the name and options of this command
+     *
+     * @return CommandData - the command information
+     */
     @Override
     @Nonnull
     public CommandData getCommandData() {
         return Commands.slash(getName(), "display all packages");
     }
 
+    /**
+     * When the user interacts with this command, an event occurs. The command checks the event
+     * input while parsing the data for the userId to determine which packages to display
+     *
+     * @param event - user's interaction with the command
+     */
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
         log.info("event: /display_packages");

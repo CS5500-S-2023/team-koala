@@ -52,7 +52,7 @@ public class PackageControllerTest {
         packageController.createPackage(package1);
         packageController.createPackage(package2);
         packageController.createPackage(package3);
-        assertEquals(packageController.getUsersPackages(package1.getUserId()).size(), 2);
+        assertThat(packageController.getUsersPackages(package1.getUserId()).size() == 2).isTrue();
     }
 
     @Test
@@ -60,7 +60,7 @@ public class PackageControllerTest {
         packageController.createPackage(package1);
         packageController.createPackage(package2);
         packageController.deletePackage(package1.getId().toString(), package1.getUserId());
-        assertEquals(packageController.getUsersPackages(package1.getUserId()).size(), 1);
+        assertThat(packageController.getUsersPackages(package1.getUserId()).size() == 1).isTrue();
     }
 
     @Test
