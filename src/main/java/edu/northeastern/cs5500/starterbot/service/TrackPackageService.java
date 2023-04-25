@@ -32,11 +32,17 @@ public class TrackPackageService implements Service {
     private static final int READ_TIMEOUT = 5000;
     public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
+    // Secrets
+    private static final String API_KEY =
+            new ProcessBuilder().environment().get("KEY_DELIVERY_API_KEY");
+    private static final String SECRET =
+            new ProcessBuilder().environment().get("KEY_DELIVERY_API_SECRET");
+
     // Response code
     private static final int OK = 200;
     private static final int PACKAGE_NOT_EXIST = 60101;
 
-    public static final Map<String, String> carrieMap =
+    public static final Map<String, String> carrierMap =
             Map.of(
                     "UPS", "ups",
                     "DHL", "dhl",
@@ -49,15 +55,11 @@ public class TrackPackageService implements Service {
                     "Canada Post", "canada_post",
                     "Purolator", "purolator");
 
-    private String API_KEY;
-    private String SECRET;
     GenericRepository<Package> packageRepository;
 
     @Inject
     public TrackPackageService(GenericRepository<Package> packageRepository) {
         this.packageRepository = packageRepository;
-        this.API_KEY = new ProcessBuilder().environment().get("KEY_DELIVERY_API_KEY");
-        this.SECRET = new ProcessBuilder().environment().get("KEY_DELIVERY_API_SECRET");
     }
 
     /**

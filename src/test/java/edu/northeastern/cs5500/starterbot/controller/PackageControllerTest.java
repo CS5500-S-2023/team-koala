@@ -44,15 +44,17 @@ public class PackageControllerTest {
 
     @Test
     public void testCreatePackageValid() {
-        assertEquals(PackageController.SUCCESS, packageController.createPackage(package2));
+        assertThat(PackageController.SUCCESS.equals(packageController.createPackage(package2)))
+                .isTrue();
     }
 
     @Test
     public void testCreatePackageExistentPackage() {
         packageController.createPackage(package1);
-        assertEquals(
-                PackageController.PACKAGE_ALREADY_EXISTS_MESSAGE,
-                packageController.createPackage(package1));
+        assertThat(
+                        PackageController.PACKAGE_ALREADY_EXISTS_MESSAGE.equals(
+                                packageController.createPackage(package1)))
+                .isTrue();
     }
 
     @Test

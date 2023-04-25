@@ -78,7 +78,7 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
 
         // Reply with a select menu for users to choose a carrier
         StringSelectMenu.Builder carrierBuilder = StringSelectMenu.create("add_package");
-        for (Map.Entry<String, String> entry : TrackPackageService.carrieMap.entrySet()) {
+        for (Map.Entry<String, String> entry : TrackPackageService.carrierMap.entrySet()) {
             carrierBuilder.addOption(
                     entry.getKey(),
                     String.format(
@@ -101,14 +101,10 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
         try {
             builtPacakge = buildPackage(params, event.getUser().getId());
         } catch (MissingMandatoryFieldsException e) {
-            event.reply(String.format(
-                                    "%s %s",
-                                    e.getMessage(),
-                                    PackageController.TRY_AGAIN_MESSAGE))
+            event.reply(String.format("%s %s", e.getMessage(), PackageController.TRY_AGAIN_MESSAGE))
                     .queue();
             return;
         }
-        
 
         // create a package and receives success or error messages
         String created = packageController.createPackage(builtPacakge);
@@ -132,7 +128,8 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
      * @throws MissingMandatoryFieldsException
      */
     @VisibleForTesting
-    Package buildPackage(String param, @Nonnull String userId) throws MissingMandatoryFieldsException {
+    Package buildPackage(String param, @Nonnull String userId)
+            throws MissingMandatoryFieldsException {
         String[] paramArray = param.split("::");
         int size = paramArray.length;
         String packageName = size >= 1 ? paramArray[0] : "";
@@ -145,7 +142,8 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
                     "Mandatory fields are missing - trackingNumber: {}, carrierId: {}",
                     trackingNumber,
                     carrierId);
-            throw new MissingMandatoryFieldsException(String.format("trackingNumber: %s, carrierId: %s", trackingNumber, carrierId));
+            throw new MissingMandatoryFieldsException(
+                    String.format("trackingNumber: %s, carrierId: %s", trackingNumber, carrierId));
         }
         if (packageName.isBlank()) {
             log.info("The package name is null");
