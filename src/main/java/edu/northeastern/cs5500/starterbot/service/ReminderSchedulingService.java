@@ -141,7 +141,9 @@ public class ReminderSchedulingService implements Service {
             Integer repeatInterval,
             ZonedDateTime now) {
         ZonedDateTime nextReminder = reminderTimeActual;
-
+        // For non-repeated reminders that are scheduled at a time that has
+        // already passsed, advance by a day
+        // E.g. scheduled a 10am reminder at 4pm, message arrives at 10am the following day.
         if (repeatInterval == null) {
             repeatInterval = 1;
             unit = TimeUnit.DAYS;
