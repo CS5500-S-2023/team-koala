@@ -157,6 +157,14 @@ public class AddReminderCommand implements SlashCommandHandler {
                         ? TIME_ZONE_CHOICES[5].getAsString()
                         : timeZoneOption.getAsString());
 
+        // check for negative values
+        if (offset < 0 || interval != null && interval < 0) {
+            event.reply(
+                            "Please specify reminder-offset / repeat interval with a non-negative integer.")
+                    .queue();
+            return;
+        }
+
         // parse reminder time
         LocalTime reminderTime = null;
         try {
