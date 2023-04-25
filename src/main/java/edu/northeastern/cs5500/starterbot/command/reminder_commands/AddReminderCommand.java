@@ -160,7 +160,7 @@ public class AddReminderCommand implements SlashCommandHandler {
         // check for negative values
         if (offset < 0 || interval != null && interval < 0) {
             event.reply(
-                            "Please specify reminder-offset / repeat interval with a non-negative integer.")
+                            "Please specify reminder-offset / repeat-interval with a non-negative integer.")
                     .queue();
             return;
         }
