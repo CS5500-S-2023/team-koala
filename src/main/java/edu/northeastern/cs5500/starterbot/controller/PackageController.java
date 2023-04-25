@@ -46,22 +46,55 @@ public class PackageController {
         return SUCCESS;
     }
 
+    /**
+     * This method gets the package with a certain id
+     *
+     * @param id
+     * @return Package the package with the associate id
+     * @throws IllegalArgumentException if the id is invalid or does not exist
+     */
     public Package getPackage(String id) throws IllegalArgumentException {
-        ObjectId objectId = new ObjectId(id);
+        ObjectId objectId = null;
+        try {
+            objectId = new ObjectId(id);
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }
         return this.packageRepository.get(objectId);
     }
 
-    public boolean deletePackage(String id, String userId)
+    /**
+     * This method deletes the package with the associated id only if it belongs to the user
+     *
+     * @param id String that represents the package id
+     * @param userId String that represents the user's discord id
+     * @throws IllegalArgumentException if the package id is invalid
+     * @throws NotYourPackageException if the user's id does not match the user id associated to the
+     *     package
+     */
+    public void deletePackage(String id, String userId)
             throws IllegalArgumentException, NotYourPackageException {
-        ObjectId objectId = new ObjectId(id);
-        Package p = packageRepository.get(objectId);
+        ObjectId objectId = null;
+        Package p = null;
+        try {
+            objectId = new ObjectId(id);
+            p = packageRepository.get(objectId);
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }
+
         if (!p.getUserId().equals(userId)) {
-            throw new NotYourPackageException("This is not your package");
+            throw new NotYourPackageException("This is not your package!");
         }
         packageRepository.delete(objectId);
-        return true;
     }
 
+    /**
+     * This method gets all the user's packages
+     *
+     * @param userId String that represents the user's discord id
+     * @return List<Package> the packages that the user owns
+     */
     public List<Package> getUsersPackages(String userId) {
         Collection<Package> allPackages = packageRepository.getAll();
 
@@ -79,11 +112,32 @@ public class PackageController {
         return usersPackages;
     }
 
+    /**
+     * This method updates the name, tracking number, and carrier id of the the package with the
+     * associated package id if the user owns the package
+     *
+     * @param id String representing the package id
+     * @param userId String representing the user's discord id
+     * @param name String representing the new package name
+     * @param trackingNumber String representing the new tracking number
+     * @param carrierId String representing the new carrier id
+     * @return Package the package that got updated
+     * @throws IllegalArgumentException if the package id is invalid
+     * @throws NotYourPackageException if the package does not belong to the user
+     */
     public Package updatePackage(
             String id, String userId, String name, String trackingNumber, String carrierId)
             throws IllegalArgumentException, NotYourPackageException {
-        ObjectId objectId = new ObjectId(id);
-        Package p = packageRepository.get(objectId);
+
+        ObjectId objectId = null;
+        Package p = null;
+        try {
+            objectId = new ObjectId(id);
+            p = packageRepository.get(objectId);
+        } catch (IllegalArgumentException e) {
+            throw e;
+        }
+
         if (!p.getUserId().equals(userId)) {
             throw new NotYourPackageException("This is not your package");
         }
