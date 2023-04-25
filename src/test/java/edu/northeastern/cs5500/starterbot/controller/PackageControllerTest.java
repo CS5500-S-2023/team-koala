@@ -1,7 +1,9 @@
 package edu.northeastern.cs5500.starterbot.controller;
 
+import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.*;
 
+import edu.northeastern.cs5500.starterbot.exception.NotYourPackageException;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import edu.northeastern.cs5500.starterbot.repository.InMemoryRepository;
@@ -42,7 +44,7 @@ public class PackageControllerTest {
 
     @Test
     public void testCreatePackage() {
-        assertEquals(packageController.createPackage(package1), packageController.SUCCESS);
+        assertEquals(PackageController.SUCCESS, packageController.createPackage(package1));
     }
 
     @Test
@@ -54,10 +56,25 @@ public class PackageControllerTest {
     }
 
     @Test
-    public void testDeletePackage() {
+    public void testDeletePackage() throws IllegalArgumentException, NotYourPackageException {
         packageController.createPackage(package1);
         packageController.createPackage(package2);
-        packageController.deletePackage(package1.getId());
+        packageController.deletePackage(package1.getId().toString(), package1.getUserId());
         assertEquals(packageController.getUsersPackages(package1.getUserId()).size(), 1);
+    }
+
+    @Test
+    public void testUpdatePackage() throws IllegalArgumentException, NotYourPackageException {
+        packageController.createPackage(package1);
+        Package p =
+                packageController.updatePackage(
+                        package1.getId().toString(),
+                        package1.getUserId(),
+                        "new name",
+                        "new tracking",
+                        "new carrier");
+        assertThat(p.getName()).isEqualTo("new name");
+        assertThat(p.getTrackingNumber()).isEqualTo("new tracking");
+        assertThat(p.getCarrierId()).isEqualTo("new carrier");
     }
 }

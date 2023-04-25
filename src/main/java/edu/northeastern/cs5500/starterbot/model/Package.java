@@ -1,14 +1,18 @@
 package edu.northeastern.cs5500.starterbot.model;
 
 import com.mongodb.lang.Nullable;
-import java.sql.Timestamp;
+import java.util.Date;
 import javax.annotation.Nonnull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 
 @Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Package implements Model {
 
     ObjectId id;
@@ -17,5 +21,5 @@ public class Package implements Model {
     @Nonnull String carrierId;
     @Nonnull String userId;
     @Nullable String status;
-    @Nullable Timestamp statusTime;
+    @Nullable Date statusTime;
 }
