@@ -112,7 +112,7 @@ public class AddReminderCommand implements SlashCommandHandler {
                         new OptionData(
                                         OptionType.STRING,
                                         "interval-unit",
-                                        "time unit of the repeat interval (defaults to null = reminder does not repeat)",
+                                        "time unit of the repeat interval (no value by default = reminder does not repeat)",
                                         false)
                                 .addChoice("minute", "m")
                                 .addChoice("hour", "h")
@@ -120,7 +120,7 @@ public class AddReminderCommand implements SlashCommandHandler {
                         new OptionData(
                                 OptionType.INTEGER,
                                 "repeat-interval",
-                                "interval between 2 reminder messages (defaults to null = reminder does not repeat)",
+                                "interval between 2 reminder messages (no value by default = reminder does not repeat)",
                                 false));
     }
 
