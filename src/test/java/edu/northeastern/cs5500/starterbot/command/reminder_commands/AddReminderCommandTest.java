@@ -1,4 +1,4 @@
-package edu.northeastern.cs5500.starterbot.command;
+package edu.northeastern.cs5500.starterbot.command.reminder_commands;
 
 import static com.google.common.truth.Truth.assertThat;
 

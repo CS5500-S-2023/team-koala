@@ -7,6 +7,7 @@ import edu.northeastern.cs5500.starterbot.command.PackageCommands.AddPackageComm
 import edu.northeastern.cs5500.starterbot.command.PackageCommands.DeletePackageCommand;
 import edu.northeastern.cs5500.starterbot.command.PackageCommands.DisplayPackagesCommand;
 import edu.northeastern.cs5500.starterbot.command.PackageCommands.UpdatePackageCommand;
+import edu.northeastern.cs5500.starterbot.command.reminder_commands.AddReminderCommand;
 
 @Module
 public class CommandModule {
