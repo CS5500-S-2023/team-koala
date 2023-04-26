@@ -33,6 +33,7 @@ Otherwise, you will receive a message indicating the failure of adding the packa
 
 ---
 ## Getting Reminder Messages
+We send you repeated / non-repeated messages of certain events you tell us about.
 ### Adding a reminder
 - Use `/add-reminder` command to add a reminder.
     - Parameters:
