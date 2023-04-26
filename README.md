@@ -23,7 +23,8 @@ We sends you daily updates of packages you ask us to track.
         For the current UI design, we can support at most 25 carriers. Feel free to suggest any carriers you want to include and we will respond to you if that carrier is supported.
 
 If your tracking number or carrier id is valid, you will receive a confirmation message indicating success. <br>
-Otherwise, you will receive a message indicating the failure of adding the package.
+Otherwise, you will receive a message indicating the failure of adding the package. <br>
+You can expect the daily update messages sent during the daytime (8:00 a.m. - 8:00 p.m.) if you are in the PDT timezone.
 
 ### Displaying your Packages
 - Use `/display-packages` command to see all your packages.
@@ -69,6 +70,8 @@ We send you repeated / non-repeated messages of certain events you tell us about
 
 
 # Development
+This is a Gradle project written in Java 17. The project utilized Dagger framework for dependency injection, Discord JDA for Discord interaction and MongoDB for data storage. <br>
+The skeleton of this project is set up by @abl at this [repo](https://github.com/abl/bot) 👏
 ## Deploying this Project to a Bot Application on Discord
 - Please refer to this [link](https://www.xda-developers.com/how-to-create-discord-bot/) to create a bot application and generate bot tokens.
 - In the terminal, at the root path of the cloned project in your local environment / online codespace, do export BOT_TOKEN=[your generated bot token].
