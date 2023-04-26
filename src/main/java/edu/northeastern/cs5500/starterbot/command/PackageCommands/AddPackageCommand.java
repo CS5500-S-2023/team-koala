@@ -1,16 +1,18 @@
 package edu.northeastern.cs5500.starterbot.command.PackageCommands;
 
+import com.google.common.annotations.VisibleForTesting;
 import edu.northeastern.cs5500.starterbot.command.SlashCommandHandler;
 import edu.northeastern.cs5500.starterbot.command.StringSelectHandler;
 import edu.northeastern.cs5500.starterbot.controller.PackageController;
+import edu.northeastern.cs5500.starterbot.exception.MissingMandatoryFieldsException;
 import edu.northeastern.cs5500.starterbot.model.Package;
+import edu.northeastern.cs5500.starterbot.service.TrackPackageService;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -24,21 +26,6 @@ import net.dv8tion.jda.api.interactions.components.selections.*;
 public class AddPackageCommand implements SlashCommandHandler, StringSelectHandler {
 
     @Inject PackageController packageController;
-
-    // may have a better solution to read the data from csv file
-    // https://github.com/CS5500-S-2023/team-koala/issues/15
-    private final Map<String, String> carrieMap =
-            Map.of(
-                    "UPS", "ups",
-                    "DHL", "dhl",
-                    "FedEx", "fedex",
-                    "USPS", "usps",
-                    "LaserShip", "lasership",
-                    "China-post", "cpcbe",
-                    "China Ems International", "china_ems_international",
-                    "GLS", "gls",
-                    "Canada Post", "canada_post",
-                    "Purolator", "purolator");
 
     @Inject
     public AddPackageCommand() {
@@ -91,7 +78,7 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
 
         // Reply with a select menu for users to choose a carrier
         StringSelectMenu.Builder carrierBuilder = StringSelectMenu.create("add_package");
-        for (Map.Entry<String, String> entry : carrieMap.entrySet()) {
+        for (Map.Entry<String, String> entry : TrackPackageService.carrierMap.entrySet()) {
             carrierBuilder.addOption(
                     entry.getKey(),
                     String.format(
@@ -105,17 +92,71 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
     }
 
     @Override
-    public void onStringSelectInteraction(StringSelectInteractionEvent event) {
+    public void onStringSelectInteraction(@Nonnull StringSelectInteractionEvent event) {
         log.info("event: /add_package:StringSelectInteractionEvent - {}", event.getValues().get(0));
 
         // collect passed in data from previous step
-        String[] paramArray = event.getValues().get(0).split("::");
-        String packageName = paramArray[0];
-        String trackingNumber = paramArray[1];
-        String carrierId = paramArray[2];
+        String params = event.getValues().get(0);
+        Package builtPacakge = new Package();
+        try {
+            builtPacakge = buildPackage(params, event.getUser().getId());
+        } catch (MissingMandatoryFieldsException e) {
+            event.reply(String.format("%s %s", e.getMessage(), PackageController.TRY_AGAIN_MESSAGE))
+                    .queue();
+            return;
+        }
 
-        // retrieve user info
-        User user = event.getUser();
+        // create a package and receives success or error messages
+        String created = "";
+        try {
+            created = packageController.createPackage(builtPacakge);
+        } catch (Exception e) {
+            event.reply(
+                            String.format(
+                                    "%s %s",
+                                    PackageController.UNKNOWN_ERROR,
+                                    PackageController.TRY_AGAIN_MESSAGE))
+                    .queue();
+            return;
+        }
+
+        log.info("package creation : {}", created);
+
+        if (created.equals(PackageController.SUCCESS)) {
+            event.reply("Your package has been created successfully!").setEphemeral(true).queue();
+        } else {
+            event.reply("Your package was not created successfuly because " + created)
+                    .setEphemeral(true)
+                    .queue();
+        }
+    }
+
+    /**
+     * Check fields for nullability and build a valid package
+     *
+     * @param paramArray - extracted from event
+     * @param userId
+     * @return a built package object
+     * @throws MissingMandatoryFieldsException
+     */
+    @VisibleForTesting
+    Package buildPackage(String param, @Nonnull String userId)
+            throws MissingMandatoryFieldsException {
+        String[] paramArray = param.split("::");
+        int size = paramArray.length;
+        String packageName = size >= 1 ? paramArray[0] : "";
+        String trackingNumber = size >= 2 ? paramArray[1] : "";
+        String carrierId = size >= 3 ? paramArray[2] : "";
+
+        // check null
+        if (trackingNumber.isBlank() || carrierId.isBlank()) {
+            log.error(
+                    "Mandatory fields are missing - trackingNumber: {}, carrierId: {}",
+                    trackingNumber,
+                    carrierId);
+            throw new MissingMandatoryFieldsException(
+                    String.format("trackingNumber: %s, carrierId: %s", trackingNumber, carrierId));
+        }
         if (packageName.isBlank()) {
             log.info("The package name is null");
             packageName = null;
@@ -125,21 +166,11 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
                 Package.builder()
                         .trackingNumber(trackingNumber)
                         .carrierId(carrierId)
-                        .userId(user.getId())
+                        .userId(userId)
                         .name(packageName)
                         .build();
         log.info(pkg.toString());
 
-        // create a package and receives success or error messages
-        String created = packageController.createPackage(pkg);
-        log.info("package creation : " + created);
-
-        if (created.equals(PackageController.SUCCESS)) {
-            event.reply("Your package has been created successfully!").setEphemeral(true).queue();
-        } else {
-            event.reply("Your package was not created successfuly because of " + created)
-                    .setEphemeral(true)
-                    .queue();
-        }
+        return pkg;
     }
 }

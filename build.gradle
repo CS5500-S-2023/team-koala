@@ -30,6 +30,8 @@ dependencies {
     implementation 'org.apache.logging.log4j:log4j-core:_'
     implementation 'org.slf4j:slf4j-simple:_'
     implementation 'com.google.code.gson:gson:2.10.1'
+    implementation 'com.google.guava:guava:31.1-jre'
+
 
     // sparkjava for simple HTTP serving
     implementation "com.sparkjava:spark-core:_"

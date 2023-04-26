@@ -1,10 +1,13 @@
 package edu.northeastern.cs5500.starterbot.service;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import edu.northeastern.cs5500.starterbot.exception.KeyDeliveryCallException;
+import edu.northeastern.cs5500.starterbot.exception.PackageNotExsitException;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import java.io.BufferedReader;
@@ -15,6 +18,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -24,16 +28,34 @@ import lombok.extern.slf4j.Slf4j;
 public class TrackPackageService implements Service {
 
     private static final String REALTIME_URL = "https://www.kd100.com/api/v1/tracking/realtime";
+    private static final int CONNECT_TIMEOUT = 1000;
+    private static final int READ_TIMEOUT = 5000;
+    public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
+    // Secrets
     private static final String API_KEY =
             new ProcessBuilder().environment().get("KEY_DELIVERY_API_KEY");
     private static final String SECRET =
             new ProcessBuilder().environment().get("KEY_DELIVERY_API_SECRET");
-    private static final int CONNECT_TIMEOUT = 1000;
-    private static final int READ_TIMEOUT = 5000;
-    public static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    private static final int API_KEY_NOT_SET = 102;
 
-    GenericRepository<Package> packageRepository; // data access object
+    // Response code
+    private static final int OK = 200;
+    private static final int PACKAGE_NOT_EXIST = 60101;
+
+    public static final Map<String, String> carrierMap =
+            Map.of(
+                    "UPS", "ups",
+                    "DHL", "dhl",
+                    "FedEx", "fedex",
+                    "USPS", "usps",
+                    "LaserShip", "lasership",
+                    "China-post", "cpcbe",
+                    "China Ems International", "china_ems_international",
+                    "GLS", "gls",
+                    "Canada Post", "canada_post",
+                    "Purolator", "purolator");
+
+    GenericRepository<Package> packageRepository;
 
     @Inject
     public TrackPackageService(GenericRepository<Package> packageRepository) {
@@ -42,47 +64,64 @@ public class TrackPackageService implements Service {
 
     /**
      * Call real-time tracking api to get the latest status Invoked when displaying list of packages
-     * Update package info in database
      *
-     * @return package1 - If there no delivery updates, status and statusTime in Package will be
-     *     null - Otherwise, they are not null
+     * @throws KeyDeliveryCallException
+     * @throws PackageNotExsitException
      */
-    public boolean getPackageLatestStatus(Package package1) {
+    public void getPackageLatestStatus(Package package1)
+            throws KeyDeliveryCallException, PackageNotExsitException {
         String carrier_id = package1.getCarrierId();
         String tracking_number = package1.getTrackingNumber();
 
-        String result = getData(REALTIME_URL, carrier_id, tracking_number, null);
-        log.info("getPackageLatestStatus: " + package1.getId() + " - " + result);
+        String result = getData(REALTIME_URL, carrier_id, tracking_number);
+        log.info(
+                String.format(
+                        "getPackageLatestStatus for package {}: {} ", package1.getId(), result));
 
-        if (result.contains("No result found")) {
-            return false;
-        }
         // read the delivery updates
         readDeliveryResponse(result, package1);
-
-        // Update package info in database
-        packageRepository.update(package1);
-        return true;
     }
 
     /**
      * Parse the response from KeyDelivery to get their delivery latest status, time and description
-     * Then, update package info in database
      *
-     * @param result
-     * @return
+     * @param result - the response from KeyDelivery
+     * @param package1 - the provided package object
+     * @throws PackageNotExsitException
+     * @throws KeyDeliveryCallException
      */
-    private void readDeliveryResponse(String result, Package package1) {
+    @VisibleForTesting
+    void readDeliveryResponse(String result, Package package1)
+            throws PackageNotExsitException, KeyDeliveryCallException {
+        log.info("readDeliveryResponse: got the delivery status of {}", package1.getId());
+
         Gson gson = new GsonBuilder().setDateFormat(DATE_FORMAT).create();
         JsonObject response = gson.fromJson(result, JsonElement.class).getAsJsonObject();
-        if (response.get("code").getAsInt() == API_KEY_NOT_SET) {
-            log.info(response.get("message").getAsString());
-            return;
+
+        int code = response.get("code").getAsInt();
+        String message = response.get("message").getAsString();
+        if (code != OK) {
+            if (code == PACKAGE_NOT_EXIST) {
+                log.error("readDeliveryResponse - error - {} : {}", PACKAGE_NOT_EXIST, message);
+                throw new PackageNotExsitException(
+                        String.format("Code: %s, Message: %s ", code, message));
+            } else {
+                log.error("readDeliveryResponse - error - {} : {}", code, message);
+                throw new KeyDeliveryCallException(
+                        String.format("Code: %s, Message: %s ", code, message));
+            }
         }
-        JsonArray deliveryStatuses = response.getAsJsonObject("data").getAsJsonArray("items");
+
+        JsonArray deliveryStatuses;
+        try {
+            deliveryStatuses = response.getAsJsonObject("data").getAsJsonArray("items");
+        } catch (Exception e) {
+            // This should not be reached after the above if else checks
+            log.error("readDeliveryResponse: UNKNOWN error {}", result);
+            throw e;
+        }
 
         if (deliveryStatuses.size() != 0) {
-            log.info("readDeliveryResponse: got the delivery status of " + package1.getId());
             JsonObject latestStatus = (JsonObject) deliveryStatuses.get(0);
 
             KeyDeliveryStatus deliveryStatus = gson.fromJson(latestStatus, KeyDeliveryStatus.class);
@@ -92,23 +131,17 @@ public class TrackPackageService implements Service {
     }
 
     /**
-     * Construct JSON strings and send post requests to a KeyDelivery API Create tracking API and
-     * Realtime tracking API both use this function
+     * Construct JSON strings and send post requests to a KeyDelivery API Realtime tracking
      *
      * @param carrier_id
      * @param tracking_number
-     * @param webhook_url
      * @return response from KeyDelivery
      */
-    private String getData(
-            String url, String carrier_id, String tracking_number, String webhook_url) {
+    private String getData(String url, String carrier_id, String tracking_number) {
 
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("carrier_id", carrier_id);
         jsonObject.addProperty("tracking_number", tracking_number);
-        if (webhook_url != null) {
-            jsonObject.addProperty("webhook_url", webhook_url);
-        }
         String param = jsonObject.toString();
         log.info("getData: json is constructed - " + param);
 

@@ -3,5 +3,7 @@
     "files.exclude": {
         "**/build": true,
         "**/bin": true
-    }
+    },
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.debug.settings.onBuildFailureProceed": true
 }

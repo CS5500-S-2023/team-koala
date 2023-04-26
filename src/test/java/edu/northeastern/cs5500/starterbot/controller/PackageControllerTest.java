@@ -22,7 +22,7 @@ public class PackageControllerTest {
 
     private Package package2 =
             Package.builder()
-                    .trackingNumber("1Z9A170W0337231976")
+                    .trackingNumber("1Z9X8Y670391444580")
                     .carrierId("ups")
                     .userId("user id")
                     .name("second package")
@@ -30,7 +30,7 @@ public class PackageControllerTest {
 
     private Package package3 =
             Package.builder()
-                    .trackingNumber("1Z9A170W0337231975")
+                    .trackingNumber("1Z9A170W0337231977")
                     .carrierId("fedex")
                     .userId("user id 2")
                     .name("third package")
@@ -38,13 +38,23 @@ public class PackageControllerTest {
 
     PackageControllerTest() {
         // Avoid using MongoDB service
-        GenericRepository repo = new InMemoryRepository<>();
+        GenericRepository<Package> repo = new InMemoryRepository<>();
         this.packageController = new PackageController(repo, new TrackPackageService(repo));
     }
 
     @Test
-    public void testCreatePackage() {
-        assertEquals(PackageController.SUCCESS, packageController.createPackage(package1));
+    public void testCreatePackageValid() {
+        assertThat(PackageController.SUCCESS.equals(packageController.createPackage(package2)))
+                .isTrue();
+    }
+
+    @Test
+    public void testCreatePackageExistentPackage() {
+        packageController.createPackage(package1);
+        assertThat(
+                        PackageController.PACKAGE_ALREADY_EXISTS_MESSAGE.equals(
+                                packageController.createPackage(package1)))
+                .isTrue();
     }
 
     @Test
