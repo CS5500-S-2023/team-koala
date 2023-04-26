@@ -157,6 +157,14 @@ public class AddReminderCommand implements SlashCommandHandler {
                         ? TIME_ZONE_CHOICES[5].getAsString()
                         : timeZoneOption.getAsString());
 
+        // check for negative values
+        if (delay < 0 || offset < 0 || interval != null && interval < 0) {
+            event.reply(
+                            "Please specify delay / reminder-offset / repeat-interval with a non-negative integer.")
+                    .queue();
+            return;
+        }
+
         // parse reminder time
         LocalTime reminderTime = null;
         try {
@@ -166,8 +174,16 @@ public class AddReminderCommand implements SlashCommandHandler {
             return;
         }
 
+        // interval and unit should be null / non-null at the same time
+        if (unitString == null && interval != null || interval == null && unitString != null) {
+            event.reply("Please specify both the repeat interval and unit to repeat the reminder")
+                    .queue();
+            return;
+        }
+
         // parse reminder time unit
-        TimeUnit unit = interval != null ? ReminderEntryController.parseTimeUnit(unitString) : null;
+        TimeUnit unit =
+                unitString == null ? null : ReminderEntryController.parseTimeUnit(unitString);
 
         // calculate actual reminder message time and the time of the first reminder message
         reminderTime = reminderTime.minusMinutes(offset);
