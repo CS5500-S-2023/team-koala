@@ -111,7 +111,7 @@ public class UpdatePackageCommand implements SlashCommandHandler {
         } catch (IllegalArgumentException e) {
             event.reply("This is not a valid package id!").queue();
         } catch (PackageNotExistException e) {
-            event.reply("This package does not exist!").queue();
+            event.reply("This package has an invalid carrier and/or tracking number!").queue();
         }
 
         event.reply("Your package has been updated successfully").queue();
