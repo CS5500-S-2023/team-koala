@@ -2,6 +2,7 @@ package edu.northeastern.cs5500.starterbot.command.PackageCommands;
 
 import edu.northeastern.cs5500.starterbot.command.SlashCommandHandler;
 import edu.northeastern.cs5500.starterbot.controller.PackageController;
+import edu.northeastern.cs5500.starterbot.exception.InvalidCarrierAndTrackingNumberException;
 import edu.northeastern.cs5500.starterbot.exception.NotYourPackageException;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import java.util.Objects;
@@ -91,19 +92,7 @@ public class UpdatePackageCommand implements SlashCommandHandler {
 
         String userId = event.getUser().getId();
         String packageId = packageIdOption.getAsString();
-        Package p = null;
-        try {
-            p = packageController.getPackage(packageId);
-            String name = event.getOption("package_name", OptionMapping::getAsString);
-            String trackingNumber = event.getOption("tracking_number", OptionMapping::getAsString);
-            String carrierId = event.getOption("carrier_id", OptionMapping::getAsString);
-
-            if (name == null) name = p.getName();
-            if (trackingNumber == null) trackingNumber = p.getTrackingNumber();
-            if (carrierId == null) carrierId = p.getCarrierId();
-        } catch (IllegalArgumentException e) {
-            event.reply("This is not a valid package id!").queue();
-        }
+        Package p = packageController.getPackage(packageId);
 
         String name = event.getOption("package_name", OptionMapping::getAsString);
         String trackingNumber = event.getOption("tracking_number", OptionMapping::getAsString);
@@ -119,6 +108,8 @@ public class UpdatePackageCommand implements SlashCommandHandler {
             event.reply(e.getMessage()).queue();
         } catch (IllegalArgumentException e) {
             event.reply("This is not a valid package id!").queue();
+        } catch (InvalidCarrierAndTrackingNumberException e) {
+            event.reply(e.getMessage()).queue();
         }
 
         event.reply("Your package has been updated successfully").queue();

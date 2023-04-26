@@ -1,6 +1,7 @@
 package edu.northeastern.cs5500.starterbot.controller;
 
 import com.mongodb.MongoException;
+import edu.northeastern.cs5500.starterbot.exception.InvalidCarrierAndTrackingNumberException;
 import edu.northeastern.cs5500.starterbot.exception.KeyDeliveryCallException;
 import edu.northeastern.cs5500.starterbot.exception.NotYourPackageException;
 import edu.northeastern.cs5500.starterbot.exception.PackageNotExsitException;
@@ -143,9 +144,9 @@ public class PackageController {
      *
      * @param id
      * @return Package the package with the associate id
-     * @throws IllegalArgumentException if the id is invalid or does not exist
+     * @throws IllegalArgumentException if the package id is invalid
      */
-    public Package getPackage(String id) throws IllegalArgumentException {
+    public Package getPackage(String id) {
         ObjectId objectId = null;
         try {
             objectId = new ObjectId(id);
@@ -164,18 +165,15 @@ public class PackageController {
      * @throws NotYourPackageException if the user's id does not match the user id associated to the
      *     package
      */
+    @SneakyThrows
     public void deletePackage(String id, String userId)
             throws IllegalArgumentException, NotYourPackageException {
-        ObjectId objectId = null;
-        Package p = null;
-        try {
-            objectId = new ObjectId(id);
-            p = packageRepository.get(objectId);
-        } catch (IllegalArgumentException e) {
-            throw e;
-        }
+        ObjectId objectId = new ObjectId(id);
+        Package p = packageRepository.get(objectId);
 
-        if (!p.getUserId().equals(userId)) {
+        if (p == null) {
+            throw new IllegalArgumentException("This is not a valid package!");
+        } else if (!p.getUserId().equals(userId)) {
             throw new NotYourPackageException("This is not your package!");
         }
         packageRepository.delete(objectId);
@@ -194,7 +192,6 @@ public class PackageController {
         List<Package> usersPackages = new ArrayList<>();
         for (Package p : allPackages) {
             if (p.getUserId().equals(userId)) {
-                // TODO: whether to handle exception - All packages should be valid
                 getPackageLatestStatus(p);
 
                 usersPackages.add(p);
@@ -216,10 +213,14 @@ public class PackageController {
      * @return Package the package that got updated
      * @throws IllegalArgumentException if the package id is invalid
      * @throws NotYourPackageException if the package does not belong to the user
+     * @throws InvalidCarrierAndTrackingNumberException if the package is not valid (bad carrier and
+     *     tracking number combination)
      */
+    @SneakyThrows
     public Package updatePackage(
             String id, String userId, String name, String trackingNumber, String carrierId)
-            throws IllegalArgumentException, NotYourPackageException {
+            throws IllegalArgumentException, NotYourPackageException,
+                    InvalidCarrierAndTrackingNumberException {
 
         ObjectId objectId = null;
         Package p = null;
@@ -237,7 +238,11 @@ public class PackageController {
         p.setTrackingNumber(trackingNumber);
         p.setCarrierId(carrierId);
 
-        // TODO: Check if updated package is still valid
+        String validationResult = validatePackage(p);
+        if (!validationResult.equals(SUCCESS)) {
+            throw new InvalidCarrierAndTrackingNumberException(
+                    "This is an invalid carrier and tracking number combination!");
+        }
 
         packageRepository.update(p);
         return p;

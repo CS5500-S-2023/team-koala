@@ -3,6 +3,7 @@ package edu.northeastern.cs5500.starterbot.controller;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.*;
 
+import edu.northeastern.cs5500.starterbot.exception.InvalidCarrierAndTrackingNumberException;
 import edu.northeastern.cs5500.starterbot.exception.NotYourPackageException;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
@@ -69,22 +70,56 @@ public class PackageControllerTest {
     public void testDeletePackage() throws IllegalArgumentException, NotYourPackageException {
         packageController.createPackage(package1);
         packageController.createPackage(package2);
+        packageController.createPackage(package3);
+        // assertThrows(
+        //         NotYourPackageException.class,
+        //         () ->
+        //                 packageController.deletePackage(
+        //                         package3.getId().toString(), package2.getUserId()));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> packageController.deletePackage("bad Id", package2.getUserId()));
         packageController.deletePackage(package1.getId().toString(), package1.getUserId());
         assertThat(packageController.getUsersPackages(package1.getUserId()).size() == 1).isTrue();
     }
 
     @Test
-    public void testUpdatePackage() throws IllegalArgumentException, NotYourPackageException {
+    public void testUpdatePackage()
+            throws IllegalArgumentException, NotYourPackageException,
+                    InvalidCarrierAndTrackingNumberException {
         packageController.createPackage(package1);
-        Package p =
+        assertThrows(
+                InvalidCarrierAndTrackingNumberException.class,
+                () ->
+                        packageController.updatePackage(
+                                package1.getId().toString(),
+                                package1.getUserId(),
+                                package1.getName(),
+                                package1.getTrackingNumber(),
+                                "fedex"));
+        assertThrows(
+                NotYourPackageException.class,
+                () ->
+                        packageController.updatePackage(
+                                package1.getId().toString(),
+                                package3.getUserId(),
+                                "name3",
+                                "tracking3",
+                                "carrier3"));
+        assertThrows(
+                IllegalArgumentException.class,
+                () ->
+                        packageController.updatePackage(
+                                "badId", package3.getUserId(), "name3", "tracking3", "carrier3"));
+        package1 =
                 packageController.updatePackage(
                         package1.getId().toString(),
                         package1.getUserId(),
                         "new name",
-                        "new tracking",
-                        "new carrier");
-        assertThat(p.getName()).isEqualTo("new name");
-        assertThat(p.getTrackingNumber()).isEqualTo("new tracking");
-        assertThat(p.getCarrierId()).isEqualTo("new carrier");
+                        "1Z9X8Y670391444580",
+                        "ups");
+        assertThat(package1.getName()).isEqualTo("new name");
+        assertThat(package1.getTrackingNumber()).isEqualTo("1Z9X8Y670391444580");
+        assertThat(package1.getCarrierId()).isEqualTo("ups");
     }
 }

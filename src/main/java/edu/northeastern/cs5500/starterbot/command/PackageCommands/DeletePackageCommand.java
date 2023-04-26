@@ -77,7 +77,7 @@ public class DeletePackageCommand implements SlashCommandHandler {
         try {
             packageController.deletePackage(packageId, userId);
         } catch (IllegalArgumentException e) {
-            event.reply("This is not a valid package id!");
+            event.reply("This is not a valid package!").queue();
         } catch (NotYourPackageException e) {
             event.reply(e.getMessage()).queue();
         }
