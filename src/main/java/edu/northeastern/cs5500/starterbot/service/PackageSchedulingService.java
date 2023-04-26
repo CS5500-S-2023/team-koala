@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.JDA;
 public class PackageSchedulingService implements Service {
 
     public static final int STARTING_HOUR = 8; // 24-hour clock
+    public static final TimeZone time_zone = TimeZone.getTimeZone("PST");
     public static final long DAY_INTERVAL_MILLISECONDS = TimeUnit.DAYS.toMillis(1);
 
     @Inject JDA jda;
@@ -31,9 +32,11 @@ public class PackageSchedulingService implements Service {
     public void scheduleTask() {
         Timer timer = new Timer();
 
+        Calendar currTime = Calendar.getInstance(time_zone);
+        Date startTime = getFirstStartTime(currTime);
         timer.schedule(
                 new GetPackageStatusTask(jda, trackPackageService),
-                getFirstStartTime(),
+                startTime,
                 DAY_INTERVAL_MILLISECONDS);
     }
 
@@ -46,16 +49,14 @@ public class PackageSchedulingService implements Service {
      * @return Date - first start time for the daily task
      */
     @VisibleForTesting
-    Date getFirstStartTime() {
+    Date getFirstStartTime(Calendar currTime) {
 
-        TimeZone time_zone = TimeZone.getTimeZone("PST");
         Calendar targetTime = Calendar.getInstance(time_zone);
 
         targetTime.set(Calendar.HOUR_OF_DAY, STARTING_HOUR);
         targetTime.set(Calendar.MINUTE, 0);
         targetTime.set(Calendar.SECOND, 0);
 
-        Calendar currTime = Calendar.getInstance(time_zone);
         // if current time has past the set start time, execute next day
         if (currTime.after(targetTime)) {
             targetTime.set(Calendar.DAY_OF_YEAR, currTime.get(Calendar.DAY_OF_YEAR) + 1);

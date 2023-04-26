@@ -69,7 +69,7 @@ public class GetPackageStatusTask extends TimerTask {
     }
 
     @VisibleForTesting
-    private int calculateNumEachTask(int size) {
+    int calculateNumEachTask(int size) {
         // Calculate the number of packages each task should iterate over
         return (int) Math.ceil(size * 1.0 / TASK_FREQUENCEY);
     }
