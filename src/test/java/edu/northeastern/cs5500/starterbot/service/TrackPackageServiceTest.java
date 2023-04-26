@@ -3,7 +3,7 @@ package edu.northeastern.cs5500.starterbot.service;
 import static org.junit.Assert.*;
 
 import edu.northeastern.cs5500.starterbot.exception.KeyDeliveryCallException;
-import edu.northeastern.cs5500.starterbot.exception.PackageNotExsitException;
+import edu.northeastern.cs5500.starterbot.exception.PackageNotExistException;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.InMemoryRepository;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ public class TrackPackageServiceTest {
     }
 
     @Test
-    void testRealtimePackageTracking() throws KeyDeliveryCallException, PackageNotExsitException {
+    void testRealtimePackageTracking() throws KeyDeliveryCallException, PackageNotExistException {
         trackPackageService.getPackageLatestStatus(package1);
         assertEquals("[SEATTLE, WA, US]DELIVERED", package1.getStatus());
     }
@@ -43,7 +43,7 @@ public class TrackPackageServiceTest {
     void testReadDeliveryResponsePackgeNotExist() {
         assertThrows(
                 "PACKAGE_NOT_FOUND",
-                PackageNotExsitException.class,
+                PackageNotExistException.class,
                 () -> {
                     trackPackageService.readDeliveryResponse(PACKAGE_NOT_FOUND_RESULT, package2);
                 });

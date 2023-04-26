@@ -4,7 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.*;
 
 import edu.northeastern.cs5500.starterbot.exception.NotYourPackageException;
-import edu.northeastern.cs5500.starterbot.exception.PackageNotExsitException;
+import edu.northeastern.cs5500.starterbot.exception.PackageNotExistException;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import edu.northeastern.cs5500.starterbot.repository.InMemoryRepository;
@@ -94,10 +94,10 @@ public class PackageControllerTest {
 
     @Test
     public void testUpdatePackage()
-            throws IllegalArgumentException, NotYourPackageException, PackageNotExsitException {
+            throws IllegalArgumentException, NotYourPackageException, PackageNotExistException {
         packageController.createPackage(package1);
         assertThrows(
-                PackageNotExsitException.class,
+                PackageNotExistException.class,
                 () ->
                         packageController.updatePackage(
                                 package1.getId().toString(),
