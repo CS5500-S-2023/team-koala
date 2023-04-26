@@ -4,6 +4,7 @@ import dagger.Component;
 import edu.northeastern.cs5500.starterbot.command.CommandModule;
 import edu.northeastern.cs5500.starterbot.listener.MessageListener;
 import edu.northeastern.cs5500.starterbot.repository.RepositoryModule;
+import edu.northeastern.cs5500.starterbot.service.PackageSchedulingService;
 import edu.northeastern.cs5500.starterbot.service.ServiceModule;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -22,6 +23,7 @@ public class Bot {
     Bot() {}
 
     @Inject MessageListener messageListener;
+    @Inject PackageSchedulingService packageSchedulingService;
     @Inject JDA jda;
 
     static String getBotToken() {
@@ -34,5 +36,7 @@ public class Bot {
         CommandListUpdateAction commands = jda.updateCommands();
         commands.addCommands(messageListener.allCommandData());
         commands.queue();
+
+        packageSchedulingService.scheduleTask();
     }
 }
