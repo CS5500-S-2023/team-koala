@@ -94,7 +94,16 @@ public class GetPackageStatusSubTask extends TimerTask {
     @VisibleForTesting
     String constructMessage(Package pkg) {
         String currStatus = pkg.getStatus();
-        trackPackageService.getPackageLatestStatus(pkg);
+        // All packages should be valid
+        try {
+            trackPackageService.getPackageLatestStatus(pkg);
+        } catch (Exception e) {
+            log.error(
+                    "constructMessage: Something wrong happened as verification checks in adding/update packages fail",
+                    e);
+            return null;
+        }
+
         String latestStatus = pkg.getStatus();
 
         // current status could be null
