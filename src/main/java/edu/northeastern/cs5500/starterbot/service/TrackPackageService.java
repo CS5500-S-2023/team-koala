@@ -7,7 +7,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import edu.northeastern.cs5500.starterbot.exception.KeyDeliveryCallException;
-import edu.northeastern.cs5500.starterbot.exception.PackageNotExsitException;
+import edu.northeastern.cs5500.starterbot.exception.PackageNotExistException;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import java.io.BufferedReader;
@@ -66,10 +66,10 @@ public class TrackPackageService implements Service {
      * Call real-time tracking api to get the latest status Invoked when displaying list of packages
      *
      * @throws KeyDeliveryCallException
-     * @throws PackageNotExsitException
+     * @throws PackageNotExistException
      */
     public void getPackageLatestStatus(Package package1)
-            throws KeyDeliveryCallException, PackageNotExsitException {
+            throws KeyDeliveryCallException, PackageNotExistException {
         String carrier_id = package1.getCarrierId();
         String tracking_number = package1.getTrackingNumber();
 
@@ -87,12 +87,12 @@ public class TrackPackageService implements Service {
      *
      * @param result - the response from KeyDelivery
      * @param package1 - the provided package object
-     * @throws PackageNotExsitException
+     * @throws PackageNotExistException
      * @throws KeyDeliveryCallException
      */
     @VisibleForTesting
     void readDeliveryResponse(String result, Package package1)
-            throws PackageNotExsitException, KeyDeliveryCallException {
+            throws PackageNotExistException, KeyDeliveryCallException {
         log.info("readDeliveryResponse: got the delivery status of {}", package1.getId());
 
         Gson gson = new GsonBuilder().setDateFormat(DATE_FORMAT).create();
@@ -103,7 +103,7 @@ public class TrackPackageService implements Service {
         if (code != OK) {
             if (code == PACKAGE_NOT_EXIST) {
                 log.error("readDeliveryResponse - error - {} : {}", PACKAGE_NOT_EXIST, message);
-                throw new PackageNotExsitException(
+                throw new PackageNotExistException(
                         String.format("Code: %s, Message: %s ", code, message));
             } else {
                 log.error("readDeliveryResponse - error - {} : {}", code, message);
