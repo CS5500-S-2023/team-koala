@@ -2,8 +2,8 @@ package edu.northeastern.cs5500.starterbot.command.PackageCommands;
 
 import edu.northeastern.cs5500.starterbot.command.SlashCommandHandler;
 import edu.northeastern.cs5500.starterbot.controller.PackageController;
-import edu.northeastern.cs5500.starterbot.exception.InvalidCarrierAndTrackingNumberException;
 import edu.northeastern.cs5500.starterbot.exception.NotYourPackageException;
+import edu.northeastern.cs5500.starterbot.exception.PackageNotExsitException;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import java.util.Objects;
 import javax.annotation.Nonnull;
@@ -81,6 +81,8 @@ public class UpdatePackageCommand implements SlashCommandHandler {
      * @exception IllegalArgumentException caught if the packageId does not exist in the database
      * @exception NotYourPackageException caught if the packageId is valid but does not belong to
      *     the user
+     * @exception PackageNotExsitException caught if the package carrier and tracking number
+     *     combination are not a correct
      */
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
@@ -108,7 +110,7 @@ public class UpdatePackageCommand implements SlashCommandHandler {
             event.reply(e.getMessage()).queue();
         } catch (IllegalArgumentException e) {
             event.reply("This is not a valid package id!").queue();
-        } catch (InvalidCarrierAndTrackingNumberException e) {
+        } catch (PackageNotExsitException e) {
             event.reply(e.getMessage()).queue();
         }
 

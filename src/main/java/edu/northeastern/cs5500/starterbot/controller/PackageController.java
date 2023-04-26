@@ -1,7 +1,6 @@
 package edu.northeastern.cs5500.starterbot.controller;
 
 import com.mongodb.MongoException;
-import edu.northeastern.cs5500.starterbot.exception.InvalidCarrierAndTrackingNumberException;
 import edu.northeastern.cs5500.starterbot.exception.KeyDeliveryCallException;
 import edu.northeastern.cs5500.starterbot.exception.NotYourPackageException;
 import edu.northeastern.cs5500.starterbot.exception.PackageNotExsitException;
@@ -172,7 +171,7 @@ public class PackageController {
         Package p = packageRepository.get(objectId);
 
         if (p == null) {
-            throw new IllegalArgumentException("This is not a valid package!");
+            throw new IllegalArgumentException("The packageId is not valid!");
         } else if (!p.getUserId().equals(userId)) {
             throw new NotYourPackageException("This is not your package!");
         }
@@ -213,14 +212,13 @@ public class PackageController {
      * @return Package the package that got updated
      * @throws IllegalArgumentException if the package id is invalid
      * @throws NotYourPackageException if the package does not belong to the user
-     * @throws InvalidCarrierAndTrackingNumberException if the package is not valid (bad carrier and
-     *     tracking number combination)
+     * @throws PackageNotExsitException if the package is not valid (bad carrier and tracking number
+     *     combination)
      */
     @SneakyThrows
     public Package updatePackage(
             String id, String userId, String name, String trackingNumber, String carrierId)
-            throws IllegalArgumentException, NotYourPackageException,
-                    InvalidCarrierAndTrackingNumberException {
+            throws IllegalArgumentException, NotYourPackageException, PackageNotExsitException {
 
         ObjectId objectId = null;
         Package p = null;
@@ -238,10 +236,10 @@ public class PackageController {
         p.setTrackingNumber(trackingNumber);
         p.setCarrierId(carrierId);
 
-        String validationResult = validatePackage(p);
-        if (!validationResult.equals(SUCCESS)) {
-            throw new InvalidCarrierAndTrackingNumberException(
-                    "This is an invalid carrier and tracking number combination!");
+        try {
+            getPackageLatestStatus(p);
+        } catch (PackageNotExsitException e) {
+            throw e;
         }
 
         packageRepository.update(p);

@@ -3,22 +3,27 @@ package edu.northeastern.cs5500.starterbot.controller;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.*;
 
-import edu.northeastern.cs5500.starterbot.exception.InvalidCarrierAndTrackingNumberException;
 import edu.northeastern.cs5500.starterbot.exception.NotYourPackageException;
+import edu.northeastern.cs5500.starterbot.exception.PackageNotExsitException;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import edu.northeastern.cs5500.starterbot.repository.InMemoryRepository;
 import edu.northeastern.cs5500.starterbot.service.TrackPackageService;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 
 public class PackageControllerTest {
     private PackageController packageController;
+    private ObjectId objectId1 = new ObjectId("00000020f51bb4362eee2a4d");
+    private ObjectId objectId2 = new ObjectId("00000020f51bb4362eee2a4b");
+    private ObjectId objectId3 = new ObjectId("00000020f51bb4362eee2a4c");
     private Package package1 =
             Package.builder()
                     .trackingNumber("1Z9A170W0337231977")
                     .carrierId("ups")
                     .userId("user id")
                     .name("first pacakge")
+                    .id(objectId1)
                     .build();
 
     private Package package2 =
@@ -27,6 +32,7 @@ public class PackageControllerTest {
                     .carrierId("ups")
                     .userId("user id")
                     .name("second package")
+                    .id(objectId2)
                     .build();
 
     private Package package3 =
@@ -35,10 +41,10 @@ public class PackageControllerTest {
                     .carrierId("fedex")
                     .userId("user id 2")
                     .name("third package")
+                    .id(objectId3)
                     .build();
 
     PackageControllerTest() {
-        // Avoid using MongoDB service
         GenericRepository<Package> repo = new InMemoryRepository<>();
         this.packageController = new PackageController(repo, new TrackPackageService(repo));
     }
@@ -59,6 +65,14 @@ public class PackageControllerTest {
     }
 
     @Test
+    public void testGetPackage() {
+        packageController.createPackage(package1);
+        assertThat(packageController.getPackage(package1.getId().toString())).isEqualTo(package1);
+        assertThrows(
+                IllegalArgumentException.class, () -> packageController.getPackage("badObjectId"));
+    }
+
+    @Test
     public void testGetUsersPackages() {
         packageController.createPackage(package1);
         packageController.createPackage(package2);
@@ -71,11 +85,6 @@ public class PackageControllerTest {
         packageController.createPackage(package1);
         packageController.createPackage(package2);
         packageController.createPackage(package3);
-        // assertThrows(
-        //         NotYourPackageException.class,
-        //         () ->
-        //                 packageController.deletePackage(
-        //                         package3.getId().toString(), package2.getUserId()));
         assertThrows(
                 IllegalArgumentException.class,
                 () -> packageController.deletePackage("bad Id", package2.getUserId()));
@@ -85,11 +94,10 @@ public class PackageControllerTest {
 
     @Test
     public void testUpdatePackage()
-            throws IllegalArgumentException, NotYourPackageException,
-                    InvalidCarrierAndTrackingNumberException {
+            throws IllegalArgumentException, NotYourPackageException, PackageNotExsitException {
         packageController.createPackage(package1);
         assertThrows(
-                InvalidCarrierAndTrackingNumberException.class,
+                PackageNotExsitException.class,
                 () ->
                         packageController.updatePackage(
                                 package1.getId().toString(),
