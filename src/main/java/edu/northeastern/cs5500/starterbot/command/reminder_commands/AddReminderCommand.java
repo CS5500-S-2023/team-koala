@@ -174,8 +174,16 @@ public class AddReminderCommand implements SlashCommandHandler {
             return;
         }
 
+        // interval and unit should be null / non-null at the same time
+        if (unitString == null && interval != null || interval == null && unitString != null) {
+            event.reply("Please specify both the repeat interval and unit to repeat the reminder")
+                    .queue();
+            return;
+        }
+
         // parse reminder time unit
-        TimeUnit unit = interval != null ? ReminderEntryController.parseTimeUnit(unitString) : null;
+        TimeUnit unit =
+                unitString == null ? null : ReminderEntryController.parseTimeUnit(unitString);
 
         // calculate actual reminder message time and the time of the first reminder message
         reminderTime = reminderTime.minusMinutes(offset);
