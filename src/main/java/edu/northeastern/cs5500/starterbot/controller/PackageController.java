@@ -3,7 +3,7 @@ package edu.northeastern.cs5500.starterbot.controller;
 import com.mongodb.MongoException;
 import edu.northeastern.cs5500.starterbot.exception.KeyDeliveryCallException;
 import edu.northeastern.cs5500.starterbot.exception.NotYourPackageException;
-import edu.northeastern.cs5500.starterbot.exception.PackageNotExsitException;
+import edu.northeastern.cs5500.starterbot.exception.PackageNotExistException;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import edu.northeastern.cs5500.starterbot.service.TrackPackageService;
@@ -113,7 +113,7 @@ public class PackageController {
     private String validatePackage(@Nonnull Package package1) {
         try {
             getPackageLatestStatus(package1);
-        } catch (PackageNotExsitException e) {
+        } catch (PackageNotExistException e) {
             return String.format("%s %s", PACKAGE_NOT_FOUND_MESSAGE, TRY_AGAIN_MESSAGE);
         } catch (KeyDeliveryCallException e) {
             return String.format("%s %s", THIRD_PARTY_API_FAILED_MESSAGE, TRY_AGAIN_MESSAGE);
@@ -130,11 +130,11 @@ public class PackageController {
      * <p>Expected: If the status and statusTime is null, then it means no status is available yet.
      *
      * @param package1
-     * @throws PackageNotExsitException
+     * @throws PackageNotExistException
      * @throws KeyDeliveryCallException
      */
     public void getPackageLatestStatus(Package package1)
-            throws KeyDeliveryCallException, PackageNotExsitException {
+            throws KeyDeliveryCallException, PackageNotExistException {
         trackPackageService.getPackageLatestStatus(package1);
     }
 
@@ -212,13 +212,13 @@ public class PackageController {
      * @return Package the package that got updated
      * @throws IllegalArgumentException if the package id is invalid
      * @throws NotYourPackageException if the package does not belong to the user
-     * @throws PackageNotExsitException if the package is not valid (bad carrier and tracking number
+     * @throws PackageNotExistException if the package is not valid (bad carrier and tracking number
      *     combination)
      */
     @SneakyThrows
     public Package updatePackage(
             String id, String userId, String name, String trackingNumber, String carrierId)
-            throws IllegalArgumentException, NotYourPackageException, PackageNotExsitException {
+            throws IllegalArgumentException, NotYourPackageException, PackageNotExistException {
 
         ObjectId objectId = null;
         Package p = null;
@@ -238,7 +238,7 @@ public class PackageController {
 
         try {
             getPackageLatestStatus(p);
-        } catch (PackageNotExsitException e) {
+        } catch (PackageNotExistException e) {
             throw e;
         }
 
