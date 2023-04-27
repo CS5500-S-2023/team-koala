@@ -8,8 +8,8 @@ import edu.northeastern.cs5500.starterbot.model.Package;
 import org.junit.jupiter.api.Test;
 
 public class AddPackageCommandTest {
-    final String name = "first package";
-    final String trackingNumber = "1Z9A170W0337231977";
+    static final String name = "first package";
+    static final String trackingNumber = "1Z9A170W0337231977";
     final String carrierId = "ups";
     final String userId = "945507823498965002";
 
