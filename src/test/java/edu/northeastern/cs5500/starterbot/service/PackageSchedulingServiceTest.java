@@ -4,7 +4,7 @@ import static com.google.common.truth.Truth.assertThat;
 
 import java.util.Calendar;
 import java.util.Date;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class PackageSchedulingServiceTest {
     PackageSchedulingService packageSchedulingService;
