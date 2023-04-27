@@ -133,6 +133,7 @@ public class PackageController {
      * @throws PackageNotExistException
      * @throws KeyDeliveryCallException
      */
+    @SneakyThrows
     public void getPackageLatestStatus(Package package1)
             throws KeyDeliveryCallException, PackageNotExistException {
         trackPackageService.getPackageLatestStatus(package1);
@@ -145,6 +146,7 @@ public class PackageController {
      * @return Package the package with the associate id
      * @throws IllegalArgumentException if the package id is invalid
      */
+    @SneakyThrows
     public Package getPackage(String id) {
         ObjectId objectId = null;
         try {
@@ -222,12 +224,8 @@ public class PackageController {
 
         ObjectId objectId = null;
         Package p = null;
-        try {
-            objectId = new ObjectId(id);
-            p = packageRepository.get(objectId);
-        } catch (IllegalArgumentException e) {
-            throw e;
-        }
+        objectId = new ObjectId(id);
+        p = packageRepository.get(objectId);
 
         if (!p.getUserId().equals(userId)) {
             throw new NotYourPackageException("This is not your package");
@@ -236,11 +234,7 @@ public class PackageController {
         p.setTrackingNumber(trackingNumber);
         p.setCarrierId(carrierId);
 
-        try {
-            getPackageLatestStatus(p);
-        } catch (PackageNotExistException e) {
-            throw e;
-        }
+        getPackageLatestStatus(p);
 
         packageRepository.update(p);
         return p;

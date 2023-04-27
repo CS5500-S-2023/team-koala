@@ -4,6 +4,7 @@ import edu.northeastern.cs5500.starterbot.command.SlashCommandHandler;
 import edu.northeastern.cs5500.starterbot.controller.PackageController;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.annotation.Nonnull;
@@ -11,6 +12,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -63,25 +65,37 @@ public class DisplayPackagesCommand implements SlashCommandHandler {
         String userId = event.getUser().getId();
         List<Package> myPackages = packageController.getUsersPackages(userId);
         EmbedBuilder embedBuilder =
-                new EmbedBuilder()
-                        .setColor(Color.red)
-                        .setTitle("Displaying Your Packages")
-                        .addBlankField(false);
+                new EmbedBuilder().setColor(Color.red).setTitle("Displaying Your Packages");
+        List<MessageEmbed> messages = new ArrayList<>();
+        messages.add(embedBuilder.build());
         for (Package p : myPackages) {
-            embedBuilder.addField("Package Id: ", displayPackageId(p.getId()), true);
-            embedBuilder.addField("Package Name: ", displayPackageName(p.getName()), true);
-            embedBuilder.addBlankField(true);
-            embedBuilder.addField("Carrier: ", displayCarrierId(p.getCarrierId()), true);
-            embedBuilder.addField(
-                    "Tracking Number: ", displayTrackingNumber(p.getTrackingNumber()), true);
-            embedBuilder.addBlankField(true);
-            embedBuilder.addField("Status: ", displayStatus(p.getStatus()), true);
-            embedBuilder.addField("ETA: ", displayStatusTime(p.getStatusTime()), true);
-            embedBuilder.addBlankField(true);
-            embedBuilder.addBlankField(false);
+            messages.add(createPackageMessage(p));
         }
 
-        event.replyEmbeds(embedBuilder.build()).queue();
+        event.replyEmbeds(messages).queue();
+    }
+
+    /**
+     * This method creates an embedded message for a package showing the packageId, name, carrierId,
+     * tracking number, status, and ETA
+     *
+     * @param p of type Package, representing the package to display
+     * @return MessageEmbed that contains all the information fields
+     */
+    @Nonnull
+    protected MessageEmbed createPackageMessage(Package p) {
+        EmbedBuilder eb = new EmbedBuilder().setColor(Color.white);
+        eb.addField("Package Id: ", displayPackageId(p.getId()), true);
+        eb.addField("Package Name: ", displayPackageName(p.getName()), true);
+        eb.addBlankField(true);
+        eb.addField("Carrier: ", displayCarrierId(p.getCarrierId()), true);
+        eb.addField("Tracking Number: ", displayTrackingNumber(p.getTrackingNumber()), true);
+        eb.addBlankField(true);
+        eb.addField("Status: ", displayStatus(p.getStatus()), true);
+        eb.addField("ETA: ", displayStatusTime(p.getStatusTime()), true);
+        eb.addBlankField(true);
+        eb.addBlankField(false);
+        return eb.build();
     }
 
     @Nonnull
@@ -107,13 +121,11 @@ public class DisplayPackagesCommand implements SlashCommandHandler {
 
     @Nonnull
     private String displayStatus(String status) {
-        if (status == null) return UNKNOWN;
         return status;
     }
 
     @Nonnull
     private String displayStatusTime(Date statusTime) {
-        if (statusTime == null) return UNKNOWN;
         return statusTime.toString();
     }
 }
