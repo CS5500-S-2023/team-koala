@@ -10,10 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 
-/**
- * A model that contains information about a package/shipment
- * 
- */
+/** A model that contains information about a package/shipment */
 @Data
 @Builder
 @NoArgsConstructor
@@ -26,20 +23,16 @@ public class Package implements Model {
     @Nonnull String trackingNumber;
     @Nonnull String carrierId;
 
-    /**
-     * Discord user id
-     */
+    /** Discord user id */
     @Nonnull String userId;
 
     /**
      * Package's latest status;
-     * 
-     * Default as null; Updated in creating/updating/displaying packages
+     *
+     * <p>Default as null; Updated in creating/updating/displaying packages
      */
     @Nullable String status;
 
-    /**
-     * Time for package's latest status happen
-     */
+    /** Time for package's latest status happen */
     @Nullable Date statusTime;
 }

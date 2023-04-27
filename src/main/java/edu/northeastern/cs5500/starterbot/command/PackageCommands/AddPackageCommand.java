@@ -66,9 +66,8 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
     }
 
     /**
-     * Collect user input for tracking number and package name
-     * Reply to users with a StringSelectMenu event to collect carrier name
-     * 
+     * Collect user input and reply to users with a StringSelectMenu event to collect carrier name
+     *
      * @param event - user's interaction event
      */
     @Override
@@ -111,7 +110,7 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
     /**
      * Check user inputs' validity, verify the combination of tracking number and carrier id
      * Finally, create package in our database
-     * 
+     *
      * @param event - user's interaction event
      */
     @Override

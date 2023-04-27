@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * This service handles interactions with third-party API KeyDelivery
+ *
  * @see https://www.kd100.com/docs/keydelivery-api
  */
 @Singleton
