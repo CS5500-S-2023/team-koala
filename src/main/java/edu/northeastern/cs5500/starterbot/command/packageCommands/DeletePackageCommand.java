@@ -2,7 +2,7 @@ package edu.northeastern.cs5500.starterbot.command.packageCommands;
 
 import edu.northeastern.cs5500.starterbot.command.SlashCommandHandler;
 import edu.northeastern.cs5500.starterbot.controller.PackageController;
-import edu.northeastern.cs5500.starterbot.exception.PackageException.NotYourPackageException;
+import edu.northeastern.cs5500.starterbot.exception.packageException.NotYourPackageException;
 import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;

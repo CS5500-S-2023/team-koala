@@ -2,7 +2,7 @@ package edu.northeastern.cs5500.starterbot.command.reminder_commands;
 
 import edu.northeastern.cs5500.starterbot.command.SlashCommandHandler;
 import edu.northeastern.cs5500.starterbot.controller.ReminderEntryController;
-import edu.northeastern.cs5500.starterbot.exception.ReminderException.UnableToAddReminderException;
+import edu.northeastern.cs5500.starterbot.exception.reminderException.UnableToAddReminderException;
 import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
 import edu.northeastern.cs5500.starterbot.service.reminderService.ReminderMessageTask;
 import edu.northeastern.cs5500.starterbot.service.reminderService.ReminderSchedulingService;

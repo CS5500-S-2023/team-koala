@@ -1,4 +1,4 @@
-package edu.northeastern.cs5500.starterbot.exception.KeyDeliveryException;
+package edu.northeastern.cs5500.starterbot.exception.keyDeliveryException;
 
 import lombok.experimental.StandardException;
 

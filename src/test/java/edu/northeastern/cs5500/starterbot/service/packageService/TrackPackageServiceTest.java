@@ -2,8 +2,8 @@ package edu.northeastern.cs5500.starterbot.service.packageService;
 
 import static org.junit.Assert.*;
 
-import edu.northeastern.cs5500.starterbot.exception.KeyDeliveryException.KeyDeliveryCallException;
-import edu.northeastern.cs5500.starterbot.exception.PackageException.PackageNotExistException;
+import edu.northeastern.cs5500.starterbot.exception.keyDeliveryException.KeyDeliveryCallException;
+import edu.northeastern.cs5500.starterbot.exception.packageException.PackageNotExistException;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.InMemoryRepository;
 import org.junit.jupiter.api.Test;

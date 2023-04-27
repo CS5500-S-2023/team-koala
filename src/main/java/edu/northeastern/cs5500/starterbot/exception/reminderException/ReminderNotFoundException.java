@@ -1,4 +1,4 @@
-package edu.northeastern.cs5500.starterbot.exception.ReminderException;
+package edu.northeastern.cs5500.starterbot.exception.reminderException;
 
 import lombok.experimental.StandardException;
 

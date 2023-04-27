@@ -3,8 +3,8 @@ package edu.northeastern.cs5500.starterbot.controller;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.*;
 
-import edu.northeastern.cs5500.starterbot.exception.PackageException.NotYourPackageException;
-import edu.northeastern.cs5500.starterbot.exception.PackageException.PackageNotExistException;
+import edu.northeastern.cs5500.starterbot.exception.packageException.NotYourPackageException;
+import edu.northeastern.cs5500.starterbot.exception.packageException.PackageNotExistException;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import edu.northeastern.cs5500.starterbot.repository.InMemoryRepository;
