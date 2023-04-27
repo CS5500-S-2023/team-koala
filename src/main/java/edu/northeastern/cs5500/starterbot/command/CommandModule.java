@@ -3,11 +3,11 @@ package edu.northeastern.cs5500.starterbot.command;
 import dagger.Module;
 import dagger.Provides;
 import dagger.multibindings.IntoSet;
-import edu.northeastern.cs5500.starterbot.command.packageCommands.AddPackageCommand;
-import edu.northeastern.cs5500.starterbot.command.packageCommands.DeletePackageCommand;
-import edu.northeastern.cs5500.starterbot.command.packageCommands.DisplayPackagesCommand;
-import edu.northeastern.cs5500.starterbot.command.packageCommands.UpdatePackageCommand;
-import edu.northeastern.cs5500.starterbot.command.reminder_commands.AddReminderCommand;
+import edu.northeastern.cs5500.starterbot.command.packages.AddPackageCommand;
+import edu.northeastern.cs5500.starterbot.command.packages.DeletePackageCommand;
+import edu.northeastern.cs5500.starterbot.command.packages.DisplayPackagesCommand;
+import edu.northeastern.cs5500.starterbot.command.packages.UpdatePackageCommand;
+import edu.northeastern.cs5500.starterbot.command.reminders.AddReminderCommand;
 
 @Module
 public class CommandModule {

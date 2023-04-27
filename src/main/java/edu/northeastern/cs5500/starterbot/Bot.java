@@ -5,7 +5,7 @@ import edu.northeastern.cs5500.starterbot.command.CommandModule;
 import edu.northeastern.cs5500.starterbot.listener.MessageListener;
 import edu.northeastern.cs5500.starterbot.repository.RepositoryModule;
 import edu.northeastern.cs5500.starterbot.service.ServiceModule;
-import edu.northeastern.cs5500.starterbot.service.packageService.PackageSchedulingService;
+import edu.northeastern.cs5500.starterbot.service.packages.PackageSchedulingService;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import net.dv8tion.jda.api.JDA;

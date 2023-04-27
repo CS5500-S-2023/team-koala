@@ -3,12 +3,12 @@ package edu.northeastern.cs5500.starterbot.controller;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.*;
 
-import edu.northeastern.cs5500.starterbot.exception.packageException.NotYourPackageException;
-import edu.northeastern.cs5500.starterbot.exception.packageException.PackageNotExistException;
+import edu.northeastern.cs5500.starterbot.exception.packages.NotYourPackageException;
+import edu.northeastern.cs5500.starterbot.exception.packages.PackageNotExistException;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import edu.northeastern.cs5500.starterbot.repository.InMemoryRepository;
-import edu.northeastern.cs5500.starterbot.service.packageService.TrackPackageService;
+import edu.northeastern.cs5500.starterbot.service.packages.TrackPackageService;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 
