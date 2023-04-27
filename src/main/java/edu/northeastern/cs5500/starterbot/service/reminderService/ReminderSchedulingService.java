@@ -1,8 +1,9 @@
-package edu.northeastern.cs5500.starterbot.service;
+package edu.northeastern.cs5500.starterbot.service.reminderService;
 
 import edu.northeastern.cs5500.starterbot.controller.ReminderEntryController;
 import edu.northeastern.cs5500.starterbot.exception.ReminderNotFoundException;
 import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
+import edu.northeastern.cs5500.starterbot.service.Service;
 import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;

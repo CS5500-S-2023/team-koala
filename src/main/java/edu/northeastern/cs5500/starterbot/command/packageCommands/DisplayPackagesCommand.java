@@ -1,4 +1,4 @@
-package edu.northeastern.cs5500.starterbot.command.PackageCommands;
+package edu.northeastern.cs5500.starterbot.command.packageCommands;
 
 import edu.northeastern.cs5500.starterbot.command.SlashCommandHandler;
 import edu.northeastern.cs5500.starterbot.controller.PackageController;

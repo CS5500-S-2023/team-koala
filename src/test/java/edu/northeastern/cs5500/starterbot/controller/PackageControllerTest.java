@@ -8,7 +8,7 @@ import edu.northeastern.cs5500.starterbot.exception.PackageNotExistException;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import edu.northeastern.cs5500.starterbot.repository.InMemoryRepository;
-import edu.northeastern.cs5500.starterbot.service.TrackPackageService;
+import edu.northeastern.cs5500.starterbot.service.packageService.TrackPackageService;
 import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 

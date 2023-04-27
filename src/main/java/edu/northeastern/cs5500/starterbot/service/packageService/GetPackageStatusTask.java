@@ -1,4 +1,4 @@
-package edu.northeastern.cs5500.starterbot.service;
+package edu.northeastern.cs5500.starterbot.service.packageService;
 
 import com.google.common.annotations.VisibleForTesting;
 import edu.northeastern.cs5500.starterbot.model.Package;

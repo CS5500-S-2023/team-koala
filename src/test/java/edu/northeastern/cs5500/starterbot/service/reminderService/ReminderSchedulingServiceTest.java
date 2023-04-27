@@ -1,4 +1,4 @@
-package edu.northeastern.cs5500.starterbot.service;
+package edu.northeastern.cs5500.starterbot.service.reminderService;
 
 import static com.google.common.truth.Truth.assertThat;
 

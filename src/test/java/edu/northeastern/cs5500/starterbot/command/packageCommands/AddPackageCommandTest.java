@@ -1,4 +1,4 @@
-package edu.northeastern.cs5500.starterbot.command.PackageCommands;
+package edu.northeastern.cs5500.starterbot.command.packageCommands;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;

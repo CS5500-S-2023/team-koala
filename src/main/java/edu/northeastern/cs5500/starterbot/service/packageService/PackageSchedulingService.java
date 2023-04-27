@@ -1,6 +1,7 @@
-package edu.northeastern.cs5500.starterbot.service;
+package edu.northeastern.cs5500.starterbot.service.packageService;
 
 import com.google.common.annotations.VisibleForTesting;
+import edu.northeastern.cs5500.starterbot.service.Service;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;

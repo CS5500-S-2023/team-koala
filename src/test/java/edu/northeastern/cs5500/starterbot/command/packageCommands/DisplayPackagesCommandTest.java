@@ -1,4 +1,4 @@
-package edu.northeastern.cs5500.starterbot.command.PackageCommands;
+package edu.northeastern.cs5500.starterbot.command.packageCommands;
 
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.*;
@@ -9,7 +9,7 @@ import edu.northeastern.cs5500.starterbot.exception.PackageNotExistException;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import edu.northeastern.cs5500.starterbot.repository.InMemoryRepository;
-import edu.northeastern.cs5500.starterbot.service.TrackPackageService;
+import edu.northeastern.cs5500.starterbot.service.packageService.TrackPackageService;
 import java.awt.Color;
 import net.dv8tion.jda.api.EmbedBuilder;
 import org.bson.types.ObjectId;

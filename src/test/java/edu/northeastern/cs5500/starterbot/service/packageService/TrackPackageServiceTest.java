@@ -1,4 +1,4 @@
-package edu.northeastern.cs5500.starterbot.service;
+package edu.northeastern.cs5500.starterbot.service.packageService;
 
 import static org.junit.Assert.*;
 

@@ -1,4 +1,4 @@
-package edu.northeastern.cs5500.starterbot.command.PackageCommands;
+package edu.northeastern.cs5500.starterbot.command.packageCommands;
 
 import com.google.common.annotations.VisibleForTesting;
 import edu.northeastern.cs5500.starterbot.command.SlashCommandHandler;
@@ -6,7 +6,7 @@ import edu.northeastern.cs5500.starterbot.command.StringSelectHandler;
 import edu.northeastern.cs5500.starterbot.controller.PackageController;
 import edu.northeastern.cs5500.starterbot.exception.MissingMandatoryFieldsException;
 import edu.northeastern.cs5500.starterbot.model.Package;
-import edu.northeastern.cs5500.starterbot.service.TrackPackageService;
+import edu.northeastern.cs5500.starterbot.service.packageService.TrackPackageService;
 import java.util.Map;
 import java.util.Objects;
 import javax.annotation.Nonnull;
