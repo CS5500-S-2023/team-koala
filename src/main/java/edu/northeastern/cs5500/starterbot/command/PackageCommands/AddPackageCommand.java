@@ -21,6 +21,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.components.selections.*;
 
+/** AddPackageCommand allows users to create packages in our database and track them later */
 @Singleton
 @Slf4j
 public class AddPackageCommand implements SlashCommandHandler, StringSelectHandler {
@@ -32,12 +33,22 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
         // Defined public and empty for Dagger injection
     }
 
+    /**
+     * Returns the name of the command.
+     *
+     * @return String - the name of the command.
+     */
     @Override
     @Nonnull
     public String getName() {
         return "add_package";
     }
 
+    /**
+     * Returns the options to retrieve tracking number and package name
+     *
+     * @return CommandData - information about this command
+     */
     @Override
     @Nonnull
     public CommandData getCommandData() {
@@ -54,6 +65,12 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
                         false);
     }
 
+    /**
+     * Collect user input for tracking number and package name
+     * Reply to users with a StringSelectMenu event to collect carrier name
+     * 
+     * @param event - user's interaction event
+     */
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
         log.info("event: /add_package");
@@ -91,6 +108,12 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
                 .queue();
     }
 
+    /**
+     * Check user inputs' validity, verify the combination of tracking number and carrier id
+     * Finally, create package in our database
+     * 
+     * @param event - user's interaction event
+     */
     @Override
     public void onStringSelectInteraction(@Nonnull StringSelectInteractionEvent event) {
         log.info("event: /add_package:StringSelectInteractionEvent - {}", event.getValues().get(0));
