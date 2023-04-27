@@ -23,6 +23,11 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * This service handles interactions with third-party API KeyDelivery
+ *
+ * @see https://www.kd100.com/docs/keydelivery-api
+ */
 @Singleton
 @Slf4j
 public class TrackPackageService implements Service {
