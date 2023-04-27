@@ -67,21 +67,26 @@ public class DisplayPackagesCommand implements SlashCommandHandler {
                         .setColor(Color.red)
                         .setTitle("Displaying Your Packages")
                         .addBlankField(false);
+        // event.replyEmbeds(embedBuilder.build()).queue();
         for (Package p : myPackages) {
-            embedBuilder.addField("Package Id: ", displayPackageId(p.getId()), true);
-            embedBuilder.addField("Package Name: ", displayPackageName(p.getName()), true);
-            embedBuilder.addBlankField(true);
-            embedBuilder.addField("Carrier: ", displayCarrierId(p.getCarrierId()), true);
-            embedBuilder.addField(
-                    "Tracking Number: ", displayTrackingNumber(p.getTrackingNumber()), true);
-            embedBuilder.addBlankField(true);
-            embedBuilder.addField("Status: ", displayStatus(p.getStatus()), true);
-            embedBuilder.addField("ETA: ", displayStatusTime(p.getStatusTime()), true);
-            embedBuilder.addBlankField(true);
-            embedBuilder.addBlankField(false);
+            buildEmbeds(event, p);
         }
+    }
 
-        event.replyEmbeds(embedBuilder.build()).queue();
+    @Nonnull
+    private void buildEmbeds(@Nonnull SlashCommandInteractionEvent event, Package p) {
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.addField("Package Id: ", displayPackageId(p.getId()), true);
+        eb.addField("Package Name: ", displayPackageName(p.getName()), true);
+        eb.addBlankField(true);
+        eb.addField("Carrier: ", displayCarrierId(p.getCarrierId()), true);
+        eb.addField("Tracking Number: ", displayTrackingNumber(p.getTrackingNumber()), true);
+        eb.addBlankField(true);
+        eb.addField("Status: ", displayStatus(p.getStatus()), true);
+        eb.addField("ETA: ", displayStatusTime(p.getStatusTime()), true);
+        eb.addBlankField(true);
+        eb.addBlankField(false);
+        event.replyEmbeds(eb.build()).queue();
     }
 
     @Nonnull
