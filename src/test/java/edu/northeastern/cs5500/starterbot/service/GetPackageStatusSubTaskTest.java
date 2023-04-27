@@ -5,7 +5,7 @@ import static com.google.common.truth.Truth.assertThat;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import edu.northeastern.cs5500.starterbot.repository.InMemoryRepository;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class GetPackageStatusSubTaskTest {
     private static final String namePkg = "first pacakge";
