@@ -1,11 +1,10 @@
 package edu.northeastern.cs5500.starterbot.command.packageCommands;
 
 import static com.google.common.truth.Truth.assertThat;
-import static org.junit.Assert.*;
 
 import edu.northeastern.cs5500.starterbot.controller.PackageController;
-import edu.northeastern.cs5500.starterbot.exception.KeyDeliveryCallException;
-import edu.northeastern.cs5500.starterbot.exception.PackageNotExistException;
+import edu.northeastern.cs5500.starterbot.exception.KeyDeliveryException.KeyDeliveryCallException;
+import edu.northeastern.cs5500.starterbot.exception.PackageException.PackageNotExistException;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import edu.northeastern.cs5500.starterbot.repository.GenericRepository;
 import edu.northeastern.cs5500.starterbot.repository.InMemoryRepository;
