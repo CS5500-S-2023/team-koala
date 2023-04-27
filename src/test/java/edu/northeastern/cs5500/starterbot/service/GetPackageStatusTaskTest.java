@@ -2,7 +2,7 @@ package edu.northeastern.cs5500.starterbot.service;
 
 import static com.google.common.truth.Truth.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class GetPackageStatusTaskTest {
     GetPackageStatusTask getPackageStatusTask;
