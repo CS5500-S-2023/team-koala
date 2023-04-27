@@ -1,7 +1,6 @@
 package edu.northeastern.cs5500.starterbot.controller;
 
 import com.mongodb.MongoException;
-
 import edu.northeastern.cs5500.starterbot.exception.ReminderException.ReminderNotFoundException;
 import edu.northeastern.cs5500.starterbot.exception.ReminderException.UnableToAddReminderException;
 import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
