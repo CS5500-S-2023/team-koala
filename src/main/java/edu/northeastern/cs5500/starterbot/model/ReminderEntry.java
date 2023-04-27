@@ -13,17 +13,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import org.bson.types.ObjectId;
 
-/**
- * The model that contains the info about a reminder:
- *
- * <p>discordUserId - user who created this reminder entry. <br>
- * title - title of reminder. <br>
- * reminderTime - the time the reminded event is supposed to start. <br>
- * nextReminderTime - the time when the next message for this reminder will be sent. <br>
- * reminderOffset - how much earlier (in minutes) the reminder should be sent. <br>
- * repeatInterval - the interval between 2 reminders if the reminder entry is repeated. <br>
- * repeatTimeUnit - time unit of the repeat interval. <br>
- */
+/** The model that contains the info about a reminder. */
 @Data
 @Builder
 @EqualsAndHashCode
@@ -31,13 +21,22 @@ import org.bson.types.ObjectId;
 @NoArgsConstructor
 @ToString
 public class ReminderEntry implements Model {
+    /** Id of the reminder, generated. */
     ObjectId id;
+    /** User who created this reminder entry. */
     @Nonnull String discordUserId;
+    /** Title of reminder. */
     @Nonnull String title;
+    /** The time the reminded event is supposed to start. */
     @Nonnull LocalTime reminderTime;
+    /** How much earlier (in minutes) the reminder message should be sent. */
     @Nonnull Integer reminderOffset;
+    /** The time when the next message for this reminder will be sent. */
     @Nonnull LocalDateTime nextReminderTime;
+    /** Time zone of the reminder. */
     @Nonnull String timeZone;
+    /** The interval between 2 reminders if the reminder is repeated. */
     @Nullable Integer repeatInterval;
+    /** Time unit of the repeat interval. */
     @Nullable TimeUnit repeatTimeUnit;
 }
