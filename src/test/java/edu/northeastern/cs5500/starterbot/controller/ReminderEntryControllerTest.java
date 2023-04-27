@@ -3,8 +3,8 @@ package edu.northeastern.cs5500.starterbot.controller;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import edu.northeastern.cs5500.starterbot.exception.ReminderNotFoundException;
-import edu.northeastern.cs5500.starterbot.exception.UnableToAddReminderException;
+import edu.northeastern.cs5500.starterbot.exception.reminders.ReminderNotFoundException;
+import edu.northeastern.cs5500.starterbot.exception.reminders.UnableToAddReminderException;
 import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
 import edu.northeastern.cs5500.starterbot.repository.InMemoryRepository;
 import java.time.LocalDateTime;
