@@ -33,6 +33,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 /**
  * The command that allows users to add a reminder by specifying title, reminder time, offset repeat
@@ -224,6 +225,30 @@ public class AddReminderCommand implements SlashCommandHandler {
         }
 
         // return reminder info in confirmation message to user
+        MessageCreateData messageData =
+                buildReminderReceiptMessage(
+                        title, reminderTimeString, offset, delay, interval, unitString);
+        event.reply(messageData).queue();
+    }
+
+    /**
+     * Build the message with an embed showing the information of the reminder added.
+     *
+     * @param title - title of the reminder.
+     * @param reminderTimeString - reminder time in string format.
+     * @param offset - reminder offset.
+     * @param delay - initial delay of the reminder.
+     * @param interval - repeat interval of the reminder.
+     * @param unitString - repeat interval time unit of the reminder.
+     * @return MessageCreateData - the message to be send back to user.
+     */
+    public MessageCreateData buildReminderReceiptMessage(
+            String title,
+            String reminderTimeString,
+            Integer offset,
+            Integer delay,
+            Integer interval,
+            String unitString) {
         List<MessageEmbed> embeds = new ArrayList<>();
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.addField("Title", title, false);
@@ -236,13 +261,12 @@ public class AddReminderCommand implements SlashCommandHandler {
         }
         MessageEmbed embed = embedBuilder.build();
         embeds.add(embed);
-
         MessageCreateBuilder messageCreateBuilder = new MessageCreateBuilder();
         messageCreateBuilder = messageCreateBuilder.addEmbeds(embeds);
         messageCreateBuilder =
                 messageCreateBuilder.setContent(
                         "The following reminder has been successfully added!");
-        event.reply(messageCreateBuilder.build()).queue();
+        return messageCreateBuilder.build();
     }
 
     /**
