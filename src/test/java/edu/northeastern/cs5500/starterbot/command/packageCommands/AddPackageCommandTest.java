@@ -3,7 +3,7 @@ package edu.northeastern.cs5500.starterbot.command.packageCommands;
 import static com.google.common.truth.Truth.assertThat;
 import static org.junit.Assert.assertThrows;
 
-import edu.northeastern.cs5500.starterbot.exception.MissingMandatoryFieldsException;
+import edu.northeastern.cs5500.starterbot.exception.PackageException.MissingMandatoryFieldsException;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import org.junit.jupiter.api.Test;
 

@@ -3,7 +3,7 @@ package edu.northeastern.cs5500.starterbot.service.reminderService;
 import static com.google.common.truth.Truth.assertThat;
 
 import edu.northeastern.cs5500.starterbot.controller.ReminderEntryController;
-import edu.northeastern.cs5500.starterbot.exception.UnableToAddReminderException;
+import edu.northeastern.cs5500.starterbot.exception.ReminderException.UnableToAddReminderException;
 import edu.northeastern.cs5500.starterbot.model.ReminderEntry;
 import edu.northeastern.cs5500.starterbot.repository.InMemoryRepository;
 import java.time.LocalDateTime;

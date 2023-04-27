@@ -2,8 +2,8 @@ package edu.northeastern.cs5500.starterbot.command.packageCommands;
 
 import edu.northeastern.cs5500.starterbot.command.SlashCommandHandler;
 import edu.northeastern.cs5500.starterbot.controller.PackageController;
-import edu.northeastern.cs5500.starterbot.exception.NotYourPackageException;
-import edu.northeastern.cs5500.starterbot.exception.PackageNotExistException;
+import edu.northeastern.cs5500.starterbot.exception.PackageException.NotYourPackageException;
+import edu.northeastern.cs5500.starterbot.exception.PackageException.PackageNotExistException;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import java.util.Objects;
 import javax.annotation.Nonnull;
