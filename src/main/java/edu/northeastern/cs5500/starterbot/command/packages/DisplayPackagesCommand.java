@@ -98,34 +98,69 @@ public class DisplayPackagesCommand implements SlashCommandHandler {
         return eb.build();
     }
 
+    /**
+     * Returns the package Id as a string
+     *
+     * @param id ObjectId
+     * @return id as a string
+     */
     @Nonnull
-    private String displayPackageId(@Nonnull ObjectId id) {
+    protected String displayPackageId(@Nonnull ObjectId id) {
         return id.toString();
     }
 
+    /**
+     * Returns the package name
+     *
+     * @param name String
+     * @return name of the package
+     */
     @Nonnull
-    private String displayPackageName(@Nonnull String name) {
-        if (name == null) return UNKNOWN;
+    protected String displayPackageName(@Nonnull String name) {
         return name;
     }
 
+    /**
+     * Returns the carrier Id
+     *
+     * @param carrierId String
+     * @return the package carrier
+     */
     @Nonnull
-    private String displayCarrierId(@Nonnull String carrierId) {
+    protected String displayCarrierId(@Nonnull String carrierId) {
         return carrierId.toUpperCase();
     }
 
+    /**
+     * Returns tracking number of the package
+     *
+     * @param trackingNumber String
+     * @return the package trackingn number
+     */
     @Nonnull
-    private String displayTrackingNumber(@Nonnull String trackingNumber) {
+    protected String displayTrackingNumber(@Nonnull String trackingNumber) {
         return trackingNumber;
     }
 
+    /**
+     * Returns the status of the package
+     *
+     * @param status String
+     * @return the status of the package
+     */
     @Nonnull
-    private String displayStatus(String status) {
+    protected String displayStatus(String status) {
         return status;
     }
 
+    /**
+     * Returns the ETA of the package
+     *
+     * @param statusTime Date
+     * @return the ETA as a String
+     */
     @Nonnull
-    private String displayStatusTime(Date statusTime) {
+    protected String displayStatusTime(Date statusTime) {
         return statusTime.toString();
     }
 }
