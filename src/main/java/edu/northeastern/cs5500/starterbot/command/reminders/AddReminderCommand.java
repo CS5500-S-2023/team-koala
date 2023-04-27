@@ -306,7 +306,7 @@ public class AddReminderCommand implements SlashCommandHandler {
      * @param now - time of execution
      * @return ZonedDateTime - the time of the next reminder message
      */
-    private ZonedDateTime getFirstReminderTime(
+    public ZonedDateTime getFirstReminderTime(
             LocalTime reminderTimeActual,
             Integer delay,
             TimeUnit unit,
