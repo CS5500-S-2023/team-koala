@@ -143,8 +143,8 @@ public class TrackPackageService implements Service {
     /**
      * Construct JSON strings and send post requests to a KeyDelivery API Realtime tracking
      *
-     * @param carrier_id
-     * @param tracking_number
+     * @param carrier_id - carrier_id from user input
+     * @param tracking_number - tracking_number from user input
      * @return response from KeyDelivery
      */
     private String getData(String url, String carrier_id, String tracking_number) {

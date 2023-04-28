@@ -10,9 +10,9 @@ import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 
-/*
- * GetPackageStatusTask is a timer task
- * which schedules various timer tasks to retrieve packages' status at different time
+/**
+ * This class is a timer task which schedules various timer tasks to retrieve packages' status at
+ * different time
  */
 @Slf4j
 public class GetPackageStatusTask extends TimerTask {
@@ -27,7 +27,7 @@ public class GetPackageStatusTask extends TimerTask {
      * Public constructor for usage in PackageSchedulingService
      *
      * @param jda - represents a connection to discord
-     * @param trackPackageService
+     * @param trackPackageService - TrackPackageService
      */
     public GetPackageStatusTask(JDA jda, TrackPackageService trackPackageService) {
         this.jda = jda;

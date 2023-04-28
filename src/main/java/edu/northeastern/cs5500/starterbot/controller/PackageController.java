@@ -17,7 +17,10 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 
-/** PackageController is a class for operations on the package model */
+/**
+ * The controller that provides combinations of database operations and services on the {@link
+ * Package}
+ */
 @Slf4j
 public class PackageController {
 
@@ -51,7 +54,7 @@ public class PackageController {
     /**
      * Add package to database after validating the existence of the package via third-party api
      *
-     * @param package1
+     * @param package1 - the provided package object
      * @return string - SUCESS or Any other error message
      */
     public String createPackage(@Nonnull Package package1) {
@@ -82,7 +85,7 @@ public class PackageController {
     /**
      * Find a package based on userId, carrierId, and trackingNumber
      *
-     * @param package1
+     * @param package1 - the provided package object
      * @return null if this package is not created yet in our system; a Package object if this
      *     package has been created.
      */
@@ -107,7 +110,7 @@ public class PackageController {
     /**
      * Verify if a package is existent via calling third-party(KeyDelivery) API
      *
-     * @param package1
+     * @param package1 - the provided package object
      * @return string - SUCESS or Any other error message
      */
     private String validatePackage(@Nonnull Package package1) {
@@ -129,9 +132,10 @@ public class PackageController {
      *
      * <p>Expected: If the status and statusTime is null, then it means no status is available yet.
      *
-     * @param package1
-     * @throws PackageNotExistException
-     * @throws KeyDeliveryCallException
+     * @param package1 - the provided package object
+     * @throws PackageNotExistException - the combination of tracking number and carrier id is
+     *     invalid
+     * @throws KeyDeliveryCallException - something wrong with KeyDelivery
      */
     @SneakyThrows
     public void getPackageLatestStatus(Package package1)
@@ -142,7 +146,7 @@ public class PackageController {
     /**
      * This method gets the package with a certain id
      *
-     * @param id
+     * @param id - should be package id; otherwise, exception is thrown
      * @return Package the package with the associate id
      * @throws IllegalArgumentException if the package id is invalid
      */

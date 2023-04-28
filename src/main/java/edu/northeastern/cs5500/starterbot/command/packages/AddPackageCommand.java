@@ -21,7 +21,7 @@ import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.components.selections.*;
 
-/** AddPackageCommand allows users to create packages in our database and track them later */
+/** The command that allows users to create packages in our database and track them later */
 @Singleton
 @Slf4j
 public class AddPackageCommand implements SlashCommandHandler, StringSelectHandler {
@@ -157,9 +157,9 @@ public class AddPackageCommand implements SlashCommandHandler, StringSelectHandl
      * Check fields for nullability and build a valid package
      *
      * @param paramArray - extracted from event
-     * @param userId
+     * @param userId - discord user id
      * @return a built package object
-     * @throws MissingMandatoryFieldsException
+     * @throws MissingMandatoryFieldsException - missing tracking number of carrier id
      */
     @VisibleForTesting
     Package buildPackage(String param, @Nonnull String userId)
