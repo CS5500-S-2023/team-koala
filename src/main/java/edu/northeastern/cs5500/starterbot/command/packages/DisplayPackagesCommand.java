@@ -5,7 +5,6 @@ import edu.northeastern.cs5500.starterbot.controller.PackageController;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -16,7 +15,6 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.CommandData;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import org.bson.types.ObjectId;
 
 /** The command that allows the user to display all of the packages that belongs to the user */
 @Singleton
@@ -85,47 +83,16 @@ public class DisplayPackagesCommand implements SlashCommandHandler {
     @Nonnull
     protected MessageEmbed createPackageMessage(Package p) {
         EmbedBuilder eb = new EmbedBuilder().setColor(Color.white);
-        eb.addField("Package Id: ", displayPackageId(p.getId()), true);
-        eb.addField("Package Name: ", displayPackageName(p.getName()), true);
+        eb.addField("Package Id: ", p.getId().toString(), true);
+        eb.addField("Package Name: ", p.getName(), true);
         eb.addBlankField(true);
-        eb.addField("Carrier: ", displayCarrierId(p.getCarrierId()), true);
-        eb.addField("Tracking Number: ", displayTrackingNumber(p.getTrackingNumber()), true);
+        eb.addField("Carrier: ", p.getCarrierId().toUpperCase(), true);
+        eb.addField("Tracking Number: ", p.getTrackingNumber(), true);
         eb.addBlankField(true);
-        eb.addField("Status: ", displayStatus(p.getStatus()), true);
-        eb.addField("ETA: ", displayStatusTime(p.getStatusTime()), true);
+        eb.addField("Status: ", p.getStatus(), true);
+        eb.addField("ETA: ", p.getStatusTime().toString(), true);
         eb.addBlankField(true);
         eb.addBlankField(false);
         return eb.build();
-    }
-
-    @Nonnull
-    private String displayPackageId(@Nonnull ObjectId id) {
-        return id.toString();
-    }
-
-    @Nonnull
-    private String displayPackageName(@Nonnull String name) {
-        if (name == null) return UNKNOWN;
-        return name;
-    }
-
-    @Nonnull
-    private String displayCarrierId(@Nonnull String carrierId) {
-        return carrierId.toUpperCase();
-    }
-
-    @Nonnull
-    private String displayTrackingNumber(@Nonnull String trackingNumber) {
-        return trackingNumber;
-    }
-
-    @Nonnull
-    private String displayStatus(String status) {
-        return status;
-    }
-
-    @Nonnull
-    private String displayStatusTime(Date statusTime) {
-        return statusTime.toString();
     }
 }
