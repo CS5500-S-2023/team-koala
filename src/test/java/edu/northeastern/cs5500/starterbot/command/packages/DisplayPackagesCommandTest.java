@@ -51,41 +51,4 @@ public class DisplayPackagesCommandTest {
         eb.addBlankField(false);
         assertThat(eb.build()).isEqualTo(displayPackagesCommand.createPackageMessage(package1));
     }
-
-    @Test
-    void testDisplayPackageId() {
-        assertThat("00000020f51bb4362eee2a4d")
-                .isEqualTo(displayPackagesCommand.displayPackageId(objectId1));
-    }
-
-    @Test
-    void testDisplayPackageName() {
-        assertThat("first pacakge")
-                .isEqualTo(displayPackagesCommand.displayPackageName(package1.getName()));
-    }
-
-    @Test
-    void testDisplayCarrierId() {
-        assertThat("UPS")
-                .isEqualTo(displayPackagesCommand.displayCarrierId(package1.getCarrierId()));
-    }
-
-    @Test
-    void testDisplayTrackingNumber() {
-        assertThat("1Z9A170W0337231977")
-                .isEqualTo(
-                        displayPackagesCommand.displayTrackingNumber(package1.getTrackingNumber()));
-    }
-
-    @Test
-    void testDisplayStatus() {
-        assertThat("[SEATTLE, WA, US]DELIVERED")
-                .isEqualTo(displayPackagesCommand.displayStatus(package1.getStatus()));
-    }
-
-    @Test
-    void testDisplayStatusTime() {
-        assertThat("2023-02-24 18:50:18.0")
-                .isEqualTo(displayPackagesCommand.displayStatusTime(package1.getStatusTime()));
-    }
 }
