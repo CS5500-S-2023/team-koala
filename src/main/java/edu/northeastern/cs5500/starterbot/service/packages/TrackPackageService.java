@@ -80,9 +80,7 @@ public class TrackPackageService implements Service {
         String tracking_number = package1.getTrackingNumber();
 
         String result = getData(REALTIME_URL, carrier_id, tracking_number);
-        log.info(
-                String.format(
-                        "getPackageLatestStatus for package %s", package1.getId()));
+        log.info(String.format("getPackageLatestStatus for package %s", package1.getId()));
 
         // read the delivery updates
         readDeliveryResponse(result, package1);

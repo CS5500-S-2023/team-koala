@@ -132,15 +132,20 @@ public class GetPackageStatusSubTask extends TimerTask {
     private void sendMessage(String userId, String content) {
 
         jda.retrieveUserById(userId)
-                .submit().whenCompleteAsync((user, error) -> {
-                    if (error != null) {
-                        user.openPrivateChannel()
-                                    .flatMap(channel -> channel.sendMessage(content))
-                                    .complete();
-                    } else {
-                        log.error("This user {} may have block our bot or hasn't enable private messages", userId, error);
-                    }
-                });
+                .submit()
+                .whenCompleteAsync(
+                        (user, error) -> {
+                            if (error != null) {
+                                user.openPrivateChannel()
+                                        .flatMap(channel -> channel.sendMessage(content))
+                                        .complete();
+                            } else {
+                                log.error(
+                                        "This user {} may have block our bot or hasn't enable private messages",
+                                        userId,
+                                        error);
+                            }
+                        });
         log.info("Package status updates have been sent to discord user " + userId);
     }
 }
