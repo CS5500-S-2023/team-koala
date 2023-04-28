@@ -1,5 +1,6 @@
 package edu.northeastern.cs5500.starterbot.command.reminders;
 
+import com.google.common.annotations.VisibleForTesting;
 import edu.northeastern.cs5500.starterbot.command.SlashCommandHandler;
 import edu.northeastern.cs5500.starterbot.controller.ReminderEntryController;
 import edu.northeastern.cs5500.starterbot.exception.reminders.UnableToAddReminderException;
@@ -242,7 +243,8 @@ public class AddReminderCommand implements SlashCommandHandler {
      * @param unitString - repeat interval time unit of the reminder.
      * @return MessageCreateData - the message to be send back to user.
      */
-    public MessageCreateData buildReminderReceiptMessage(
+    @VisibleForTesting
+    MessageCreateData buildReminderReceiptMessage(
             String title,
             String reminderTimeString,
             Integer offset,
@@ -306,7 +308,8 @@ public class AddReminderCommand implements SlashCommandHandler {
      * @param now - time of execution
      * @return ZonedDateTime - the time of the next reminder message
      */
-    private ZonedDateTime getFirstReminderTime(
+    @VisibleForTesting
+    ZonedDateTime getFirstReminderTime(
             LocalTime reminderTimeActual,
             Integer delay,
             TimeUnit unit,
