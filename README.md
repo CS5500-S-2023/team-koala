@@ -2,14 +2,14 @@
 Koala Reminder is a discord chatbot that reminds discord users of their packages or events. Discord users can interact with the bot via commands.
 
 # Functionalities
-Reminds you of status updates of your packages via discord private messages.
+Reminds users of status updates of their packages via discord private messages.
 - Currently, this bot supports creating, updating, updating and deleting packages.
 - Once users have created packages with the bot, they will be notified daily (from 8:00 a.m. to 8:00 p.m. PST) if there are any updates.
     - Adaptability to users in time zones that is not PST is in the plan.
 
 
 
-Remind you of events via discord private messages
+Reminds users of events via discord private messages
 - Currently, this bot only supports creating reminders/events that repeats or don't repeat.
 - Timezone
 > Note: This documentation uses the word **reminder** interchagebaly with the word **event**.
@@ -19,12 +19,12 @@ Remind you of events via discord private messages
 ### `/add-package`
 - Options:
 
-    - tracking_number (required): the tracking number of your package.
+    - tracking_number (required): the tracking number of a package/shipment.
 
-    - name (optional): an alias for your package, strongly suggested for identifying your packages. 
-      - When our bot sends you updates about your packages, you can recognize your packages by name, otherwise by tracking number.
+    - name (optional): a name for the package, strongly suggested for identifying packages.
+      - When Koala Reminder bot sends users updates of their packages, they can easily recognize their packages by name, otherwise by tracking number.
 
-- Users will then be prompted to select the carrier of your package (input required).
+- Users will then be prompted to select the carrier of the package (input required).
     - Supported carriers:
 
         UPS, DHL, FedEx, USPS, LaserShip, China-post, China Ems International, GLS, Canada Post, Purolator
@@ -35,8 +35,8 @@ Remind you of events via discord private messages
         Feel free to suggest any carriers you want to include and we will respond to you if that carrier is supported.
 
 - Confirmation messages
-    - If the combination of the tracking number and carrier id is valid, users will receive a confirmation message indicating success. 
-    - Otherwise, users will receive a message indicating the failure of adding the package. 
+    - If the combination of the tracking number and carrier id is valid, users will receive a confirmation message indicating success.
+    - Otherwise, users will receive a message indicating the failure of adding the package.
 
 ### `/display-packages`
 - To see all packages with latest status that current users created
@@ -45,11 +45,10 @@ Remind you of events via discord private messages
 - Options:
     - package ID (required) to delete a specific package that current users have created
 - Confirmation messages:
-    - If 
+    - If
 
----
-## Reminder Commands
-We send you repeated / non-repeated messages of certain events you tell us about.
+
+# Reminder Commands
 ### `/add-reminder`
 - Options:
 
