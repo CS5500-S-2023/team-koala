@@ -2,8 +2,12 @@ package edu.northeastern.cs5500.starterbot.command.reminders;
 
 import static com.google.common.truth.Truth.assertThat;
 
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -12,6 +16,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.junit.jupiter.api.Test;
 
 class AddReminderCommandTest {
+    static final String TIME_ZONE = "America/Los_Angeles";
 
     static final List<OptionData> OPTIONS =
             Arrays.asList(
@@ -93,5 +98,44 @@ class AddReminderCommandTest {
         assertThat(fields.get(3).getValue()).isEqualTo(String.valueOf(DELAY));
         assertThat(fields.get(4).getValue()).isEqualTo(String.valueOf(INTERVAL));
         assertThat(fields.get(5).getValue()).isEqualTo(UNIT);
+
+        MessageCreateData messageWithNullValues =
+                addReminderCommand.buildReminderReceiptMessage(
+                        TITLE, REMINDER_TIME, OFFSET, DELAY, null, null);
+        embeds = messageWithNullValues.getEmbeds();
+        assertThat(embeds.size()).isEqualTo(1);
+
+        embed = embeds.get(0);
+        fields = embed.getFields();
+        assertThat(fields.size()).isEqualTo(4);
+        assertThat(fields.get(0).getValue()).isEqualTo(TITLE);
+        assertThat(fields.get(1).getValue()).isEqualTo(REMINDER_TIME);
+        assertThat(fields.get(2).getValue()).isEqualTo(String.valueOf(OFFSET));
+        assertThat(fields.get(3).getValue()).isEqualTo(String.valueOf(DELAY));
+    }
+
+    @Test
+    void testGetFirstReminderTime() {
+        AddReminderCommand addReminderCommand = new AddReminderCommand();
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of(TIME_ZONE));
+        now = now.withYear(2023).withMonth(4).withDayOfMonth(18).withHour(1).withMinute(0);
+
+        LocalTime reminderTime = LocalTime.of(0, 57);
+        Integer delay = 2;
+        TimeUnit unit = TimeUnit.HOURS;
+        Integer interval = 1;
+
+        ZonedDateTime withDelay =
+                addReminderCommand.getFirstReminderTime(reminderTime, delay, unit, interval, now);
+        assertThat(withDelay.getDayOfMonth()).isEqualTo(20);
+        assertThat(withDelay.getHour()).isEqualTo(0);
+        assertThat(withDelay.getMinute()).isEqualTo(57);
+
+        delay = 0;
+        ZonedDateTime withoutDelay =
+                addReminderCommand.getFirstReminderTime(reminderTime, delay, unit, interval, now);
+        assertThat(withoutDelay.getDayOfMonth()).isEqualTo(18);
+        assertThat(withoutDelay.getHour()).isEqualTo(1);
+        assertThat(withoutDelay.getMinute()).isEqualTo(57);
     }
 }
