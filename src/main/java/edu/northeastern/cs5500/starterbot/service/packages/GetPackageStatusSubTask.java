@@ -73,7 +73,11 @@ public class GetPackageStatusSubTask extends TimerTask {
             Package pkg = allPackages[i];
 
             String statusMessage = constructMessage(pkg);
+            // null means no updates
             if (statusMessage == null) continue;
+
+            // Update in database
+            trackPackageService.packageRepository.update(pkg);
 
             packageStatusMessages.putIfAbsent(pkg.getUserId(), new StringBuilder());
             packageStatusMessages.get(pkg.getUserId()).append(statusMessage + "\n");
