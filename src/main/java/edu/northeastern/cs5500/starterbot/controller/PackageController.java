@@ -68,7 +68,7 @@ public class PackageController {
             return validationResult;
         }
 
-        // write to database
+        // write to database with the package that has latest status
         try {
             packageRepository.add(package1);
         } catch (MongoException e) {

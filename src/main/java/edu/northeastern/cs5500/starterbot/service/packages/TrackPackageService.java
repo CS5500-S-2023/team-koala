@@ -82,7 +82,7 @@ public class TrackPackageService implements Service {
         String result = getData(REALTIME_URL, carrier_id, tracking_number);
         log.info(
                 String.format(
-                        "getPackageLatestStatus for package {}: {} ", package1.getId(), result));
+                        "getPackageLatestStatus for package %s", package1.getId()));
 
         // read the delivery updates
         readDeliveryResponse(result, package1);
@@ -102,7 +102,12 @@ public class TrackPackageService implements Service {
         log.info("readDeliveryResponse: got the delivery status of {}", package1.getId());
 
         Gson gson = new GsonBuilder().setDateFormat(DATE_FORMAT).create();
-        JsonObject response = gson.fromJson(result, JsonElement.class).getAsJsonObject();
+        JsonObject response = new JsonObject();
+        try {
+            response = gson.fromJson(result, JsonElement.class).getAsJsonObject();
+        } catch (NullPointerException e) {
+            log.error(String.format("readDeliveryResponse : %s and result is %s", e, result));
+        }
 
         int code = response.get("code").getAsInt();
         String message = response.get("message").getAsString();
