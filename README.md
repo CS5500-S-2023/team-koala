@@ -10,8 +10,8 @@ Reminds users of status updates of their packages via discord private messages.
 
 
 Reminds users of events via discord private messages
-- Currently, this bot only supports creating reminders/events that repeats or don't repeat.
-- Timezone
+- Currently, this bot only supports creating reminders/events that repeats or don't repeat. User facing delete functionality is not yet implemented. Regarding deleting / stopping the reminders please refer to details in [Reminder Commands](#reminder-commands) section below.
+- This bot supports reminders in all 24 time zones with the default time zone being GMT-7 (PDT).
 > Note: This documentation uses the word **reminder** interchagebaly with the word **event**.
 
 
@@ -80,8 +80,9 @@ Reminds users of events via discord private messages
 
 ### `/delete_reminder`
 - Coming soon... Developers please go to MongoDB to delete reminders.
-> Note: reminders with repeat intervals will repeat until they are deleted.
+> Note: reminders with repeat intervals will repeat until they are deleted.<br>If you don't want it anymore, delete it from the database, or if using our deployed version, ping the developers to delete it for you or you will be blessed with endless love from our bot 😘
 
+Find out more about the design decisions related to this feature [here](https://docs.google.com/document/d/1Chwb-RiiAHWGnp7b_wHYfwkcA4QZn1ouDYVdsjwNhBg/edit?usp=sharing)
 
 <br>
 
