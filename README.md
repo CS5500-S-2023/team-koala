@@ -109,6 +109,8 @@ export KEY_DELIVERY_API_KEY=<your_api_key>
 
 # Documentation
 - All documents related to this project can be found [here](https://drive.google.com/drive/folders/1KwwUDZ7SErRCVsoH6g6h0l3_oXPF8htD).
+- [Test coverage](https://docs.google.com/document/d/1SSd0cFggNsWBtrIKm-X0d1yxvv9Z705I0Zmhrh6CJxI/edit?usp=sharing)
+- [Future work & Improvement](https://docs.google.com/document/d/1gbyAg_fo3wLi9vyA04fN0BnJyelq-1aVXwh5wa0CTIY/edit?usp=sharing)
 
 <br>
 
