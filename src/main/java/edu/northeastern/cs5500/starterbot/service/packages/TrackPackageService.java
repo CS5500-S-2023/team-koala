@@ -107,6 +107,7 @@ public class TrackPackageService implements Service {
             response = gson.fromJson(result, JsonElement.class).getAsJsonObject();
         } catch (NullPointerException e) {
             log.error(String.format("readDeliveryResponse : %s and result is %s", e, result));
+            throw e;
         }
 
         int code = response.get("code").getAsInt();
