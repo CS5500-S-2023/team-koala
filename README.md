@@ -1,76 +1,94 @@
 # __Koala Reminder Bot__
+Koala Reminder is a discord chatbot that reminds discord users of their packages or events. Discord users can interact with the bot via commands.
 
-# Functionality
+# Functionalities
+Reminds you of status updates of your packages via discord private messages.
+- Currently, this bot supports creating, updating, updating and deleting packages.
+- Once users have created packages with the bot, they will be notified daily (from 8:00 a.m. to 8:00 p.m. PST) if there are any updates.
+    - Adaptability to users in time zones that is not PST is in the plan.
 
-## Package Status Update
-We sends you daily updates of packages you ask us to track.
-### Adding a Package
-- Use `/add-package` command and type in a tracking number and optionally a name for your package.
-    - Parameters:
 
-        tracking_number (required): the tracking number of your package.
 
-        name (optional): an alias for your package, strongly suggested for identifying your packages. <br>
-        &emsp; &emsp; &emsp; &emsp; &emsp; &emsp; &nbsp;When our bot sends you updates about your packages, you can recognize your packages by name, otherwise by tracking number.
+Remind you of events via discord private messages
+- Currently, this bot only supports creating reminders/events that repeats or don't repeat.
+- Timezone
+> Note: This documentation uses the word **reminder** interchagebaly with the word **event**.
 
-- You will then be prompted to select the carrier of your package (input required).
+
+# Pakcage Commands
+### `/add-package`
+- Options:
+
+    - tracking_number (required): the tracking number of your package.
+
+    - name (optional): an alias for your package, strongly suggested for identifying your packages. 
+      - When our bot sends you updates about your packages, you can recognize your packages by name, otherwise by tracking number.
+
+- Users will then be prompted to select the carrier of your package (input required).
     - Supported carriers:
 
         UPS, DHL, FedEx, USPS, LaserShip, China-post, China Ems International, GLS, Canada Post, Purolator
 
-        > Note:
-        The above 10 carriers are what we think are popular based on personal experiences and online searches.
-        For the current UI design, we can support at most 25 carriers. Feel free to suggest any carriers you want to include and we will respond to you if that carrier is supported.
+        > Note:<br>
+        The above 10 carriers are what we think are popular based on personal experiences and online searches.<br>
+        For the current UI design, we can support at most 25 carriers. <br>
+        Feel free to suggest any carriers you want to include and we will respond to you if that carrier is supported.
 
-If your tracking number or carrier id is valid, you will receive a confirmation message indicating success. <br>
-Otherwise, you will receive a message indicating the failure of adding the package. <br>
-You can expect the daily update messages sent during the daytime (8:00 a.m. - 8:00 p.m.) if you are in the PDT timezone.
+- Confirmation messages
+    - If the combination of the tracking number and carrier id is valid, users will receive a confirmation message indicating success. 
+    - Otherwise, users will receive a message indicating the failure of adding the package. 
 
-### Displaying your Packages
-- Use `/display-packages` command to see all your packages.
+### `/display-packages`
+- To see all packages with latest status that current users created
 
-### Deleting a Package
-- Use `/delete-package` command and type in your package ID to delete a specific package of yours.
+### `/delete-package`
+- Options:
+    - package ID (required) to delete a specific package that current users have created
+- Confirmation messages:
+    - If 
 
 ---
-## Getting Reminder Messages
+## Reminder Commands
 We send you repeated / non-repeated messages of certain events you tell us about.
-### Adding a reminder
-- Use `/add-reminder` command to add a reminder.
-    - Parameters:
+### `/add-reminder`
+- Options:
 
-        title (required): the title of the event you want to be reminded of.
+    - Required:
+        - title: the title of the event you want to be reminded of.
 
-        reminder-time (required): when the reminded event starts (hh:mm 24 hour clock format, 2 digit for hour and minute each; e.g. 14:00).
+        - reminder-time: when the reminded event starts (hh:mm 24 hour clock format, 2 digit for hour and minute each; e.g. 14:00).
 
-        reminder-offset (optional): how much earlier do you want us to remind you (in minutes, default: 0).
+    - Optional:
+        - reminder-offset: how much earlier do you want us to remind you (in minutes, default: 0).
 
-        time-zone (optional): time zone of the reminder, defaults to GMT-7 (PDT).
+        - time-zone: time zone of the reminder, defaults to GMT-7 (PDT).
 
-        delay (optional): how many days later do you expect the first reminder (default: 0).
+        - delay: how many days later do you expect the first reminder (default: 0).
 
-        interval-unit (optional): time unit of the repeat interval (no value by default = reminder does not repeat).
+        - interval-unit: time unit of the repeat - interval (no value by default = reminder does not repeat).
 
-        repeat-interval (optional): interval between 2 reminder messages (no value by default = reminder does not repeat).
-
+        - repeat-interval: interval between 2 reminder messages (no value by default = reminder does not repeat).
+        <br>
         > Note:
         interval-unit and repeat interval should both be specified to repeat your reminder, if only one of them is specified you
         will receive an error message.
 
-    After successfully adding a reminder, we will send back the reminder info you entered as a receipte and you can expect reminder message at the rate defined by specified interval-unit and repeat-interval.
+- Confirmation Messages
+    - After successfully adding a reminder, the bot will send back the reminder info users entered as a receipt.
 
-### Displaying your Reminders
+### `/display_reminder`
 - Coming soon... Developers please go to MongoDB to see the reminders.
 
-### Deleting a Reminder
+### `/deleted_reminder`
 - Coming soon... Developers please go to MongoDB to delete reminders.
+> Note: reminders with repeat intervals will repeat until they are deleted.
 
 
 <br>
 
 
 # Development
-This is a Gradle project written in Java 17. The project utilized Dagger framework for dependency injection, Discord JDA for Discord interaction and MongoDB for data storage. <br>
+This is a Gradle project written in Java 17. The project utilized Dagger framework for dependency injection, Discord JDA for Discord interaction and MongoDB for data storage. <br><br>
 The skeleton of this project is set up by @abl at this [repo](https://github.com/abl/bot) 👏
 ## Deploying this Project to a Bot Application on Discord
 - Please refer to this [link](https://www.xda-developers.com/how-to-create-discord-bot/) to create a bot application and generate bot tokens.
