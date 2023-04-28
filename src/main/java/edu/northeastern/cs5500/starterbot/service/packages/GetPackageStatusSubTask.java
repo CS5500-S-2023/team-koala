@@ -73,7 +73,11 @@ public class GetPackageStatusSubTask extends TimerTask {
             Package pkg = allPackages[i];
 
             String statusMessage = constructMessage(pkg);
+            // null means no updates
             if (statusMessage == null) continue;
+
+            // Update in database
+            trackPackageService.packageRepository.update(pkg);
 
             packageStatusMessages.putIfAbsent(pkg.getUserId(), new StringBuilder());
             packageStatusMessages.get(pkg.getUserId()).append(statusMessage + "\n");
@@ -128,11 +132,19 @@ public class GetPackageStatusSubTask extends TimerTask {
     private void sendMessage(String userId, String content) {
 
         jda.retrieveUserById(userId)
-                .queue(
-                        user -> {
-                            user.openPrivateChannel()
-                                    .flatMap(channel -> channel.sendMessage(content))
-                                    .queue();
+                .submit()
+                .whenCompleteAsync(
+                        (user, error) -> {
+                            if (error != null) {
+                                user.openPrivateChannel()
+                                        .flatMap(channel -> channel.sendMessage(content))
+                                        .complete();
+                            } else {
+                                log.error(
+                                        "This user {} may have block our bot or hasn't enable private messages",
+                                        userId,
+                                        error);
+                            }
                         });
         log.info("Package status updates have been sent to discord user " + userId);
     }

@@ -102,6 +102,26 @@ jacocoTestReport {
 // Check coverage after each test run
 check.dependsOn jacocoTestCoverageVerification
 
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.4
+            }
+
+            limit {
+                counter = 'BRANCH'
+                value = 'COVEREDRATIO'
+                minimum = 0.4
+            }
+        }
+
+    }
+}
+
 // Target Java 17 - make sure system.properties matches this as well
 sourceCompatibility = 1.17
 targetCompatibility = 1.17
