@@ -184,7 +184,7 @@ public class PackageController {
      * This method gets all the user's packages
      *
      * @param userId String that represents the user's discord id
-     * @return List<Package> the packages that the user owns
+     * @return a list of Packages - the packages that the user owns
      */
     @SneakyThrows
     public List<Package> getUsersPackages(String userId) {

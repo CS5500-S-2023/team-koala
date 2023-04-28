@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * This service handles interactions with third-party API KeyDelivery
  *
- * @see https://www.kd100.com/docs/keydelivery-api
+ * @see <a href="https://www.kd100.com/docs/keydelivery-api">KeyDelivery Dcoumentation</a>
  */
 @Singleton
 @Slf4j
@@ -160,7 +160,8 @@ public class TrackPackageService implements Service {
     }
 
     /**
-     * @see https://www.kd100.com/docs/create-tracking
+     * @see <a href="https://www.kd100.com/docs/create-tracking">KeyDelivery CreateTracking
+     *     Dcoumentation</a>
      */
     private String post(String param, String signature, String urlTarget) {
         StringBuffer response = new StringBuffer("");
@@ -219,7 +220,8 @@ public class TrackPackageService implements Service {
 }
 
 /**
- * @see https://www.kd100.com/docs/create-tracking
+ * @see <a href="https://www.kd100.com/docs/create-tracking">KeyDelivery CreateTracking
+ *     Dcoumentation</a>
  */
 class MD5Utils {
     private static MessageDigest mdigest = null;

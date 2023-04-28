@@ -26,8 +26,6 @@ public class ReminderEntryController {
      *
      * @param unitString - the string input specifying the repeat time unit
      * @return TimeUnit - the time unit in proper type
-     * @throws InvalidTimeUnitException - thrown when the input is not m (minute) / h (hour) / d
-     *     (day)
      */
     public static TimeUnit parseTimeUnit(String unitString) {
         TimeUnit unit = null;
@@ -53,12 +51,6 @@ public class ReminderEntryController {
     /**
      * Adds a new ReminderEntry with specified info to the database.
      *
-     * @param discordUserId - the user who added the reminder
-     * @param title - title of the reminder
-     * @param reminderTime - time of the reminder
-     * @param offset - how much earlier do the user wants to be reminded
-     * @param interval - the interval between 2 reminder messages if reminder repeats
-     * @param unit - the time unit of the repeat interval
      * @return ReminderEntry - the saved ReminderEntry.
      * @throws UnableToAddReminderException - when MongoDB fails to save reminder data.
      */
@@ -80,7 +72,7 @@ public class ReminderEntryController {
      * Returns all reminders for user specified by discordUserId.
      *
      * @param discordUserId - the specified user
-     * @return Collection<ReminderEntry> - all reminders for the specified user
+     * @return a collection of ReminderEntry - all reminders for the specified user
      */
     public Collection<ReminderEntry> getRemindersForUser(String discordUserId) {
         Collection<ReminderEntry> reminderEntries = reminderEntryRepository.getAll();

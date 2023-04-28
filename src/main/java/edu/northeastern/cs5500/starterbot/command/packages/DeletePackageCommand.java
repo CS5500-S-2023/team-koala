@@ -59,9 +59,6 @@ public class DeletePackageCommand implements SlashCommandHandler {
      * inputs are valid, else exceptions will be caught and a message will be printed.
      *
      * @param event - user's interaction by inputting a packageId
-     * @exception IllegalArgumentException caught if the packageId does not exist in the database
-     * @exception NotYourPackageException caught if the packageId is valid but does not belong to
-     *     the user
      */
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
