@@ -1,5 +1,5 @@
 # __Koala Reminder Bot__
-Koala Reminder is a discord chatbot that reminds discord users of their packages or events. Discord users can interact with the bot via commands.
+Koala Reminder is a discord chatbot that reminds discord users of their packages or events. Discord users need to interact with the bot via commands.
 
 # Functionalities
 Reminds users of status updates of their packages via discord private messages.
@@ -87,7 +87,7 @@ Reminds users of events via discord private messages
 
 
 # Development
-This is a Gradle project written in Java 17. The project utilized Dagger framework for dependency injection, Discord JDA for Discord interaction and MongoDB for data storage. <br><br>
+This is a Gradle project written in Java 17. The project utilizes Dagger framework for dependency injection, Discord JDA for Discord interaction and MongoDB for data storage, and a third-party service KeyDelivery for package tracking, running on fly.io. <br><br>
 The skeleton of this project is set up by @abl at this [repo](https://github.com/abl/bot) 👏
 ## Deploying this Project to a Bot Application on Discord
 - Please refer to this [link](https://www.xda-developers.com/how-to-create-discord-bot/) to create a bot application and generate bot tokens.
@@ -98,7 +98,14 @@ The skeleton of this project is set up by @abl at this [repo](https://github.com
 - Please refer to this [document](https://docs.google.com/document/d/1VnlAC4TKOfoEuJhqoeGt6jn3dgVf3ulPvvVPQkEQnFE/) to set up a connection string in MongoDB Atlas.
 - In the terminal, at the root path of the cloned project in your local environment / online codespace, do export MONGODB_URI=[your MongoDB connection string].
 
-<br>
+## Connecting to the third-party service - KeyDelivery
+- Please register an account on [KeyDelivery](https://www.kd100.com/docs/keydelivery-api)
+- After logging in, retrieve the unique SECRET and API_KEY. Then do export KEY_DELIVERY_API_SECRET=<your_secret> <br>
+export KEY_DELIVERY_API_KEY=<your_api_key>
+
+ ## Deploying on fly.io
+ - Please register an account on [fly.io](https://fly.io/), install [flyctl](https://fly.io/docs/hands-on/install-flyctl/), and refer to [this document](https://fly.io/docs/flyctl/apps/) to create an app
+ - Then refer to [API_TOKENS](https://fly.io/docs/app-guides/continuous-deployment-with-github-actions/#api-tokens-and-deployment) to create your deploy token to authorize your applications and do export FLY_API_TOKEN=<your_API_TOKEN>
 
 # Documentation
 - All documents related to this project can be found [here](https://drive.google.com/drive/folders/1KwwUDZ7SErRCVsoH6g6h0l3_oXPF8htD).
