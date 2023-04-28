@@ -228,7 +228,7 @@ public class AddReminderCommand implements SlashCommandHandler {
         // return reminder info in confirmation message to user
         MessageCreateData messageData =
                 buildReminderReceiptMessage(
-                        title, reminderTimeString, offset, delay, interval, unitString);
+                        title, reminderTimeString, offset, timeZone, delay, interval, unit);
         event.reply(messageData).queue();
     }
 
@@ -248,18 +248,21 @@ public class AddReminderCommand implements SlashCommandHandler {
             String title,
             String reminderTimeString,
             Integer offset,
+            String timeZone,
             Integer delay,
             Integer interval,
-            String unitString) {
+            TimeUnit unit) {
         List<MessageEmbed> embeds = new ArrayList<>();
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.addField("Title", title, false);
         embedBuilder.addField("Reminder Time", reminderTimeString, false);
-        embedBuilder.addField("Reminder Offset", String.valueOf(offset), false);
-        embedBuilder.addField("Delay", String.valueOf(delay), false);
+        embedBuilder.addField(
+                "Reminder Offset", String.format("%s minute(s)", String.valueOf(offset)), false);
+        embedBuilder.addField("Time Zone", timeZone, false);
+        embedBuilder.addField("Delay", String.format("%s day(s)", String.valueOf(delay)), false);
         if (interval != null) {
             embedBuilder.addField("Repeat Interval", String.valueOf(interval), false);
-            embedBuilder.addField("Repeat Interval Time Unit", unitString, false);
+            embedBuilder.addField("Repeat Interval Time Unit", String.valueOf(unit), false);
         }
         MessageEmbed embed = embedBuilder.build();
         embeds.add(embed);

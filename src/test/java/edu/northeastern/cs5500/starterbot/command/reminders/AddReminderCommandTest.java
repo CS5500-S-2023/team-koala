@@ -16,7 +16,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import org.junit.jupiter.api.Test;
 
 class AddReminderCommandTest {
-    static final String TIME_ZONE = "America/Los_Angeles";
+    static final String TIME_ZONE = "GMT-07:00";
 
     static final List<OptionData> OPTIONS =
             Arrays.asList(
@@ -61,7 +61,7 @@ class AddReminderCommandTest {
     static final Integer OFFSET = 5;
     static final Integer INTERVAL = 10;
     static final Integer DELAY = 1;
-    static final String UNIT = "h";
+    static final TimeUnit UNIT = TimeUnit.HOURS;
 
     @Test
     void testNameMatchesData() {
@@ -85,33 +85,39 @@ class AddReminderCommandTest {
         AddReminderCommand addReminderCommand = new AddReminderCommand();
         MessageCreateData message =
                 addReminderCommand.buildReminderReceiptMessage(
-                        TITLE, REMINDER_TIME, OFFSET, DELAY, INTERVAL, UNIT);
+                        TITLE, REMINDER_TIME, OFFSET, TIME_ZONE, DELAY, INTERVAL, UNIT);
         List<MessageEmbed> embeds = message.getEmbeds();
         assertThat(embeds.size()).isEqualTo(1);
 
         MessageEmbed embed = embeds.get(0);
         List<MessageEmbed.Field> fields = embed.getFields();
-        assertThat(fields.size()).isEqualTo(6);
+        assertThat(fields.size()).isEqualTo(7);
         assertThat(fields.get(0).getValue()).isEqualTo(TITLE);
         assertThat(fields.get(1).getValue()).isEqualTo(REMINDER_TIME);
-        assertThat(fields.get(2).getValue()).isEqualTo(String.valueOf(OFFSET));
-        assertThat(fields.get(3).getValue()).isEqualTo(String.valueOf(DELAY));
-        assertThat(fields.get(4).getValue()).isEqualTo(String.valueOf(INTERVAL));
-        assertThat(fields.get(5).getValue()).isEqualTo(UNIT);
+        assertThat(fields.get(2).getValue())
+                .isEqualTo(String.format("%s minute(s)", String.valueOf(OFFSET)));
+        assertThat(fields.get(3).getValue()).isEqualTo(TIME_ZONE);
+        assertThat(fields.get(4).getValue())
+                .isEqualTo(String.format("%s day(s)", String.valueOf(DELAY)));
+        assertThat(fields.get(5).getValue()).isEqualTo(String.valueOf(INTERVAL));
+        assertThat(fields.get(6).getValue()).isEqualTo(String.valueOf(UNIT));
 
         MessageCreateData messageWithNullValues =
                 addReminderCommand.buildReminderReceiptMessage(
-                        TITLE, REMINDER_TIME, OFFSET, DELAY, null, null);
+                        TITLE, REMINDER_TIME, OFFSET, TIME_ZONE, DELAY, null, null);
         embeds = messageWithNullValues.getEmbeds();
         assertThat(embeds.size()).isEqualTo(1);
 
         embed = embeds.get(0);
         fields = embed.getFields();
-        assertThat(fields.size()).isEqualTo(4);
+        assertThat(fields.size()).isEqualTo(5);
         assertThat(fields.get(0).getValue()).isEqualTo(TITLE);
         assertThat(fields.get(1).getValue()).isEqualTo(REMINDER_TIME);
-        assertThat(fields.get(2).getValue()).isEqualTo(String.valueOf(OFFSET));
-        assertThat(fields.get(3).getValue()).isEqualTo(String.valueOf(DELAY));
+        assertThat(fields.get(2).getValue())
+                .isEqualTo(String.format("%s minute(s)", String.valueOf(OFFSET)));
+        assertThat(fields.get(3).getValue()).isEqualTo(TIME_ZONE);
+        assertThat(fields.get(4).getValue())
+                .isEqualTo(String.format("%s day(s)", String.valueOf(DELAY)));
     }
 
     @Test
