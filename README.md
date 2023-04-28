@@ -78,7 +78,7 @@ Reminds users of events via discord private messages
 ### `/display_reminder`
 - Coming soon... Developers please go to MongoDB to see the reminders.
 
-### `/deleted_reminder`
+### `/delete_reminder`
 - Coming soon... Developers please go to MongoDB to delete reminders.
 > Note: reminders with repeat intervals will repeat until they are deleted.
 
@@ -109,8 +109,10 @@ export KEY_DELIVERY_API_KEY=<your_api_key>
 
 # Documentation
 - All documents related to this project can be found [here](https://drive.google.com/drive/folders/1KwwUDZ7SErRCVsoH6g6h0l3_oXPF8htD).
+- [Initial Design](https://docs.google.com/document/d/1ZgdpBscUf6FoKca9pQKqD_rYdXiLibfzId_-MMShRhw/edit?usp=sharing) and [decisions](https://drive.google.com/drive/folders/1rSHJKEkgYdzEcGHBGkIuOK1fCH0dQ5Cl?usp=share_link)
 - [Test coverage](https://docs.google.com/document/d/1SSd0cFggNsWBtrIKm-X0d1yxvv9Z705I0Zmhrh6CJxI/edit?usp=sharing)
 - [Future work & Improvement](https://docs.google.com/document/d/1gbyAg_fo3wLi9vyA04fN0BnJyelq-1aVXwh5wa0CTIY/edit?usp=sharing)
+- Javadoc
 
 <br>
 
