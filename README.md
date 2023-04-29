@@ -113,9 +113,10 @@ export KEY_DELIVERY_API_KEY=<your_api_key>
 - [Initial Design](https://docs.google.com/document/d/1ZgdpBscUf6FoKca9pQKqD_rYdXiLibfzId_-MMShRhw/edit?usp=sharing) and [decisions](https://drive.google.com/drive/folders/1rSHJKEkgYdzEcGHBGkIuOK1fCH0dQ5Cl?usp=share_link)
 - [Test coverage](https://docs.google.com/document/d/1SSd0cFggNsWBtrIKm-X0d1yxvv9Z705I0Zmhrh6CJxI/edit?usp=sharing)
 - [Future work & Improvement](https://docs.google.com/document/d/1gbyAg_fo3wLi9vyA04fN0BnJyelq-1aVXwh5wa0CTIY/edit?usp=sharing)
-- Javadoc
+- Javadoc generation task has been created in build.gradle. Please do ./gradlew javadoc to see the Javadoc
 
 <br>
 
-# Invitation Link
+# Invitation and Youtube Link
 - Join our [server](https://discord.com/api/oauth2/authorize?client_id=1079155253699686490&permissions=0&scope=bot) and play with our bot! 🥳
+- Check out the [demo](https://www.youtube.com/watch?v=0iAOVqx_JKg) about our bot!
