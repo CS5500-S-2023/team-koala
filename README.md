@@ -16,7 +16,7 @@ Reminds users of events via discord private messages
 
 
 # Pakcage Commands
-### `/add-package`
+### `/add_package`
 - Options:
 
     - tracking_number (required): the tracking number of a package/shipment.
@@ -35,23 +35,43 @@ Reminds users of events via discord private messages
         Feel free to suggest any carriers you want to include and we will respond to you if that carrier is supported.
 
 - Confirmation messages
-    - If the combination of the tracking number and carrier id is valid, users will receive a confirmation message indicating success.
-    - Otherwise, users will receive a message indicating the failure of adding the package.
-
-### `/display-packages`
+    - Upon successful update of a valid package(please check the following note), users will receive a confirmation message.
+    - Otherwise, users will receive a useful message indicating possible cause and the failure of adding the package.
+>Note: <br>
+This documentation refers a valid package to a real package with the correct and existent tracking number and the corresponding carrier id.
+### `/display_packages`
 - To see all packages with latest status that current users created
 
-### `/delete-package`
+### `/delete_package`
 - Options:
-    - package ID (required) to delete a specific package that current users have created
+    - Required
+        - package_id - the package id which users can find via `/display_packages`
 - Confirmation messages:
-    - If
+    - Upon successful deletion of a package, users will receivea a confirmation message indicating success.
+    - Otherwise, they will receive a useful message indicating possible cause and the failure of deleting the package.
+>Note <br>
+Users can only delete packages that are created by themselves and exist in our database.
 
+### `/update_package`
+- Options:
+    - Required:
+        - package_id - the package id which users can find via `/display_packages`
+    - Optional:
+        - package_name - the package name users want to update to
+        - tracking_number - the new tracking number users want to update to
+        - carrier_id  - the carrier id users want to update to
+            - supported 10 carrier ids:
+                - ups, dhl, fedex, usps, lasership, cpcbe, gls, canada_post, purolator, china_ems_international
+- Confirmation messages:
+    - Upon successful update of a package, users will receivea a confirmation message indicating success.
+    - Otherwise, they will receive a useful message indicating possible cause and the failure of updating the package.
+>Note <br>
+Users can only update packages that are created by themselves and exist in our database.<br>
+Users can only update the current package to another valid package.
 
 # Reminder Commands
 ### `/add-reminder`
 - Options:
-
     - Required:
         - title: the title of the event you want to be reminded of.
 
