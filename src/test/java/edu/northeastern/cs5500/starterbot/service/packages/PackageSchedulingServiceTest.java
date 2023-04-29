@@ -18,7 +18,6 @@ public class PackageSchedulingServiceTest {
         Calendar currTime = Calendar.getInstance(PackageSchedulingService.time_zone);
         currTime.set(Calendar.HOUR_OF_DAY, 7);
         currTime.set(Calendar.MINUTE, 0);
-        currTime.set(Calendar.SECOND, 0);
         int currDay = currTime.get(Calendar.DAY_OF_YEAR);
 
         // check the expected day and hour
@@ -33,7 +32,6 @@ public class PackageSchedulingServiceTest {
         Calendar currTime = Calendar.getInstance(PackageSchedulingService.time_zone);
         currTime.set(Calendar.HOUR_OF_DAY, 11);
         currTime.set(Calendar.MINUTE, 0);
-        currTime.set(Calendar.SECOND, 0);
         int currDay = currTime.get(Calendar.DAY_OF_YEAR);
 
         // check the expected day and hour
