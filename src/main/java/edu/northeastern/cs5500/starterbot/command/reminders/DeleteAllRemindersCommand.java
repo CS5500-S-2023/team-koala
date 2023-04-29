@@ -57,6 +57,6 @@ public class DeleteAllRemindersCommand implements SlashCommandHandler {
 
         reminderEntryController.deleteAllReminders();
 
-        event.reply("All reminders has been successfully deleted!");
+        event.reply("All reminders has been successfully deleted!").queue();
     }
 }

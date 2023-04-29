@@ -8,6 +8,7 @@ import edu.northeastern.cs5500.starterbot.command.packages.DeletePackageCommand;
 import edu.northeastern.cs5500.starterbot.command.packages.DisplayPackagesCommand;
 import edu.northeastern.cs5500.starterbot.command.packages.UpdatePackageCommand;
 import edu.northeastern.cs5500.starterbot.command.reminders.AddReminderCommand;
+import edu.northeastern.cs5500.starterbot.command.reminders.DeleteAllRemindersCommand;
 
 @Module
 public class CommandModule {
@@ -50,5 +51,12 @@ public class CommandModule {
     @IntoSet
     public SlashCommandHandler addReminderCommand(AddReminderCommand addReminderCommand) {
         return addReminderCommand;
+    }
+
+    @Provides
+    @IntoSet
+    public SlashCommandHandler deleteAllReminderCommand(
+            DeleteAllRemindersCommand deleteAllReminderCommand) {
+        return deleteAllReminderCommand;
     }
 }
