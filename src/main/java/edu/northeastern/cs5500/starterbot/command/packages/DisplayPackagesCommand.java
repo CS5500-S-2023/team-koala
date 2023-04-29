@@ -5,6 +5,7 @@ import edu.northeastern.cs5500.starterbot.controller.PackageController;
 import edu.northeastern.cs5500.starterbot.model.Package;
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
@@ -84,15 +85,30 @@ public class DisplayPackagesCommand implements SlashCommandHandler {
     protected MessageEmbed createPackageMessage(Package p) {
         EmbedBuilder eb = new EmbedBuilder().setColor(Color.white);
         eb.addField("Package Id: ", p.getId().toString(), true);
-        eb.addField("Package Name: ", p.getName(), true);
+        eb.addField("Package Name: ", displayPackageName(p.getName()), true);
         eb.addBlankField(true);
-        eb.addField("Carrier: ", p.getCarrierId().toUpperCase(), true);
+        eb.addField("Carrier: ", p.getCarrierId(), true);
         eb.addField("Tracking Number: ", p.getTrackingNumber(), true);
         eb.addBlankField(true);
-        eb.addField("Status: ", p.getStatus(), true);
-        eb.addField("ETA: ", p.getStatusTime().toString(), true);
+        eb.addField("Status: ", displayStatus(p.getStatus()), true);
+        eb.addField("ETA: ", displayStatusTime(p.getStatusTime()), true);
         eb.addBlankField(true);
         eb.addBlankField(false);
         return eb.build();
+    }
+
+    private String displayPackageName(String name) {
+        if (name == null) return UNKNOWN;
+        return name;
+    }
+
+    private String displayStatus(String status) {
+        if (status == null) return UNKNOWN;
+        return status;
+    }
+
+    private String displayStatusTime(Date statusTime) {
+        if (statusTime == null) return UNKNOWN;
+        return statusTime.toString();
     }
 }
