@@ -15,6 +15,16 @@ plugins {
     id "com.diffplug.spotless"
 }
 
+task javadocs(type: Javadoc) {
+    source sourceSets.main.allJava
+    destinationDir = new File(buildDir, "docs")
+    classpath = sourceSets.main.compileClasspath
+    failOnError = false
+    excludes = ['**/generated/**']
+    options.addStringOption('encoding', 'UTF-8')
+    options.addStringOption('charSet', 'UTF-8')
+}
+
 repositories {
     mavenCentral()
     jcenter()

@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 
 @Slf4j
-/** PackageSchedulingService is in charge of schedule tasks to send package updates to users */
+/** This service is in charge of schedule tasks to send package updates to users */
 public class PackageSchedulingService implements Service {
 
     public static final int STARTING_HOUR = 8; // 24-hour clock

@@ -40,11 +40,7 @@ public class ReminderSchedulingService implements Service {
         }
     }
 
-    /**
-     * Restart the messages for exsiting reminders in the nearest future compared to now.
-     *
-     * @param now - time of execution / initialization.
-     */
+    /** Restart the messages for exsiting reminders in the nearest future compared to now. */
     public void initializeReminders() {
         ReminderEntry[] allReminders =
                 reminderEntryController.getAllReminders().toArray(new ReminderEntry[0]);

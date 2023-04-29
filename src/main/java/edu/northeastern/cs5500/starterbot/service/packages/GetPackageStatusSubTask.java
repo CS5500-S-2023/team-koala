@@ -12,8 +12,8 @@ import lombok.extern.slf4j.Slf4j;
 import net.dv8tion.jda.api.JDA;
 
 /**
- * GetPackageStatusSubTask is a timer task that get package latest status and notify discord users
- * in a private discord channel when there are updates
+ * This class is a timer task that get package latest status and notify discord users in a private
+ * discord channel when there are updates
  */
 @Slf4j
 public class GetPackageStatusSubTask extends TimerTask {
@@ -29,11 +29,11 @@ public class GetPackageStatusSubTask extends TimerTask {
      * of multiple sub-tasks
      *
      * @param jda - represents a connection to discord
-     * @param trackPackageService
-     * @param allPackages
-     * @param startIdx
-     * @param endIdx
-     * @param taskId
+     * @param trackPackageService - TrackPackageService
+     * @param allPackages - all packages in database as an array
+     * @param startIdx - the starting index in the allPackages array(inclusive)
+     * @param endIdx - the ending index in the allPackages array(exclusive)
+     * @param taskId - task number
      */
     public GetPackageStatusSubTask(
             JDA jda,
@@ -92,7 +92,7 @@ public class GetPackageStatusSubTask extends TimerTask {
     /**
      * Contruct a message of updated status for this package
      *
-     * @param pkg
+     * @param pkg - provided package object
      * @return null if no updates; a message string if having updates
      */
     @VisibleForTesting

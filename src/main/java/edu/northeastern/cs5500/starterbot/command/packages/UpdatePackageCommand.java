@@ -78,11 +78,6 @@ public class UpdatePackageCommand implements SlashCommandHandler {
      *
      * @param event - user's interaction by inputting a packageId, and optional name, tracking
      *     number, and carrier id
-     * @exception IllegalArgumentException caught if the packageId does not exist in the database
-     * @exception NotYourPackageException caught if the packageId is valid but does not belong to
-     *     the user
-     * @exception PackageNotExistException caught if the package carrier and tracking number
-     *     combination are not a correct
      */
     @Override
     public void onSlashCommandInteraction(@Nonnull SlashCommandInteractionEvent event) {
