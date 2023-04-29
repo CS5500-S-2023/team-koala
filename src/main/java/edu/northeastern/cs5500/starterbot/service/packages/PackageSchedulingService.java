@@ -30,6 +30,8 @@ public class PackageSchedulingService implements Service {
     /**
      * Read starting hour from environment variables to make it flexible for developers
      *
+     * <p>If environmental variable is not a valid integer, the default hour will be used.
+     *
      * @return the starting hour for daily task
      */
     static int getStartingHour() {
@@ -51,6 +53,8 @@ public class PackageSchedulingService implements Service {
 
     /**
      * Read starting minute from environment variables to make it flexible for developers
+     *
+     * <p>If environmental variable is not a valid integer, the default minute will be used.
      *
      * @return the starting minute for daily task
      */
