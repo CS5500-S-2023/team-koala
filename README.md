@@ -101,7 +101,7 @@ Users can only update the current package to another valid package.
 
 ### `/delete_reminder`
 - Coming soon... Developers please go to MongoDB to delete reminders.
-> Note: reminders with repeat intervals will repeat until they are deleted.<br>If you don't want it anymore, delete it from the database, or if using our deployed version, ping the developers to delete it for you or you will be blessed with endless love from our bot 😘
+> Note: reminders with repeat intervals will repeat until they are deleted.<br>If you don't want it anymore, delete it from the database, or if using our deployed version, use the `\delete_all_reminders` command, which is a temporary command to make testing easier.
 
 Find out more about the design decisions related to this feature [here](https://docs.google.com/document/d/1Chwb-RiiAHWGnp7b_wHYfwkcA4QZn1ouDYVdsjwNhBg/edit?usp=sharing)
 
