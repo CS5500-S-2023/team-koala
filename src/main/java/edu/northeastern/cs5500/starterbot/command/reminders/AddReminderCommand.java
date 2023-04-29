@@ -72,7 +72,7 @@ public class AddReminderCommand implements SlashCommandHandler {
     @Override
     @Nonnull
     public String getName() {
-        return "add-reminder";
+        return "add_reminder";
     }
 
     /**

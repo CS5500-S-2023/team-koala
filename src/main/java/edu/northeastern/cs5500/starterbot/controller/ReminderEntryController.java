@@ -126,4 +126,12 @@ public class ReminderEntryController {
         reminder.setNextReminderTime(nextReminderTime);
         reminderEntryRepository.update(reminder);
     }
+
+    /** Deletes all reminders in the database. */
+    public void deleteAllReminders() {
+        Collection<ReminderEntry> reminderEntries = reminderEntryRepository.getAll();
+        for (ReminderEntry entry : reminderEntries) {
+            deleteReminder(entry.getId().toString());
+        }
+    }
 }
