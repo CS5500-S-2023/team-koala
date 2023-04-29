@@ -5,7 +5,8 @@ Koala Reminder is a discord chatbot that reminds discord users of their packages
 Reminds users of status updates of their packages via discord private messages.
 - Currently, this bot supports creating, updating, updating and deleting packages.
 - Once users have created packages with the bot, they will be notified daily (from 8:00 a.m. to 8:00 p.m. PST) if there are any updates.
-    - Adaptability to users in time zones that is not PST is in the plan.
+    - The bot only sends daily notifications of packages that are created before 8:00 a.m. PST that day. If users create packages after this time, they should expect notifications starting next day if there are any updates.
+    - Adaptability to users in other time zones that are not PST is in the plan.
 
 
 
@@ -127,6 +128,10 @@ export KEY_DELIVERY_API_KEY=<your_api_key>
  ## Deploying on fly.io
  - Please register an account on [fly.io](https://fly.io/), install [flyctl](https://fly.io/docs/hands-on/install-flyctl/), and refer to [this document](https://fly.io/docs/flyctl/apps/) to create an app
  - Then refer to [API_TOKENS](https://fly.io/docs/app-guides/continuous-deployment-with-github-actions/#api-tokens-and-deployment) to create your deploy token to authorize your applications and do export FLY_API_TOKEN=<your_API_TOKEN>
+
+### Setting starting time for daily tasks to retrieve package status
+- The default starting hour is 8 and starting minute is 0.
+- Please do flyctl secrets set or export PACKAGE_SCHEDULING_DAILY_TASK_STARTING_HOUR=<your_starting_hour> PACKAGE_SCHEDULING_DAILY_TASK_STARTING_MINUTE<your_starting_minute>
 
 # Documentation
 - All documents related to this project can be found [here](https://drive.google.com/drive/folders/1KwwUDZ7SErRCVsoH6g6h0l3_oXPF8htD).
