@@ -42,7 +42,7 @@ public class DisplayPackagesCommandTest {
         eb.addField("Package Id: ", "00000020f51bb4362eee2a4d", true);
         eb.addField("Package Name: ", "first pacakge", true);
         eb.addBlankField(true);
-        eb.addField("Carrier: ", "UPS", true);
+        eb.addField("Carrier: ", "ups", true);
         eb.addField("Tracking Number: ", "1Z9A170W0337231977", true);
         eb.addBlankField(true);
         eb.addField("Status: ", "[SEATTLE, WA, US]DELIVERED", true);
